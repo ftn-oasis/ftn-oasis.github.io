@@ -310,7 +310,12 @@ y=auto を明示するショートハンド) としています — 片方の軸
     見える不具合になるため付けていません — `IconButton` 自体が `min-width: var(--control-size)`
     を持つので, `.center` はその最小幅を自然に尊重させる必要があります.
 - 検索ボタンの横幅上限は `IconButton.module.css` の `.stretch` で
-  `max-width: calc(var(--control-size) * 4)` (140px) としています.
+  `max-width: calc(var(--control-size) * 4)` (140px) としています. `.center` 自体には
+  max-width を付けていません — 以前は `max-width: 720px` を付けていましたが, ウィンドウ幅が
+  それを超えると `.center` の伸長がそこで頭打ちになり, 余った幅は `.right` の
+  `margin-left: auto` に吸われて `.center`/`.right` の間に隙間ができ, 検索バーが画面中央
+  付近に取り残されて見える不具合になっていました. 検索ボタン自身が `.stretch` の 140px
+  で頭打ちになるため, `.center` 側で重ねて上限を設ける必要はありません.
 
 ## プロフィールページのタブ (`ProfileTabs`)
 
