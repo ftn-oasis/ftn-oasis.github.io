@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 最適化済中間生成物
+emblems/optimized/
+
+# 個人的な作業メモ (指示のログなど)
+/Prompts.md

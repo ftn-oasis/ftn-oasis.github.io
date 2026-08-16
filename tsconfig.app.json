@@ -20,7 +20,14 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* 絶対パス化 */
+    "baseUrl": ".",          // プロジェクトのルートディレクトリを package.json のあるこの階層に設定
+    "paths": {
+      "@/*": ["./*"],        // プロジェクトルート以下で '@/MyModule' というパスを書いた場合, './Mymodule' というパスに変換されるように設定
+      "@src/*": ["./src/*"]  // プロジェクトルート以下で '@src/MyModule' というパスを書いた場合, './src/Mymodule' というパスに変換されるように設定
+    }
   },
   "include": ["src"]
 }

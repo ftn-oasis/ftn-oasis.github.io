@@ -4,17 +4,21 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "emblems": "svgo -f emblems/exported -o emblems/optimized && node scripts/build-sprite.mjs",
+    "dev": "npm run emblems && vite",
+    "build": "npm run emblems && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-router": "^8.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@tabler/icons-react": "^3.46.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
@@ -23,8 +27,14 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "png-to-ico": "^3.0.2",
+    "svgo": "^4.0.2",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.65.0",
-    "vite": "^8.2.0"
+    "vite": "^8.2.0",
+    "vite-tsconfig-paths": "^6.1.1"
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": true
   }
 }
