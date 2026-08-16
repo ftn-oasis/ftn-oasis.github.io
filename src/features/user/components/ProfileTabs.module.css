@@ -7,13 +7,13 @@
 }
 
 .tab {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 10px 12px;
   margin: 6px 0;
   border: none;
-  border-bottom: 2px solid transparent;
   border-radius: 8px;
   background: transparent;
   color: var(--color-header-body);
@@ -31,10 +31,22 @@
   outline-offset: -2px;
 }
 
+/* 選択中を示す下線. ボタン自身の border ではなく, ボタンの margin (6px) の外側
+   = .root の border-bottom と同じ高さまで伸ばした疑似要素として独立させることで,
+   ヘッダー下部の線 (.root の border-bottom) に沿って表示されるようにしている */
+.selected::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  left: 0;
+  height: 2px;
+  background: var(--color-link);
+}
+
 .selected {
   color: var(--color-header-body-em);
   font-weight: 700;
-  border-bottom-color: var(--color-link);
 }
 
 .count {
