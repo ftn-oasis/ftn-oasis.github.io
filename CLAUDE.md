@@ -142,7 +142,8 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   テーマ以外のグローバルスタイルを追加する場合の置き場として空けてあるので, テーマの内容は
   `theme.css` に足してください. 新しい部品の色は極力これらのカスタムプロパティを参照してください —
   **定義済みだが未使用のトークンが無いか確認してから新しい色を決めてください**
-  (`--color-header-logo`/`--color-header-body-em` はこうして見つかった例です). `theme.css` は
+  (`--color-header-logo`/`--color-header-body-em`/`--color-current-content-bar`
+  (`MenuLink` の `.active` の左脇の線) はこうして見つかった例です). `theme.css` は
   `:root`/`[data-theme="light"]` (既定) と `[data-theme="dark"]` の2ブロックで構成され,
   後者は前者と同じトークン名を Mocha パレットで1:1に上書きする完全なミラーです — 新しいトークンは
   必ず両方のブロックに追加してください (片方だけだとテーマ切り替え時にそこだけ色が変わらず残ります).
@@ -232,9 +233,14 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 `MenuLink` (`src/components/ui/MenuLink.tsx`) はこの土台の上にアイコン+可視ラベルを乗せた
 リンクです. `to` が `/^https?:\/\//` にマッチすれば `<a href>` (外部リンク), それ以外は
-`react-router` の `<Link>` として描画します — `<Link>` はフルの外部URLを渡しても正しく機能しない
-(パスとして解釈される) ため使い分けています. `onClick?: () => void` は任意で, ポップオーバー/
-ドロワーを閉じる目的で使います.
+`react-router` の `<NavLink to={...} end>` として描画します — `<Link>` ではなく `<NavLink>`
+なのは, 現在のパスと `to` が一致する項目に `.active` (menuItemBase 側で定義,
+hover と同じ背景 + `box-shadow: inset` の左脇の太い青線 `--color-current-content-bar`)
+を自動付与するためです. `end` を付けているのは, 付けないと `to="/"` が常にどのパスでも
+一致してしまう (NavLink は既定でプレフィックス一致) ためで, 現状ネストしたサブページが
+無いこととも合わせ, 完全一致で揃えています. 外部リンク (`<a href>`) 側は URL
+がそもそも現在のパスと一致し得ないため `.active` の対象外です. `onClick?: () => void`
+は任意で, ポップオーバー/ドロワーを閉じる目的で使います.
 
 `icon`+`label` の定型に収まらない行 (`NavDrawer` の「問題を報告」ボタン, `UserMenuButton` の
 プロフィール行) は `MenuLink` を使わず `menuItemBase.root` を直接 `<button>`/`<Link>` に適用して

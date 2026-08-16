@@ -1,6 +1,6 @@
 import type { TablerIcon } from "@tabler/icons-react";
 import clsx from "clsx";
-import { Link } from "react-router";
+import { NavLink } from "react-router";
 
 import { Icon } from "./Icon";
 
@@ -35,9 +35,16 @@ function MenuLink({ to, label, icon, onClick, className }: MenuLinkProps) {
   }
 
   return (
-    <Link to={to} onClick={onClick} className={clsx(styles.root, className)}>
+    <NavLink
+      to={to}
+      end
+      onClick={onClick}
+      className={({ isActive }) =>
+        clsx(styles.root, isActive && styles.active, className)
+      }
+    >
       {content}
-    </Link>
+    </NavLink>
   );
 }
 
