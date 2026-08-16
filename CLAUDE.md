@@ -17,18 +17,28 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 - テーマシステム (`ThemeContext`) — ライト/ダーク (Catppuccin Latte/Mocha) を OS
   の設定から自動検出し, 手動切り替えにも対応.
 - `NavDrawer` — 左からスライドインするメニュー (ホーム/各種申請/規則等/組織など).
+- ルーティングの土台と最初のページ — `App.tsx` に `<Routes>` を導入し, `AppLayout`
+  (`Header` + `<Outlet />`, 全ページ共通) 配下に `/:userId` → `UserProfilePage`
+  (`src/pages/`) を実装済みです. `currentUser.id` と一致しない `userId`
+  (未知のユーザーや `/issues` のような他機能の予約パスなど) は「ユーザーが見つかりません」
+  という結果になります — 実際のユーザー検索/存在チェックの API が無いための暫定挙動です.
+  `UserProfilePage` はアバター+ユーザー名と `ProfileTabs` を表示するのみで,
+  タブごとの本文切り替えはまだ実装していません.
 
 現状できていないこと (着手する際は要確認):
 
-- ルーティング/ページ本体 — `BrowserRouter` は導入済みですが `<Routes>` 定義が無く, `src/pages/`
-  も空です. `App.tsx` は現状 `<Header />` のみを描画しています. Header/Drawer
-  内のリンクはすべて「まだページが存在しない」状態です. 最初にメインページ (User Profile 等)
-  を作る際は, まずルート定義を通す必要があります. URL の命名は既存のリンク (`getBreadcrumb.ts` の
-  `SPECIAL_ROOT_LABELS`, `src/lib/currentUser.ts` の `/${currentUser.id}` など) と揃えてください.
+- **上記以外のページ**は依然として存在しません. Header/Drawer 内のリンク先の大半は
+  「まだページが存在しない」状態です. 新しいページを作る際, URL の命名は既存のリンク
+  (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など) と揃えてください. `/:userId`
+  という動的ルートが既に存在するため, 新しいトップレベルのページ (`/foo` 等) を追加する場合は
+  それより**前**に `<Route>` を並べてください — でないと `/:userId` に飲み込まれます
+  (`/issues` などが「ユーザーが見つかりません」と表示されるのはこのためで, 実際に `/issues`
+  ページを作る際に解消します).
 - 認証/バックエンド — 存在しません. `src/lib/currentUser.ts` に仮のユーザー情報
-  (`id`/`name`/`email`) を置いているだけです.
+  (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書/栞の件数も
+  ダミーの数値です (`DUMMY_DOCUMENT_COUNT`/`DUMMY_BOOKMARK_COUNT`).
 - テストスイート — 設定されていません.
-- `src/` 内の一部ファイルは空のスタブです (例: `AppLayout.tsx`, `SearchBar.tsx`). import
+- `src/` 内の一部ファイルは空のスタブです (例: `SearchBar.tsx`). import
   されているからといって中身があるとは限らないので, 必ず内容を確認してください.
 
 ## コマンド
@@ -115,11 +125,13 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   - `ui/` — `Button`/`Avatar`/`IconLink`/`IconButton`/`MenuLink`/`Divider` などの原子的な部品と,
     それらが共有するフック (`useTooltipAlign`, `useDismissablePopover`, `useEscapeKey`).
   - `layout/` — `Header` とその内部部品 (`Breadcrumb`, `PrimaryNavLinks`,
-    `useHeaderResponsiveLayout`, `getBreadcrumb`), `AppLayout` (まだ空).
-- `src/features/<feature>/` — 機能ごとにまとまったコード. 現状 `features/navigation/`
-  (`MenuButton`, `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`) と
-  `features/profile/` (`ProfileTabs`) が存在.
-- `src/pages/` — ルートと1対1で対応するコンポーネント (まだ未実装).
+    `useHeaderResponsiveLayout`, `getBreadcrumb`), 全ページ共通の `AppLayout`
+    (`Header` + `<Outlet />`).
+- `src/features/<feature>/` — 機能ごとにまとまったコード. 現状 `features/navigation/` (`MenuButton`,
+  `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`) と `features/profile/`
+  (`ProfileTabs`) が存在.
+- `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
+  (`/:userId`) のみ存在.
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
 - コンポーネントのスタイルは CSS Modules をコンポーネントと同じ場所に配置する方式です (`Foo.tsx` +
   `Foo.module.css`), `clsx` で合成します.
@@ -303,8 +315,8 @@ y=auto を明示するショートハンド) としています — 片方の軸
 
 `src/features/profile/ProfileTabs.tsx` は GitHub の User Profile ページを参考にした,
 プロフィールページ下部 (アバターやユーザー名などのプロフィール情報の下) に置くタブバーです.
-グローバルヘッダー (`Header.tsx`) とは別物で, プロフィールページ本体がまだ無いため
-現状はどこからも呼び出されていません.
+グローバルヘッダー (`Header.tsx`) とは別物です. `src/pages/UserProfilePage.tsx`
+(`/:userId`) から呼び出されています.
 
 - `documentCount`/`bookmarkCount` prop (件数) が 0 または未指定の場合, 「文書」「栞」タブ
   自体を描画しません — 「概要」タブは常に表示されます. 件数はまだ実データが無いため,
@@ -312,13 +324,19 @@ y=auto を明示するショートハンド) としています — 片方の軸
 - 選択中のタブは `border-bottom` (`--color-link`) と `font-weight: 700` で強調し,
   それ以外はレギュラーのままにします. ホバー時は `menuItemBase` の行と同じ背景色
   (`--color-header-button-hover`) のみで示し, 独自の box-shadow などは使っていません.
-  `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです
-  (コンテナは `<nav>` ではなく `<div role="tablist">` — `<nav>` は landmark role のため
-  `tablist` role と併用できません).
-- 選択状態は内部の `useState` で完結しており, 実際のページ本文の切り替えとはまだ
-  接続されていません (`onChange` prop はあるが呼び出し元が無い). ルーティングを実装し
-  プロフィールページ本体を作る際に, 選択されたタブに応じて表示するコンテンツを
-  切り替える処理と接続してください.
+  `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです (コンテナは
+  `<nav>` ではなく `<div role="tablist">` — `<nav>` は landmark role のため `tablist` role
+  と併用できません).
+- 選択状態は内部の `useState` で完結しており, 実際のページ本文の切り替えとはまだ接続されていません
+  (`onChange` prop はあるが `UserProfilePage` からは渡していません — 今のところタブを切り替えても
+  「概要」の本文が表示され続けます). タブごとの本文を実装する際に接続してください.
+
+`src/pages/UserProfilePage.tsx` (`/:userId`) はアバター (`size="large"`, 300px) + ユーザー名 +
+`ProfileTabs` を表示します. `useParams()` で取った `userId` が `currentUser.id`
+と一致しない場合は「ユーザーが見つかりません」を表示します — 他ユーザーの実データが無いための
+暫定挙動で, 同時に `/issues` のような (まだページの無い) 他機能の予約パスが誤って
+プロフィールページとして表示されてしまうのも防いでいます (詳細は「プロジェクトについて」の
+「現状できていないこと」を参照).
 
 ## アイコン・emblem パイプライン
 
