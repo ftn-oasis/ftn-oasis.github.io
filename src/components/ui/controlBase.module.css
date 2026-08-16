@@ -1,0 +1,79 @@
+/* IconButton / IconLink 共通の見た目 (サイズ・色・hover/focus/active・ホバー時ツールチップ) */
+
+.root {
+  --control-size: 35px;
+
+  height: var(--control-size);
+  width: fit-content;
+  min-width: var(--control-size);
+  padding: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: 8px;
+  color: var(--color-header-body);
+  background: var(--color-header-button-background);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  font: inherit;
+  z-index: 0;
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--color-focus);
+}
+
+.root:hover,
+.root:focus-visible {
+  z-index: 1;
+}
+
+.root:hover {
+  background-color: var(--color-header-button-hover);
+}
+
+.root:active {
+  background-color: var(--color-header-button-active);
+}
+
+/* aria-label を tooltip として表示する (実際のテキストは持たせず, aria-label をそのまま流用する) */
+.root::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--color-hover-body);
+  background: var(--color-hover-background);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.05s ease;
+}
+
+.root[aria-label]:not([aria-label=""]):hover::after,
+.root[aria-label]:not([aria-label=""]):focus-visible::after {
+  opacity: 1;
+}
+
+/* 画面端でツールチップが見切れる場合, useTooltipAlign が判定した側に寄せる */
+.root[data-tooltip-align="left"]::after {
+  left: 0;
+  transform: translateY(4px);
+}
+
+.root[data-tooltip-align="right"]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}
+
+/* ドロップダウンなど, 別のポップオーバーが同じ位置に開いている間はツールチップを出さない */
+.root[data-tooltip-hidden]::after {
+  content: none;
+}

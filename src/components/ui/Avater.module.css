@@ -1,0 +1,19 @@
+.avatar {
+  flex: none;
+  object-fit: cover;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+}
+
+.small {
+  width: 20px;
+}
+
+.medium {
+  width: 40px;
+}
+
+.large {
+  width: 300px;
+}

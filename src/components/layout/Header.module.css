@@ -1,0 +1,79 @@
+.header {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  padding: 0 16px;
+  gap: 10px;
+  color: var(--color-header-body);
+  background: var(--color-header-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+  max-width: 720px;
+}
+
+.right {
+  margin-left: auto;
+}
+
+/* ロゴのアイコン化リンク: IconLink の見た目 (正方形・枠線・背景) は持たず,
+   サイズはそのまま, ホバー時のツールチップだけを controlBase と同じ見た目で表示する */
+.homeLink {
+  position: relative;
+  display: inline-flex;
+  width: fit-content;
+  color: var(--color-header-logo);
+  text-decoration: none;
+}
+
+.homeLink:focus-visible {
+  outline: 2px solid var(--color-focus);
+}
+
+.homeLink::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--color-hover-body);
+  background: var(--color-hover-background);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.05s ease;
+  z-index: 1;
+}
+
+.homeLink[aria-label]:not([aria-label=""]):hover::after,
+.homeLink[aria-label]:not([aria-label=""]):focus-visible::after {
+  opacity: 1;
+}
+
+/* 画面端でツールチップが見切れる場合, useTooltipAlign が判定した側に寄せる */
+.homeLink[data-tooltip-align="left"]::after {
+  left: 0;
+  transform: translateY(4px);
+}
+
+.homeLink[data-tooltip-align="right"]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}

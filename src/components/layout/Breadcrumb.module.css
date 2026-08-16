@@ -1,0 +1,15 @@
+.root {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--color-header-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 表示中のページ (パスの最下層) だけボールドにする */
+.current {
+  font-weight: 700;
+  color: var(--color-header-body-em);
+}

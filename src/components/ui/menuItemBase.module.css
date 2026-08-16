@@ -1,0 +1,33 @@
+/* NavDrawer 内のメニュー項目 (MenuLink / 問題を報告ボタン) 共通の見た目
+   IconButton/IconLink の controlBase と違い, 通常時はボーダーを表示せず,
+   横幅は親要素いっぱい, 中身は左揃えにする. */
+
+.root {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-header-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.root:hover {
+  background: var(--color-header-button-hover);
+}
+
+.root:active {
+  background: var(--color-header-button-active);
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

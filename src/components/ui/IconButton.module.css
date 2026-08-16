@@ -1,0 +1,35 @@
+.root {
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* dropdown (icon + IconCaretDownFilled) は横幅ぴったりに広がるだけで, 単一アイコン時に
+   min-width が自然に作る左右のクリアランス (枠線の外側から 6.5px, controlBase の
+   --control-size 基準) が無くなってしまう. padding は border の内側に足されるため,
+   同じ 6.5px を再現するには枠線 (1px) を差し引いた 5.5px を指定する */
+.dropdown {
+  padding-inline: 5.5px;
+}
+
+/* 検索ボタンなど, 正方形ではなく横幅いっぱいに広がり中身が左揃えになる見た目用.
+   横幅の上限は縦 (--control-size) の4倍 */
+.stretch {
+  width: 100%;
+  max-width: calc(var(--control-size) * 4);
+  justify-content: flex-start;
+  gap: 8px;
+  padding-inline: 8px;
+  font-size: 1rem;
+  color: var(--color-header-body);
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--color-header-badge);
+  border: 2px solid var(--color-header-background);
+}
