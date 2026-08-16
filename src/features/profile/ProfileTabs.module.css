@@ -1,0 +1,47 @@
+.root {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  background: var(--color-header-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-header-body);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ホバー時はメニュードロワーの行 (menuItemBase) と同じ背景色のみで示す */
+.tab:hover {
+  background: var(--color-header-button-hover);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.selected {
+  color: var(--color-header-body-em);
+  font-weight: 700;
+  border-bottom-color: var(--color-link);
+}
+
+.count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-surface1);
+  color: var(--color-header-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+}

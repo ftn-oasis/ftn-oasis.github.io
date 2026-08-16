@@ -10,27 +10,26 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 現状できていること:
 
-- `Header` (`src/components/layout/`) — ハンバーガーメニュー (`NavDrawer` を開閉),
-  ロゴ+パンくず, 検索ボタン, 「作成」ドロップダウン, 主要ナビアイコン, 通知, ユーザーメニュー
-  (`UserMenuButton`) を1行に並べたグローバルヘッダー. 画面が狭くなると検索ボタンやナビアイコンが
+- `Header` (`src/components/layout/`) — ハンバーガーメニュー (`NavDrawer` を開閉), ロゴ+パンくず,
+  検索ボタン, 「作成」ドロップダウン, 主要ナビアイコン, 通知, ユーザーメニュー (`UserMenuButton`)
+  を1行に並べたグローバルヘッダー. 画面が狭くなると検索ボタンやナビアイコンが
   自動で折り畳まれるレスポンシブ対応あり.
-- テーマシステム (`ThemeContext`) — ライト/ダーク (Catppuccin Latte/Mocha) を OS の設定から自動検出し,
-  手動切り替えにも対応.
+- テーマシステム (`ThemeContext`) — ライト/ダーク (Catppuccin Latte/Mocha) を OS
+  の設定から自動検出し, 手動切り替えにも対応.
 - `NavDrawer` — 左からスライドインするメニュー (ホーム/各種申請/規則等/組織など).
 
 現状できていないこと (着手する際は要確認):
 
-- ルーティング/ページ本体 — `BrowserRouter` は導入済みですが `<Routes>` 定義が無く,
-  `src/pages/` も空です. `App.tsx` は現状 `<Header />` のみを描画しています.
-  Header/Drawer 内のリンクはすべて「まだページが存在しない」状態です.
-  最初にメインページ (User Profile 等) を作る際は, まずルート定義を通す必要があります.
-  URL の命名は既存のリンク (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS`,
-  `src/lib/currentUser.ts` の `/${currentUser.id}` など) と揃えてください.
+- ルーティング/ページ本体 — `BrowserRouter` は導入済みですが `<Routes>` 定義が無く, `src/pages/`
+  も空です. `App.tsx` は現状 `<Header />` のみを描画しています. Header/Drawer
+  内のリンクはすべて「まだページが存在しない」状態です. 最初にメインページ (User Profile 等)
+  を作る際は, まずルート定義を通す必要があります. URL の命名は既存のリンク (`getBreadcrumb.ts` の
+  `SPECIAL_ROOT_LABELS`, `src/lib/currentUser.ts` の `/${currentUser.id}` など) と揃えてください.
 - 認証/バックエンド — 存在しません. `src/lib/currentUser.ts` に仮のユーザー情報
   (`id`/`name`/`email`) を置いているだけです.
 - テストスイート — 設定されていません.
-- `src/` 内の一部ファイルは空のスタブです (例: `AppLayout.tsx`, `SearchBar.tsx`).
-  import されているからといって中身があるとは限らないので, 必ず内容を確認してください.
+- `src/` 内の一部ファイルは空のスタブです (例: `AppLayout.tsx`, `SearchBar.tsx`). import
+  されているからといって中身があるとは限らないので, 必ず内容を確認してください.
 
 ## コマンド
 
@@ -46,18 +45,21 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 - **UI の変更を確認する際は `npm run dev` を起動したままにしてください.** ポート占有の解消などで
   一旦落とすのは構いませんが, 作業の最後までに再度起動しておいてください.
-- **仕様が曖昧な場合 (命名, 挙動, 配置場所など) は推測で埋めず, 実装前にユーザーに質問してください.**
+- **仕様が曖昧な場合 (命名, 挙動, 配置場所など) は推測で埋めず,
+  実装前にユーザーに質問してください.**
 - **依頼された変更の結果, 既存コードと重複が生まれてコンポーネント/フックとして切り出すべきと
-  判断できる場合は, 指示されていなくても一緒に切り出してください** (設計判断に迷ったら上記と同様に質問する).
+  判断できる場合は, 指示されていなくても一緒に切り出してください**
+  (設計判断に迷ったら上記と同様に質問する).
 - **編集後は以下をすべて実行し, 指摘があれば直してから完了としてください.**
-  - `tsc --project tsconfig.app.json --noEmit --ignoreDeprecations 6.0` — プロジェクト全体に対して実行する
-    (共有コンポーネント/フックの型を変えた場合, 他の呼び出し元への波及がここで分かります).
-    ユーザーの nvim 上のエラー表示は LSP キャッシュが古いだけのことがあるので, ユーザーから
-    エラーを報告されたら, まずこのコマンドで現在のファイル内容に対する実際の型エラーの有無を確認し,
-    再現しなければその旨 (LSP再起動で解消する可能性) を伝えてください.
+  - `tsc --project tsconfig.app.json --noEmit --ignoreDeprecations 6.0` —
+    プロジェクト全体に対して実行する (共有コンポーネント/フックの型を変えた場合,
+    他の呼び出し元への波及がここで分かります). ユーザーの nvim 上のエラー表示は LSP
+    キャッシュが古いだけのことがあるので, ユーザーから エラーを報告されたら,
+    まずこのコマンドで現在のファイル内容に対する実際の型エラーの有無を確認し, 再現しなければその旨
+    (LSP再起動で解消する可能性) を伝えてください.
   - `npx eslint <編集したファイル>`
-  - `biome lint <編集したファイル>` — Biome はグローバルインストール済みでリポジトリに
-    `biome.json` は無く, ユーザーの nvim では既定設定で LSP 診断として lint が表示されます.
+  - `biome lint <編集したファイル>` — Biome はグローバルインストール済みでリポジトリに `biome.json`
+    は無く, ユーザーの nvim では既定設定で LSP 診断として lint が表示されます.
     フォーマットの差分は既定のインデントスタイル (タブ) がこのプロジェクトの規約 (2スペース) と
     食い違うだけなので無視してよく, `biome check` ではなく `biome lint` で確認してください.
   - `.css`/`.module.css` を編集した場合は `stylelint <編集したファイル>` も.
@@ -65,7 +67,8 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
     `selector-class-pattern` (クラスセレクタを kebab-case にせよという指摘) は, CSS Modules を
     camelCase (`.homeLink` 等, `styles.homeLink` のように JS 側からプロパティアクセスするため) で
     書くこのプロジェクトの規約と既定設定が衝突しているだけなので無視してください. それ以外
-    (ショートハンドの提案, `@import url(...)` の記法, 宣言前の空行など) は実際の指摘なので直してください.
+    (ショートハンドの提案, `@import url(...)` の記法, 宣言前の空行など)
+    は実際の指摘なので直してください.
   - Biome/stylelint いずれも, プロジェクトの依存関係や設定ファイルとして追加する話ではありません —
     エディタ上の見え方に合わせて確認するためだけのものです.
 
@@ -85,27 +88,26 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 ### アプリの構成
 
 `main.tsx` は `<AppProviders><App /></AppProviders>` をマウントします. `AppProviders`
-(`src/providers/AppProviders.tsx`) は Context/Router などのグローバルなラッパーをまとめる唯一の場所で,
-現状は `BrowserRouter` (`react-router`) と `ThemeProvider` の2つです. 新しいグローバルな Provider
-を追加する際は, `main.tsx` に直接ラップするのではなく, ここに追加してください. `react-router` の
-`<Link>` など Router のコンテキストに依存する機能は, この `BrowserRouter` より内側でないと
-実行時エラーになります.
+(`src/providers/AppProviders.tsx`) は Context/Router
+などのグローバルなラッパーをまとめる唯一の場所で, 現状は `BrowserRouter` (`react-router`) と
+`ThemeProvider` の2つです. 新しいグローバルな Provider を追加する際は, `main.tsx`
+に直接ラップするのではなく, ここに追加してください. `react-router` の `<Link>` など Router
+のコンテキストに依存する機能は, この `BrowserRouter` より内側でないと 実行時エラーになります.
 
 `ThemeContext` (`src/contexts/ThemeContext.tsx`) はライト/ダークテーマの状態と `useTheme()`
 フックを保持します.
 
-- 初期値は `getSystemTheme()` (`matchMedia("(prefers-color-scheme: dark)")`) で OS
-  の設定から決め, `matchMedia` の `change` イベントも購読しているため, アプリを開いたまま OS 側の
+- 初期値は `getSystemTheme()` (`matchMedia("(prefers-color-scheme: dark)")`) で OS の設定から決め,
+  `matchMedia` の `change` イベントも購読しているため, アプリを開いたまま OS 側の
   設定を変えるとサイトのテーマも自動追従します.
-- `toggleTheme` で手動切り替えすると `hasManualOverrideRef` が立ち, それ以降は
-  (再読み込みするまで) OS 側の変更より手動選択を優先します — 自動追従と手動トグルが
-  競合しないためです.
+- `toggleTheme` で手動切り替えすると `hasManualOverrideRef` が立ち, それ以降は (再読み込みするまで)
+  OS 側の変更より手動選択を優先します — 自動追従と手動トグルが 競合しないためです.
 - `theme` state は `useEffect` で `document.documentElement.dataset.theme` に反映しており,
-  `src/styles/theme.css` の `[data-theme="light"|"dark"]` セレクタがこれを参照します.
-  state を持つだけでは見た目に反映されない点に注意してください.
+  `src/styles/theme.css` の `[data-theme="light"|"dark"]` セレクタがこれを参照します. state
+  を持つだけでは見た目に反映されない点に注意してください.
 - 永続化 (localStorage 等) にはまだ対応していません — 手動選択はページ再読み込みで失われます.
-- `ToggleThemeButton` (`src/features/navigation/ToggleThemeButton.tsx`) は動作しますが,
-  まだ Header などの実際のUIには組み込まれていません (呼び出し元が無いプロトタイプの状態).
+- `ToggleThemeButton` (`src/features/navigation/ToggleThemeButton.tsx`) は動作しますが, まだ Header
+  などの実際のUIには組み込まれていません (呼び出し元が無いプロトタイプの状態).
 
 ### ディレクトリの規約
 
@@ -114,8 +116,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
     それらが共有するフック (`useTooltipAlign`, `useDismissablePopover`, `useEscapeKey`).
   - `layout/` — `Header` とその内部部品 (`Breadcrumb`, `PrimaryNavLinks`,
     `useHeaderResponsiveLayout`, `getBreadcrumb`), `AppLayout` (まだ空).
-- `src/features/<feature>/` — 機能ごとにまとまったコード. 現状は `features/navigation/`
-  (`MenuButton`, `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`) のみ存在.
+- `src/features/<feature>/` — 機能ごとにまとまったコード. 現状 `features/navigation/`
+  (`MenuButton`, `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`) と
+  `features/profile/` (`ProfileTabs`) が存在.
 - `src/pages/` — ルートと1対1で対応するコンポーネント (まだ未実装).
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
 - コンポーネントのスタイルは CSS Modules をコンポーネントと同じ場所に配置する方式です (`Foo.tsx` +
@@ -124,35 +127,35 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   `src/styles/theme.css` に定義されており, `src/styles/globals.css` (`@import url("./theme.css");`
   のみの薄いファイル) 経由で `src/index.css` から import されています. `globals.css` は将来
   テーマ以外のグローバルスタイルを追加する場合の置き場として空けてあるので, テーマの内容は
-  `theme.css` に足してください. 新しい部品の色は極力これらのカスタムプロパティを参照してください
-  — **定義済みだが未使用のトークンが無いか確認してから新しい色を決めてください**
-  (`--color-header-logo`/`--color-header-body-em` はこうして見つかった例です).
-  `theme.css` は `:root`/`[data-theme="light"]` (既定) と `[data-theme="dark"]` の2ブロックで構成され,
+  `theme.css` に足してください. 新しい部品の色は極力これらのカスタムプロパティを参照してください —
+  **定義済みだが未使用のトークンが無いか確認してから新しい色を決めてください**
+  (`--color-header-logo`/`--color-header-body-em` はこうして見つかった例です). `theme.css` は
+  `:root`/`[data-theme="light"]` (既定) と `[data-theme="dark"]` の2ブロックで構成され,
   後者は前者と同じトークン名を Mocha パレットで1:1に上書きする完全なミラーです — 新しいトークンは
   必ず両方のブロックに追加してください (片方だけだとテーマ切り替え時にそこだけ色が変わらず残ります).
 - `src/index.css` の `body` は `margin: 0` のみで, `padding` は付けません (`Header` が画面の
   上下左右いっぱいに表示されるべきデザインのため).
-- フォントは `src/styles/fonts.css` で `--font-body` ("Noto Sans JP") / `--font-mono`
-  ("M PLUS 1 Code") を定義し, `src/index.css` から import した上で `:root` (本文) と
-  `code`/`pre`/`kbd`/`samp` (等幅) にそれぞれ適用しています. 実体は `index.html` の Google Fonts
-  の `<link>` で読み込んでおり (現状 400/700 のみ), 太さを増やす場合は `index.html` の
-  `family=...:wght@...` にも追加してください.
+- フォントは `src/styles/fonts.css` で `--font-body` ("Noto Sans JP") / `--font-mono` ("M PLUS 1
+  Code") を定義し, `src/index.css` から import した上で `:root` (本文) と `code`/`pre`/`kbd`/`samp`
+  (等幅) にそれぞれ適用しています. 実体は `index.html` の Google Fonts の `<link>` で読み込んでおり
+  (現状 400/700 のみ), 太さを増やす場合は `index.html` の `family=...:wght@...`
+  にも追加してください.
 
 ### export の方法
 
 宣言 (`function`/`const`/`type` など) には `export` を付けず, ファイル末尾にまとめて
 `export { Foo, Bar };` (型は `export { type Foo, Bar };`) の形で1箇所に集約します. `export default`
 や, 宣言と同時に `export function Foo() {}` のように書くスタイルは使いません. 自動生成ファイル
-(`src/components/ui/emblem-names.ts` など) も対象で, 生成元のスクリプト
-(`scripts/build-sprite.mjs`) の出力テンプレート側を直してください. この規約は `src/`
-(と, それを生成するスクリプト) が対象です — `header-src/` は非対象のプロトタイプ資料なので,
-独自の `export function Foo()` スタイルのまま揃えなくて構いません.
+(`src/components/ui/emblem-names.ts` など) も対象で, 生成元のスクリプト (`scripts/build-sprite.mjs`)
+の出力テンプレート側を直してください. この規約は `src/` (と, それを生成するスクリプト) が対象です —
+`header-src/` は非対象のプロトタイプ資料なので, 独自の `export function Foo()`
+スタイルのまま揃えなくて構いません.
 
 ## UI コンポーネントの共通パターン
 
-似た見た目・挙動のコントロールは土台となる CSS Module (`○○Base.module.css`) を共有し, 各コンポーネント
-自身の `Foo.module.css` にはタグ固有のリセットだけを書く構成にしています. 新しい部品を追加する際は
-まずこれらのパターンに当てはまらないか検討してください.
+似た見た目・挙動のコントロールは土台となる CSS Module (`○○Base.module.css`) を共有し,
+各コンポーネント 自身の `Foo.module.css` にはタグ固有のリセットだけを書く構成にしています.
+新しい部品を追加する際は まずこれらのパターンに当てはまらないか検討してください.
 
 ### 正方形アイコン系: `controlBase.module.css`
 
@@ -166,9 +169,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   小さければ正方形, 広ければ (ラベルや `dropdown` の追加アイコンなどで) その分だけ横に広がります.
 - **`dropdown?: boolean`** — `icon` の右隣に `IconCaretDownFilled` (`size={13}`) を並べます.
   開閉の実際の挙動は持たず, 呼び出し側が `onClick` で実装します. 2つのアイコンの合計幅が
-  `--control-size` 相当に達し単一アイコン時のようなクリアランスが自然には生まれないため,
-  `.dropdown` 修飾クラスで `padding-inline: 5.5px` (6.5px の見た目のクリアランスから border 1px
-  を差し引いた値) を明示的に補っています.
+  `--control-size` 相当に達し単一アイコン時のようなクリアランスが自然には生まれないため, `.dropdown`
+  修飾クラスで `padding-inline: 5.5px` (6.5px の見た目のクリアランスから border 1px を差し引いた値)
+  を明示的に補っています.
 - **`text?: string`** — アイコンの右隣に可視のラベルテキストを表示します (例: Header の検索ボタン
   `<IconButton icon={IconSearch} label="検索" text="検索…" stretch />`). `text` がある場合は
   `aria-label` を付けません (可視テキストがアクセシブルネームを兼ねるため) — 結果として CSS
@@ -186,14 +189,14 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   距離を判定 — 疑似要素は直接計測できないため文字数ベースの概算です) が返す `ref`/`align`/
   `onMouseEnter`/`onFocus` をトリガー要素にそのまま渡し, `align` を `data-tooltip-align`
   属性として設定してください. `controlBase` 側は `.root[data-tooltip-align="left"|"right"]::after`
-  で中央寄せを上書きします. **戻り値をオブジェクトのまま JSX に展開する
-  (`ref={tooltip.ref}` のようにプロパティアクセスする) と `eslint-plugin-react-hooks` の
-  `react-hooks/refs` が誤検知するため, 必ず分割代入してから個別に渡してください.**
-  `controlBase` を使わない独自のツールチップ (`.homeLink` など) を実装する場合も同じフックと
-  `data-tooltip-align` の仕組みを流用してください.
-- **ツールチップの背景色** (`--color-hover-background`, `theme.css` で Catppuccin `overlay2`
-  を指す) はツールチップ専用のトークンです — `controlBase.module.css` と `Header.module.css`
-  の `.homeLink` の2箇所以外からは参照されていません.
+  で中央寄せを上書きします. **戻り値をオブジェクトのまま JSX に展開する (`ref={tooltip.ref}`
+  のようにプロパティアクセスする) と `eslint-plugin-react-hooks` の `react-hooks/refs`
+  が誤検知するため, 必ず分割代入してから個別に渡してください.** `controlBase`
+  を使わない独自のツールチップ (`.homeLink` など) を実装する場合も同じフックと `data-tooltip-align`
+  の仕組みを流用してください.
+- **ツールチップの背景色** (`--color-hover-background`, `theme.css` で Catppuccin `overlay2` を指す)
+  はツールチップ専用のトークンです — `controlBase.module.css` と `Header.module.css` の `.homeLink`
+  の2箇所以外からは参照されていません.
 
 `src/components/ui/Icon.tsx` は `@tabler/icons-react` のアイコンをラップしますが, `icon`/`size`
 以外の props (`aria-hidden` など) はそのまま `<svg>` へ転送されます. ボタン/リンク側に `aria-label`
@@ -201,11 +204,11 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 `IconLink` の `icon` prop は `TablerIcon` 専用です. `Emblem` (`fth-oasis-icon` など, git LFS
 管理の自前 SVG スプライト) のように `TablerIcon` でない中身をリンクにしたい場合は `IconLink`/
-`controlBase` を使わず, 同じ見た目のツールチップだけを個別に実装します — Header のロゴ
-(`.homeLink`) が実例です. `Emblem` に `label` を渡さなければ自動的に `aria-hidden` になるので,
-リンク側の `aria-label` と二重に持たせる必要はありません. `.homeLink` の `color` は他のヘッダー
-要素と違い `--color-header-logo` (Catppuccin `text`) を使っています — `Emblem` の SVG は
-`fill="currentColor"` なので, この `color` がそのままアイコンの塗り色になります.
+`controlBase` を使わず, 同じ見た目のツールチップだけを個別に実装します — Header のロゴ (`.homeLink`)
+が実例です. `Emblem` に `label` を渡さなければ自動的に `aria-hidden` になるので, リンク側の
+`aria-label` と二重に持たせる必要はありません. `.homeLink` の `color` は他のヘッダー 要素と違い
+`--color-header-logo` (Catppuccin `text`) を使っています — `Emblem` の SVG は `fill="currentColor"`
+なので, この `color` がそのままアイコンの塗り色になります.
 
 ### 横並びリスト行系: `menuItemBase.module.css`
 
@@ -235,15 +238,16 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 (アバターのメニュー) はどちらもこの型です:
 
 - 開閉状態・範囲外クリック/Escape での自動クローズは `useDismissablePopover<T>()`
-  (`src/components/ui/useDismissablePopover.ts`) にまとめてあります. `{ open, wrapperRef, toggle,
-  close }` を返すので, `wrapperRef` をトリガーとパネルの両方を包む `position: relative` な
-  `<div>` に付けてください. 内部で `useEscapeKey` (`src/components/ui/useEscapeKey.ts`,
-  `NavDrawer` のEscape処理とも共用) を使っています.
+  (`src/components/ui/useDismissablePopover.ts`) にまとめてあります.
+  `{ open, wrapperRef, toggle,
+  close }` を返すので, `wrapperRef` をトリガーとパネルの両方を包む
+  `position: relative` な `<div>` に付けてください. 内部で `useEscapeKey`
+  (`src/components/ui/useEscapeKey.ts`, `NavDrawer` のEscape処理とも共用) を使っています.
 - パネル自体は `position: absolute; top: calc(100% + 4px);` でトリガーの下に開き, 枠線・角丸・
   box-shadow を持つ独立したカードとして表示します (`CreateButton.module.css`/
-  `UserMenuButton.module.css` の `.menu` が実例). 横位置はトリガーの位置に応じて
-  `left: 0` (`CreateButton`, 画面中央寄り) か `right: 0` (`UserMenuButton`, 画面右端寄り)
-  を使い分けています — 画面端でのはみ出し検知は (`useTooltipAlign` のような) 未実装です.
+  `UserMenuButton.module.css` の `.menu` が実例). 横位置はトリガーの位置に応じて `left: 0`
+  (`CreateButton`, 画面中央寄り) か `right: 0` (`UserMenuButton`, 画面右端寄り) を使い分けています —
+  画面端でのはみ出し検知は (`useTooltipAlign` のような) 未実装です.
 - 中身の各行は `menuItemBase.module.css` (`MenuLink`, または独自の `<button>`) を使い,
   区切りが要る場合は `Divider` を挟みます.
 - トリガーが `IconButton` の場合は `hideTooltip={open}` を渡してください (「正方形アイコン系」参照).
@@ -255,21 +259,21 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 `NavDrawer` の先頭には `drawerHeader` (左に `<Emblem name="fth-oasis-icon" />`, 右に閉じるボタン)
 があります. 閉じるボタンは正方形の1箇所だけの利用のため `menuItemBase` は流用せず
-`NavDrawer.module.css` 内に単独で定義しています. `.drawer` は `overflow: hidden auto;`
-(x=hidden, y=auto を明示するショートハンド) としています — 片方の軸だけ `visible` 以外にすると
-CSS の仕様上もう片方も暗黙的に `auto` 扱いになり, わずかなはみ出しでも横スクロールバーが
-出てしまうため, 横スクロールを一切許可しないコンテナでは両軸を明示してください. `.drawer` は
+`NavDrawer.module.css` 内に単独で定義しています. `.drawer` は `overflow: hidden auto;` (x=hidden,
+y=auto を明示するショートハンド) としています — 片方の軸だけ `visible` 以外にすると CSS
+の仕様上もう片方も暗黙的に `auto` 扱いになり, わずかなはみ出しでも横スクロールバーが 出てしまうため,
+横スクロールを一切許可しないコンテナでは両軸を明示してください. `.drawer` は
 左端が画面外にスライドして隠れるため, `border-radius: 0 8px 8px 0;` で右側の角だけを丸めています
 (`8px` は他のパネル/ボタン類と揃えた値です).
 
 ## Header 固有の実装
 
 `Header.tsx` は `.left` (ハンバーガー・ロゴ・パンくず)/`.center` (検索, `flex: 1 1 auto` で
-残り幅いっぱいに広がりつつ `justify-content: flex-end` で中身は右詰め)/`.right`
-(`margin-left: auto` で右詰め, それ以外のアイコン群とアバター) の3つの `<div>` に分けた
-`display: flex` (CSS Grid ではありません) の1行レイアウトです. `.header` 自体の `gap` と
-`.right` 内の `gap` は両方 `10px` に揃えています (検索ボタンが正方形に縮んだ際, 隣接ボタンとの
-隙間が食い違わないようにするため). 新しく横並びのセクションを追加する場合もこの3分割に沿ってください.
+残り幅いっぱいに広がりつつ `justify-content: flex-end` で中身は右詰め)/`.right` (`margin-left: auto`
+で右詰め, それ以外のアイコン群とアバター) の3つの `<div>` に分けた `display: flex` (CSS Grid
+ではありません) の1行レイアウトです. `.header` 自体の `gap` と `.right` 内の `gap` は両方 `10px`
+に揃えています (検索ボタンが正方形に縮んだ際, 隣接ボタンとの 隙間が食い違わないようにするため).
+新しく横並びのセクションを追加する場合もこの3分割に沿ってください.
 
 - **パンくず** (`Breadcrumb.tsx`) — `getBreadcrumb(pathname)` (`getBreadcrumb.ts`) が現在パスを
   `string[]` (各要素が1階層分の表示名) に変換し, `Breadcrumb` が `" / "` で結合して**配列の
@@ -287,13 +291,34 @@ CSS の仕様上もう片方も暗黙的に `auto` 扱いになり, わずかな
     `PrimaryNavLinks` (「作成」「全ての通知」「アバター」以外の主要ナビアイコン) をまるごと
     描画から外します. `.right` は `margin-left: auto` で常にヘッダー右端に張り付いているため,
     中身をどれだけ隠しても右端の座標は変わりません — そのため `navCollapsed`
-    の判定結果が自分自身の計測対象に影響するフィードバックループにはなりません.
-    新しく `.right` 内のアイコンを非表示にする条件を追加する場合もこの性質を崩さないでください.
+    の判定結果が自分自身の計測対象に影響するフィードバックループにはなりません. 新しく `.right`
+    内のアイコンを非表示にする条件を追加する場合もこの性質を崩さないでください.
   - `.center` に `min-width: 0` を付けると, 検索ボタンがゼロ幅まで潰れて `.right` と重なって
     見える不具合になるため付けていません — `IconButton` 自体が `min-width: var(--control-size)`
     を持つので, `.center` はその最小幅を自然に尊重させる必要があります.
 - 検索ボタンの横幅上限は `IconButton.module.css` の `.stretch` で
   `max-width: calc(var(--control-size) * 4)` (140px) としています.
+
+## プロフィールページのタブ (`ProfileTabs`)
+
+`src/features/profile/ProfileTabs.tsx` は GitHub の User Profile ページを参考にした,
+プロフィールページ下部 (アバターやユーザー名などのプロフィール情報の下) に置くタブバーです.
+グローバルヘッダー (`Header.tsx`) とは別物で, プロフィールページ本体がまだ無いため
+現状はどこからも呼び出されていません.
+
+- `documentCount`/`bookmarkCount` prop (件数) が 0 または未指定の場合, 「文書」「栞」タブ
+  自体を描画しません — 「概要」タブは常に表示されます. 件数はまだ実データが無いため,
+  呼び出し側でダミーの数値を渡す想定です.
+- 選択中のタブは `border-bottom` (`--color-link`) と `font-weight: 700` で強調し,
+  それ以外はレギュラーのままにします. ホバー時は `menuItemBase` の行と同じ背景色
+  (`--color-header-button-hover`) のみで示し, 独自の box-shadow などは使っていません.
+  `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです
+  (コンテナは `<nav>` ではなく `<div role="tablist">` — `<nav>` は landmark role のため
+  `tablist` role と併用できません).
+- 選択状態は内部の `useState` で完結しており, 実際のページ本文の切り替えとはまだ
+  接続されていません (`onChange` prop はあるが呼び出し元が無い). ルーティングを実装し
+  プロフィールページ本体を作る際に, 選択されたタブに応じて表示するコンテンツを
+  切り替える処理と接続してください.
 
 ## アイコン・emblem パイプライン
 
