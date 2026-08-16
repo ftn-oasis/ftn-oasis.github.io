@@ -128,8 +128,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
     `useHeaderResponsiveLayout`, `getBreadcrumb`), 全ページ共通の `AppLayout`
     (`Header` + `<Outlet />`).
 - `src/features/<feature>/` — 機能ごとにまとまったコード. 現状 `features/navigation/` (`MenuButton`,
-  `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`) と `features/profile/`
-  (`ProfileTabs`) が存在.
+  `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`, フラットに直下へ配置) と
+  `features/user/components/` (`ProfileTabs`, README.md のファイル構造に合わせて `components/`
+  を1段挟む配置 — `features/navigation/` とは階層が異なる点に注意) が存在.
 - `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
   (`/:userId`) のみ存在.
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
@@ -313,10 +314,16 @@ y=auto を明示するショートハンド) としています — 片方の軸
 
 ## プロフィールページのタブ (`ProfileTabs`)
 
-`src/features/profile/ProfileTabs.tsx` は GitHub の User Profile ページを参考にした,
-プロフィールページ下部 (アバターやユーザー名などのプロフィール情報の下) に置くタブバーです.
-グローバルヘッダー (`Header.tsx`) とは別物です. `src/pages/UserProfilePage.tsx`
-(`/:userId`) から呼び出されています.
+`src/features/user/components/ProfileTabs.tsx` (README.md のファイル構造に合わせ,
+`features/user/components/` に配置 — `features/navigation/` のようにフラットではなく `components/`
+を1段挟みます) は GitHub の User Profile ページを参考にしたタブバーです.
+`src/pages/UserProfilePage.tsx` (`/:userId`) がページの唯一の中身として描画しており,
+アバターやユーザー名などのプロフィール情報は表示しません — グローバルヘッダー (`Header.tsx`)
+の直下に隙間なく続けて表示することで, ヘッダー自体にタブの行が増えたかのように見せています
+(`ProfileTabs.module.css` の `.root` が `Header.module.css` の `.header` と同じ
+`padding: 0 16px`/`background: var(--color-header-background)`/
+`border-bottom: 1px solid var(--color-border)` を使っているのはこの見た目の連続性のためで,
+`Header.tsx` 自体は `ProfileTabs` を知りません — あくまで色/余白を揃えているだけの別コンポーネントです).
 
 - `documentCount`/`bookmarkCount` prop (件数) が 0 または未指定の場合, 「文書」「栞」タブ
   自体を描画しません — 「概要」タブは常に表示されます. 件数はまだ実データが無いため,
@@ -331,10 +338,9 @@ y=auto を明示するショートハンド) としています — 片方の軸
   (`onChange` prop はあるが `UserProfilePage` からは渡していません — 今のところタブを切り替えても
   「概要」の本文が表示され続けます). タブごとの本文を実装する際に接続してください.
 
-`src/pages/UserProfilePage.tsx` (`/:userId`) はアバター (`size="large"`, 300px) + ユーザー名 +
-`ProfileTabs` を表示します. `useParams()` で取った `userId` が `currentUser.id`
-と一致しない場合は「ユーザーが見つかりません」を表示します — 他ユーザーの実データが無いための
-暫定挙動で, 同時に `/issues` のような (まだページの無い) 他機能の予約パスが誤って
+`src/pages/UserProfilePage.tsx` (`/:userId`) は `useParams()` で取った `userId` が
+`currentUser.id` と一致しない場合は「ユーザーが見つかりません」を表示します — 他ユーザーの実データが
+無いための暫定挙動で, 同時に `/issues` のような (まだページの無い) 他機能の予約パスが誤って
 プロフィールページとして表示されてしまうのも防いでいます (詳細は「プロジェクトについて」の
 「現状できていないこと」を参照).
 

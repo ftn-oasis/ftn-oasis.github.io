@@ -1,5 +1,4 @@
-import { Avater } from "@src/components/ui/Avatar";
-import { ProfileTabs } from "@src/features/profile/ProfileTabs";
+import { ProfileTabs } from "@src/features/user/components/ProfileTabs";
 import { currentUser } from "@src/lib/currentUser";
 import { useParams } from "react-router";
 
@@ -19,16 +18,10 @@ function UserProfilePage() {
   }
 
   return (
-    <div>
-      <div className={styles.header}>
-        <Avater size="large" />
-        <h1 className={styles.name}>{currentUser.name}</h1>
-      </div>
-      <ProfileTabs
-        documentCount={DUMMY_DOCUMENT_COUNT}
-        bookmarkCount={DUMMY_BOOKMARK_COUNT}
-      />
-    </div>
+    <ProfileTabs
+      documentCount={DUMMY_DOCUMENT_COUNT}
+      bookmarkCount={DUMMY_BOOKMARK_COUNT}
+    />
   );
 }
 
