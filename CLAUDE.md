@@ -125,8 +125,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   - `ui/` — `Button`/`Avatar`/`IconLink`/`IconButton`/`MenuLink`/`Divider` などの原子的な部品と,
     それらが共有するフック (`useTooltipAlign`, `useDismissablePopover`, `useEscapeKey`).
   - `layout/` — `Header` とその内部部品 (`Breadcrumb`, `PrimaryNavLinks`,
-    `useHeaderResponsiveLayout`, `getBreadcrumb`), 全ページ共通の `AppLayout`
-    (`Header` + `<Outlet />`).
+    `useHeaderResponsiveLayout`, `getBreadcrumb`, 下部ヘッダーのスロットを提供する
+    `HeaderBottomSlotContext`/`HeaderBottomPortal`), 全ページ共通の `AppLayout`
+    (`HeaderBottomSlotProvider` + `Header` + `<Outlet />`).
 - `src/features/<feature>/` — 機能ごとにまとまったコード. 現状 `features/navigation/` (`MenuButton`,
   `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`, フラットに直下へ配置) と
   `features/user/components/` (`ProfileTabs`, README.md のファイル構造に合わせて `components/`
@@ -287,12 +288,32 @@ y=auto を明示するショートハンド) としています — 片方の軸
 
 ## Header 固有の実装
 
-`Header.tsx` は `.left` (ハンバーガー・ロゴ・パンくず)/`.center` (検索, `flex: 1 1 auto` で
-残り幅いっぱいに広がりつつ `justify-content: flex-end` で中身は右詰め)/`.right` (`margin-left: auto`
-で右詰め, それ以外のアイコン群とアバター) の3つの `<div>` に分けた `display: flex` (CSS Grid
-ではありません) の1行レイアウトです. `.header` 自体の `gap` と `.right` 内の `gap` は両方 `10px`
-に揃えています (検索ボタンが正方形に縮んだ際, 隣接ボタンとの 隙間が食い違わないようにするため).
-新しく横並びのセクションを追加する場合もこの3分割に沿ってください.
+`Header.tsx` (`<header className={styles.header}>`) は縦に2段の構造です. `.header` 自体は
+`flex-direction: column` で, `background`/`border-bottom: 1px solid var(--color-border)`
+もこの最上位の要素にだけ付けています — 下段 (後述の「下部ヘッダーのスロット」) が
+あってもなくても, ヘッダー全体が常に1つの区切られたブロックに見えるようにするためです.
+
+1段目 (`.top`, 固定 `height: 60px`) が常時表示される行で, `.left` (ハンバーガー・ロゴ・
+パンくず)/`.center` (検索, `flex: 1 1 auto` で残り幅いっぱいに広がりつつ
+`justify-content: flex-end` で中身は右詰め)/`.right` (`margin-left: auto` で右詰め,
+それ以外のアイコン群とアバター) の3つの `<div>` に分けた `display: flex` (CSS Grid
+ではありません) の1行レイアウトです. `.top` 自体の `gap` と `.right` 内の `gap` は両方
+`10px` に揃えています (検索ボタンが正方形に縮んだ際, 隣接ボタンとの隙間が食い違わないように
+するため). 新しく横並びのセクションを追加する場合もこの3分割に沿ってください.
+
+2段目は `<div ref={setSlot} />` という中身の無い要素で, 「下部ヘッダーのスロット」
+(`HeaderBottomSlotContext.tsx`/`HeaderBottomPortal.tsx`) です. `ProfileTabs`
+のようにページ固有の内容をヘッダーの一部として (実際に `<header>` の内部の DOM として)
+表示したい場合に使います. `AppLayout.tsx` 上で `Header` と `<Outlet />` は兄弟要素のため,
+props で直接渡すことができません — `AppLayout` を `HeaderBottomSlotProvider` で包み,
+`Header` がスロットの `<div>` の ref を `setSlot` として Context に公開し,
+ページ側 (`<Outlet />` の中身) が `HeaderBottomPortal` (`createPortal`) でその DOM
+ノードへ描画する, という構成です (`ThemeContext.tsx` と同様, Provider コンポーネントと
+フックだけを export し, 生の Context オブジェクトはファイル内に閉じています). スロットが
+空の `<div>` は高さ 0 に潰れるだけなので, 何も描画しないページでは単純な1行ヘッダーに戻ります.
+このスロットは Header 自身がどのページの, どんな内容かを一切知らない汎用の差し込み口です
+— `Header.tsx` (`components/layout/`, ドメインを知らない汎用部品) が
+`ProfileTabs` (`features/user/`, ドメイン固有) を import しないで済むのはこの設計のためです.
 
 - **パンくず** (`Breadcrumb.tsx`) — `getBreadcrumb(pathname)` (`getBreadcrumb.ts`) が現在パスを
   `string[]` (各要素が1階層分の表示名) に変換し, `Breadcrumb` が `" / "` で結合して**配列の
@@ -328,20 +349,24 @@ y=auto を明示するショートハンド) としています — 片方の軸
 `src/features/user/components/ProfileTabs.tsx` (README.md のファイル構造に合わせ,
 `features/user/components/` に配置 — `features/navigation/` のようにフラットではなく `components/`
 を1段挟みます) は GitHub の User Profile ページを参考にしたタブバーです.
-`src/pages/UserProfilePage.tsx` (`/:userId`) がページの唯一の中身として描画しており,
-アバターやユーザー名などのプロフィール情報は表示しません — グローバルヘッダー (`Header.tsx`)
-の直下に隙間なく続けて表示することで, ヘッダー自体にタブの行が増えたかのように見せています
-(`ProfileTabs.module.css` の `.root` が `Header.module.css` の `.header` と同じ
-`padding: 0 16px`/`background: var(--color-header-background)`/
-`border-bottom: 1px solid var(--color-border)` を使っているのはこの見た目の連続性のためで,
-`Header.tsx` 自体は `ProfileTabs` を知りません — あくまで色/余白を揃えているだけの別コンポーネントです).
+`src/pages/UserProfilePage.tsx` (`/:userId`) がページの唯一の中身として,
+`HeaderBottomPortal` (前述の「Header 固有の実装」を参照) 経由でグローバルヘッダー
+(`Header.tsx`) 内部のスロットへ描画しています — アバターやユーザー名などのプロフィール情報は
+表示しません. DOM 上でも実際に `<header>` の内側に含まれるため, `ProfileTabs.module.css`
+の `.root` 自身は `background`/`border-bottom` を持たず (外側の `.header` が既に持っている
+ため二重に線が出てしまう), `padding: 0 16px` (`Header.module.css` の `.top` と揃えた値)
+だけを持ちます.
 
 - `documentCount`/`bookmarkCount` prop (件数) が 0 または未指定の場合, 「文書」「栞」タブ
   自体を描画しません — 「概要」タブは常に表示されます. 件数はまだ実データが無いため,
   呼び出し側でダミーの数値を渡す想定です.
-- 選択中のタブは `border-bottom` (`--color-link`) と `font-weight: 700` で強調し,
-  それ以外はレギュラーのままにします. ホバー時は `menuItemBase` の行と同じ背景色
-  (`--color-header-button-hover`) のみで示し, 独自の box-shadow などは使っていません.
+- 選択中のタブは `.selected::after` の絶対配置 (`--color-link`, 太さ2px) と
+  `font-weight: 700` で強調し, それ以外はレギュラーのままにします. `.tab` 自身の
+  `border-bottom` にしていないのは, ボタンの `margin: 6px 0` の分だけ線が
+  ヘッダー下部の境界線より上に浮いて見えてしまうためで, `bottom: -6px`
+  でボタンの margin の外側 = ヘッダー下部の境界線の位置まで伸ばすことで沿わせています.
+  ホバー時は `menuItemBase` の行と同じ背景色 (`--color-header-button-hover`) のみで示し,
+  独自の box-shadow などは使っていません.
   `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです (コンテナは
   `<nav>` ではなく `<div role="tablist">` — `<nav>` は landmark role のため `tablist` role
   と併用できません).

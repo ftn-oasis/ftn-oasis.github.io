@@ -1,9 +1,11 @@
+/* 背景/下部の境界線は付けない: HeaderBottomPortal 経由で Header.tsx の内部
+   (Header.module.css の .header) に描画されるため, それらは外側の .header が
+   既に持っている. ここで重ねて付けると, タブが無いページとの間で線の太さが
+   食い違ってしまう */
 .root {
   display: flex;
   gap: 4px;
   padding: 0 16px;
-  background: var(--color-header-background);
-  border-bottom: 1px solid var(--color-border);
 }
 
 .tab {
@@ -32,8 +34,8 @@
 }
 
 /* 選択中を示す下線. ボタン自身の border ではなく, ボタンの margin (6px) の外側
-   = .root の border-bottom と同じ高さまで伸ばした疑似要素として独立させることで,
-   ヘッダー下部の線 (.root の border-bottom) に沿って表示されるようにしている */
+   = .root の下端 (= 外側の .header の border-bottom の位置) まで伸ばした疑似要素
+   として独立させることで, ヘッダー下部の線に沿って表示されるようにしている */
 .selected::after {
   content: "";
   position: absolute;

@@ -1,12 +1,20 @@
 .header {
   display: flex;
+  flex-direction: column;
+  color: var(--color-header-body);
+  background: var(--color-header-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* 常に表示される1行目 (ハンバーガー・ロゴ・パンくず/検索/通知・アバターなど).
+   下部スロット (HeaderBottomPortal の描画先) が空でも高さが 0 に潰れて
+   違和感が出ないよう, 固定高さは .header 全体ではなくこちらに付けている */
+.top {
+  display: flex;
   align-items: center;
   height: 60px;
   padding: 0 16px;
   gap: 10px;
-  color: var(--color-header-body);
-  background: var(--color-header-background);
-  border-bottom: 1px solid var(--color-border);
 }
 
 .left,

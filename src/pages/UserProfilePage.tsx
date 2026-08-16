@@ -1,3 +1,4 @@
+import { HeaderBottomPortal } from "@src/components/layout/HeaderBottomPortal";
 import { ProfileTabs } from "@src/features/user/components/ProfileTabs";
 import { currentUser } from "@src/lib/currentUser";
 import { useParams } from "react-router";
@@ -18,10 +19,12 @@ function UserProfilePage() {
   }
 
   return (
-    <ProfileTabs
-      documentCount={DUMMY_DOCUMENT_COUNT}
-      bookmarkCount={DUMMY_BOOKMARK_COUNT}
-    />
+    <HeaderBottomPortal>
+      <ProfileTabs
+        documentCount={DUMMY_DOCUMENT_COUNT}
+        bookmarkCount={DUMMY_BOOKMARK_COUNT}
+      />
+    </HeaderBottomPortal>
   );
 }
 
