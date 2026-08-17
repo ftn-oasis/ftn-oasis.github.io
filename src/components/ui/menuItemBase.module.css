@@ -15,7 +15,7 @@
   margin: 0 6px;
   padding: 8px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--borderRadius-medium);
   background: transparent;
   color: var(--color-header-body);
   text-align: left;

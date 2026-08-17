@@ -12,10 +12,10 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  border-radius: 8px;
+  border-radius: var(--borderRadius-medium);
   color: var(--color-header-body);
   background: var(--color-header-button-background);
-  border: 1px solid var(--color-border);
+  border: var(--borderWidth-thin) solid var(--color-border);
   cursor: pointer;
   font: inherit;
   z-index: 0;

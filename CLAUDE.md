@@ -57,6 +57,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   一旦落とすのは構いませんが, 作業の最後までに再度起動しておいてください.
 - **仕様が曖昧な場合 (命名, 挙動, 配置場所など) は推測で埋めず,
   実装前にユーザーに質問してください.**
+- **ボタンの見た目 (border-radius/border-width など) に関する新しい指定があった場合は,
+  `--borderRadius-medium`/`--borderWidth-thin` (`globals.css` で定義, 詳細は
+  「共通デザイントークン」を参照) など既存の共通変数を使うかどうかを実装前に質問してください.**
 - **依頼された変更の結果, 既存コードと重複が生まれてコンポーネント/フックとして切り出すべきと
   判断できる場合は, 指示されていなくても一緒に切り出してください**
   (設計判断に迷ったら上記と同様に質問する).
@@ -76,8 +79,11 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
     こちらもグローバルインストール済みで設定ファイルは無く, 既定設定で動作します.
     `selector-class-pattern` (クラスセレクタを kebab-case にせよという指摘) は, CSS Modules を
     camelCase (`.homeLink` 等, `styles.homeLink` のように JS 側からプロパティアクセスするため) で
-    書くこのプロジェクトの規約と既定設定が衝突しているだけなので無視してください. それ以外
-    (ショートハンドの提案, `@import url(...)` の記法, 宣言前の空行など)
+    書くこのプロジェクトの規約と既定設定が衝突しているだけなので無視してください.
+    `custom-property-pattern` (カスタムプロパティを kebab-case にせよという指摘) のうち
+    `--borderRadius-medium`/`--borderWidth-thin` (共通デザイントークン, `globals.css`
+    で定義) も同様に, 指示された表記をそのまま採用した意図的なものなので無視してください.
+    それ以外 (ショートハンドの提案, `@import url(...)` の記法, 宣言前の空行など)
     は実際の指摘なので直してください.
   - Biome/stylelint いずれも, プロジェクトの依存関係や設定ファイルとして追加する話ではありません —
     エディタ上の見え方に合わせて確認するためだけのものです.
@@ -149,6 +155,19 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   `:root`/`[data-theme="light"]` (既定) と `[data-theme="dark"]` の2ブロックで構成され,
   後者は前者と同じトークン名を Mocha パレットで1:1に上書きする完全なミラーです — 新しいトークンは
   必ず両方のブロックに追加してください (片方だけだとテーマ切り替え時にそこだけ色が変わらず残ります).
+  色以外の共通デザイントークン (テーマに依らず値が変わらないもの) は `globals.css` 自身の
+  `:root` ブロックに定義します — 現状 `--borderRadius-medium: 0.375rem`/
+  `--borderWidth-thin: 0.0625rem` の2つ (ユーザーからそのままの表記で指定されたため, 既存の
+  `--color-*` 系と異なり camelCase を含みます — `stylelint` の `custom-property-pattern`
+  指摘は意図的なものとして無視してください). `--borderRadius-medium` は `controlBase`
+  (`IconButton`/`IconLink`)・`menuItemBase` (`MenuLink` など)・`NavDrawer` の
+  閉じるボタン・`ProfileTabs` の `.tab` など, 「角丸 8px のボタン, またはそのボーダーを
+  取り払ったもの」に適用しています. `--borderWidth-thin` はそのうちボーダーが実際に
+  表示されているもの (`controlBase` のみ) に適用しています. `CreateButton`/`UserMenuButton`
+  の `.menu` (ドロップダウンパネル) や `NavDrawer` の `.drawer` (ドロワー全体) は角丸の数値こそ
+  同じ 8px でしたが, ボタンではなくパネル/コンテナのため対象外としました — ボタンの見た目の
+  トークンとして導入した経緯を踏まえての判断です. パネル類にも広げるかどうかはユーザーに
+  未確認なので, 今後変更する際は先に相談してください.
 - `src/index.css` の `body` は `margin: 0` のみで, `padding` は付けません (`Header` が画面の
   上下左右いっぱいに表示されるべきデザインのため).
 - フォントは `src/styles/fonts.css` で `--font-body` ("Noto Sans JP") / `--font-mono` ("M PLUS 1

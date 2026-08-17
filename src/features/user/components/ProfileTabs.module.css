@@ -16,7 +16,7 @@
   padding: 10px 12px;
   margin: 6px 0;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--borderRadius-medium);
   background: transparent;
   color: var(--color-header-body);
   font: inherit;
