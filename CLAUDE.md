@@ -122,8 +122,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 ### ディレクトリの規約
 
 - `src/components/` — ドメインを知らない汎用部品.
-  - `ui/` — `Button`/`Avatar`/`IconLink`/`IconButton`/`MenuLink`/`Divider` などの原子的な部品と,
-    それらが共有するフック (`useTooltipAlign`, `useDismissablePopover`, `useEscapeKey`).
+  - `ui/` — `Button`/`Avatar`/`IconLink`/`IconButton`/`MenuLink`/`Divider`/`CurrentContentBar`
+    などの原子的な部品と, それらが共有するフック (`useTooltipAlign`, `useDismissablePopover`,
+    `useEscapeKey`).
   - `layout/` — `Header` とその内部部品 (`Breadcrumb`, `PrimaryNavLinks`,
     `useHeaderResponsiveLayout`, `getBreadcrumb`, 下部ヘッダーのスロットを提供する
     `HeaderBottomSlotContext`/`HeaderBottomPortal`), 全ページ共通の `AppLayout`
@@ -235,13 +236,23 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 `MenuLink` (`src/components/ui/MenuLink.tsx`) はこの土台の上にアイコン+可視ラベルを乗せた
 リンクです. `to` が `/^https?:\/\//` にマッチすれば `<a href>` (外部リンク), それ以外は
 `react-router` の `<NavLink to={...} end>` として描画します — `<Link>` ではなく `<NavLink>`
-なのは, 現在のパスと `to` が一致する項目に `.active` (menuItemBase 側で定義,
-hover と同じ背景 + `box-shadow: inset` の左脇の太い青線 `--color-current-content-bar`)
-を自動付与するためです. `end` を付けているのは, 付けないと `to="/"` が常にどのパスでも
-一致してしまう (NavLink は既定でプレフィックス一致) ためで, 現状ネストしたサブページが
-無いこととも合わせ, 完全一致で揃えています. 外部リンク (`<a href>`) 側は URL
-がそもそも現在のパスと一致し得ないため `.active` の対象外です. `onClick?: () => void`
+なのは, 現在のパスと `to` が一致する項目を強調するためです. `end` を付けているのは, 付けないと
+`to="/"` が常にどのパスでも一致してしまう (NavLink は既定でプレフィックス一致) ためで,
+現状ネストしたサブページが無いこととも合わせ, 完全一致で揃えています. 一致する項目には
+`.active` (menuItemBase 側で定義, hover と同じ背景) を付けつつ, `NavLink`
+の children-as-function (`{({ isActive }) => ...}`) で `isActive` が真の場合のみ
+`CurrentContentBar` (後述) を差し込みます. 外部リンク (`<a href>`) 側は URL
+がそもそも現在のパスと一致し得ないため対象外です. `onClick?: () => void`
 は任意で, ポップオーバー/ドロワーを閉じる目的で使います.
+
+`CurrentContentBar` (`src/components/ui/CurrentContentBar.tsx`) は「現在選択中/表示中」を示す
+左脇の太い青線 (`--color-current-content-bar`) だけを持つ汎用部品です. `position: absolute;
+top: 0; bottom: 0; left: 0;` の独立した `<span>` として重ねる作りで, `box-shadow: inset`
+を使わないのは, 親要素の `border-radius` に沿って角が丸まってしまうのを避けるためです —
+`menuItemBase.root` (`border-radius: 8px`) の上に乗せても直線のまま表示されます. 使う側は
+親要素に `position: relative` を指定した上で配置してください (`menuItemBase.root`
+は既に指定済み). 現状 `MenuLink` の `.active` でのみ使っていますが, 名前の通り
+リスト行など他の「現在選択中」を示したい箇所でも流用できる想定です.
 
 `icon`+`label` の定型に収まらない行 (`NavDrawer` の「問題を報告」ボタン, `UserMenuButton` の
 プロフィール行) は `MenuLink` を使わず `menuItemBase.root` を直接 `<button>`/`<Link>` に適用して

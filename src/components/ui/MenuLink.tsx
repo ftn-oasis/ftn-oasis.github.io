@@ -2,6 +2,7 @@ import type { TablerIcon } from "@tabler/icons-react";
 import clsx from "clsx";
 import { NavLink } from "react-router";
 
+import { CurrentContentBar } from "./CurrentContentBar";
 import { Icon } from "./Icon";
 
 import styles from "./menuItemBase.module.css";
@@ -43,7 +44,12 @@ function MenuLink({ to, label, icon, onClick, className }: MenuLinkProps) {
         clsx(styles.root, isActive && styles.active, className)
       }
     >
-      {content}
+      {({ isActive }) => (
+        <>
+          {isActive && <CurrentContentBar />}
+          {content}
+        </>
+      )}
     </NavLink>
   );
 }
