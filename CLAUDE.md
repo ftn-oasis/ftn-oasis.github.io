@@ -24,16 +24,21 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   が無いための暫定挙動です. `ProfileTabs` の「概要」タブの本文として `OverviewSection`
   (`src/features/user/components/`, 詳細は「プロフィールページの概要タブ」を参照)
   を実装済みですが, 「文書」「栞」タブの本文はまだ無く, タブを切り替えても何も表示されません.
+  `path="*"` の catch-all として `NotFoundPage` (`src/pages/`, 詳細は「404 ページ
+  (`NotFoundPage`)」を参照) も実装済みで, `/users/:userId` 以外のどのパスにもマッチしない
+  URL は 404 ページになります (以前はここが完全な白紙になっていました).
 
 現状できていないこと (着手する際は要確認):
 
-- **上記以外のページ**は依然として存在しません. Header/Drawer 内のリンク先の大半は
-  「まだページが存在しない」状態です. 新しいページを作る際, URL の命名は既存のリンク
-  (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など) と揃えてください. ユーザーの
-  プロフィールページは `/users/:userId` (`/` 直下ではなく `/users` 配下) に切り出してあるため,
-  新しいトップレベルのページ (`/foo` 等) を追加する際に `<Route>` の並び順を気にする必要は
-  ありません — 以前は `/:userId` という動的ルートが最上位にあり, 新しいページより前に置かないと
-  そちらに飲み込まれてしまう問題がありましたが, `/users` 配下に切り出したことで解消しています.
+- **`/users/:userId` 以外の実ページ**は依然として存在しません — Header/Drawer 内のリンク先の
+  大半は実際には `NotFoundPage` (404) が表示されるだけの状態です. 新しいページを作る際, URL
+  の命名は既存のリンク (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など) と揃えてください.
+  ユーザーのプロフィールページは `/users/:userId` (`/` 直下ではなく `/users` 配下) に
+  切り出してあるため, 新しいトップレベルのページ (`/foo` 等) を追加する際に `<Route>`
+  の並び順を気にする必要はありません (`path="*"` の `NotFoundPage` より前に置く必要は
+  ありますが, それ以外の既存ルートとの前後関係は無関係です) — 以前は `/:userId` という
+  動的ルートが最上位にあり, 新しいページより前に置かないとそちらに飲み込まれてしまう問題が
+  ありましたが, `/users` 配下に切り出したことで解消しています.
 - 認証/バックエンド — 存在しません. `src/lib/currentUser.ts` に仮のユーザー情報
   (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書/栞の件数
   (`DUMMY_DOCUMENT_COUNT`/`DUMMY_BOOKMARK_COUNT`) や, 「概要」タブの所属組織/文書一覧
@@ -506,6 +511,27 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 個別のコンポーネント側で上書きするのではなく, 根本原因である `App.css`
 とその import ごと削除しています — 同様に「揃えたはずなのに揃わない」ことがあれば,
 まずこの手のグローバルな残骸が無いか (`src/index.css`/`src/styles/` 以下) 疑ってください.
+
+## 404 ページ (`NotFoundPage`)
+
+`src/pages/NotFoundPage.tsx` は `App.tsx` の `path="*"` (`/users/:userId` の次, 一番最後の
+`<Route>`) に紐づく catch-all です. `AppLayout` 配下なので `Header` (上部の1行) は
+表示されますが, `HeaderBottomPortal` を使わないため下部ヘッダーのスロットは空のまま —
+「上部ヘッダーのみを残す」という要件はこの構造で自然に満たされます. 本文
+(`NotFoundPage.module.css` の `.root`) は `OverviewSection` と同様 `max-width: 1280px;
+padding: 24px 16px; margin: 0 auto;` で, 中身は `text-align: center` の「404」
+(`.code`, `width: 100%` を明示) と説明文の2行だけです.
+
+パンくずを空にする指示への対応として, `getBreadcrumb.ts` の最終フォールバック
+(`SPECIAL_ROOT_LABELS` にも `currentUser`/`/users/:userId` パターンにも一致しない場合)
+を, 従来の `segments.slice(0, 2)` (生のパス文字列を最大2階層表示) から `[]`
+(何も表示しない) に変更しました. **注意**: `SPECIAL_ROOT_LABELS` に登録済みのパス
+(`/issues`/`/documents` など) は, 対応する実ページがまだ無く実際には `NotFoundPage`
+が表示される場合でも, パンくず自体は登録済みの日本語名 (「指摘事項」等) を引き続き表示します
+— 未登録の完全に未知なパスのときだけパンくずが空になる, という判断です (`/:userId` が
+まだ分離されていなかった頃, 同様に「ユーザーが見つかりません」の裏でパンくずだけ表示され
+続けていたのと同じ考え方です). 「`NotFoundPage` が表示されている間は常にパンくずを空にする」
+という, より厳格な解釈が必要であれば実装を変更してください.
 
 ## アイコン・emblem パイプライン
 

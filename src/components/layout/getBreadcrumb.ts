@@ -30,7 +30,9 @@ function getBreadcrumb(pathname: string): string[] {
     return [specialLabel];
   }
 
-  return segments.slice(0, 2);
+  // どれにも一致しないパスは App.tsx の catch-all (NotFoundPage) が表示される想定
+  // のため, パンくずには何も出さない
+  return [];
 }
 
 export { getBreadcrumb };
