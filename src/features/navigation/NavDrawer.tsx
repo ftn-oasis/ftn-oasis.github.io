@@ -3,7 +3,7 @@ import {
   IconBuilding,
   IconCalendarTime,
   IconFileAlert,
-  IconFileDescription,
+  IconFileText,
   IconFileTextSpark,
   IconHome,
   IconMessageReport,
@@ -60,7 +60,7 @@ function NavDrawer({ open, onClose }: NavDrawerProps) {
         <MenuLink to="/pulls" icon={IconFileTextSpark} label="修正の提案" />
         <MenuLink
           to="/documents"
-          icon={IconFileDescription}
+          icon={IconFileText}
           label="全ての文書"
         />
         <MenuLink to="/books" icon={IconReceiptYen} label="全ての会計申請" />
