@@ -55,25 +55,52 @@ function NavDrawer({ open, onClose }: NavDrawerProps) {
           </button>
         </div>
 
-        <MenuLink to="/" icon={IconHome} label="ホーム" />
-        <MenuLink to="/issues" icon={IconFileAlert} label="指摘事項" />
-        <MenuLink to="/pulls" icon={IconFileTextSpark} label="修正提案" />
+        <MenuLink to="/" icon={IconHome} label="ホーム" onClick={onClose} />
+        <MenuLink
+          to="/issues"
+          icon={IconFileAlert}
+          label="指摘事項"
+          onClick={onClose}
+        />
+        <MenuLink
+          to="/pulls"
+          icon={IconFileTextSpark}
+          label="修正提案"
+          onClick={onClose}
+        />
         <MenuLink
           to="/documents"
           icon={IconFileText}
           label="全ての文書"
+          onClick={onClose}
         />
-        <MenuLink to="/books" icon={IconReceiptYen} label="全ての会計申請" />
+        <MenuLink
+          to="/books"
+          icon={IconReceiptYen}
+          label="全ての会計申請"
+          onClick={onClose}
+        />
         <MenuLink
           to="/meetings"
           icon={IconCalendarTime}
           label="予定されている会議"
+          onClick={onClose}
         />
 
         <Divider />
 
-        <MenuLink to="/materials" icon={IconBook2} label="規則･資料" />
-        <MenuLink to="/orgs" icon={IconBuilding} label="組織" />
+        <MenuLink
+          to="/materials"
+          icon={IconBook2}
+          label="規則･資料"
+          onClick={onClose}
+        />
+        <MenuLink
+          to="/orgs"
+          icon={IconBuilding}
+          label="組織"
+          onClick={onClose}
+        />
 
         <div className={styles.spacer} />
 
