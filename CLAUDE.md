@@ -358,6 +358,13 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   1階層目だけを日本語の表示名で表示します (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` に列挙—
   同様の性質を持つルートを新設したらここに追加). `/${currentUser.id}` (ユーザーのプロフィール
   ページ) も同様に1階層だけの特別扱いで, パス文字列ではなく `currentUser.name` を表示します.
+  `issues`/`pulls`/`notifications` も同様に追加済みで, それぞれ「指摘事項」「修正提案」「通知」
+  です — `issues`/`pulls` は他の特殊パスと違い, パンくずだけでなく `PrimaryNavLinks`/`NavDrawer`
+  のラベル (ヘッダーのツールチップ/ドロワーの表示文言) もこの表記に揃えるようユーザーから
+  指定されたため, そちらも変更済みです (`CreateButton` の「新たに改善点を指摘」は動詞句のため
+  対象外としています). `logout` はユーザー確認の結果, 専用画面になる想定のため
+  意図的に `SPECIAL_ROOT_LABELS` へ追加していません — 抜けているわけではないので,
+  新たに追加しないよう注意してください.
 - **レスポンシブな折り畳み** (`useHeaderResponsiveLayout.ts`) — `breadcrumbRef`/
   `searchWrapperRef`/`rightRef` の位置を `useEffect` (初回計測 + `resize` イベント, `pathname`
   が変わったら再計測) で測り, 2段階のブレークポイントを判定します.

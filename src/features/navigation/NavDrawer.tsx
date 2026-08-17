@@ -56,8 +56,8 @@ function NavDrawer({ open, onClose }: NavDrawerProps) {
         </div>
 
         <MenuLink to="/" icon={IconHome} label="ホーム" />
-        <MenuLink to="/issues" icon={IconFileAlert} label="改善点の指摘" />
-        <MenuLink to="/pulls" icon={IconFileTextSpark} label="修正の提案" />
+        <MenuLink to="/issues" icon={IconFileAlert} label="指摘事項" />
+        <MenuLink to="/pulls" icon={IconFileTextSpark} label="修正提案" />
         <MenuLink
           to="/documents"
           icon={IconFileText}

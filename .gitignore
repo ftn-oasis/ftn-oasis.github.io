@@ -28,3 +28,6 @@ emblems/optimized/
 
 # 個人的な作業メモ (指示のログなど)
 /Prompts.md
+
+# Playwright MCP の動作確認スクリーンショット/ログ
+/.playwright-mcp/

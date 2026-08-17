@@ -7,6 +7,9 @@ const SPECIAL_ROOT_LABELS: Record<string, string> = {
   organizations: "組織",
   meetings: "会議",
   books: "帳簿",
+  issues: "指摘事項",
+  pulls: "修正提案",
+  notifications: "通知",
 };
 
 // 表示する各階層の文字列を返す. 最後の要素が現在表示中のページ (呼び出し側でボールドにする)
