@@ -1,8 +1,12 @@
+/* left: -6px は menuItemBase.root の margin (6px, ボタンとの隙間を作るために
+   確保している) の中に納める位置. 3px 幅のバー + ボタンとの間の 3px の隙間で,
+   ちょうど margin 分 (6px) を使い切る計算 */
 .root {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
+  left: -6px;
   width: 3px;
+  border-radius: 999px;
   background: var(--color-current-content-bar);
 }

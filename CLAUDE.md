@@ -245,14 +245,18 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 がそもそも現在のパスと一致し得ないため対象外です. `onClick?: () => void`
 は任意で, ポップオーバー/ドロワーを閉じる目的で使います.
 
-`CurrentContentBar` (`src/components/ui/CurrentContentBar.tsx`) は「現在選択中/表示中」を示す
-左脇の太い青線 (`--color-current-content-bar`) だけを持つ汎用部品です. `position: absolute;
-top: 0; bottom: 0; left: 0;` の独立した `<span>` として重ねる作りで, `box-shadow: inset`
-を使わないのは, 親要素の `border-radius` に沿って角が丸まってしまうのを避けるためです —
-`menuItemBase.root` (`border-radius: 8px`) の上に乗せても直線のまま表示されます. 使う側は
-親要素に `position: relative` を指定した上で配置してください (`menuItemBase.root`
-は既に指定済み). 現状 `MenuLink` の `.active` でのみ使っていますが, 名前の通り
-リスト行など他の「現在選択中」を示したい箇所でも流用できる想定です.
+`CurrentContentBar` (`src/components/ui/CurrentContentBar.tsx`) は「現在選択中/表示中」を示す,
+両端が丸い太さ3pxの青線 (`--color-current-content-bar`) だけを持つ汎用部品です.
+`position: absolute; top: 0; bottom: 0;` の独立した `<span>` として重ねる作りで,
+`box-shadow: inset` を使わないのは, 親要素の `border-radius` に沿って角が丸まってしまうのを
+避けるためです — `menuItemBase.root` (`border-radius: 8px`) の上に乗せてもバー自身の
+`border-radius: 999px` だけで丸まり, ボタンの角には影響されません. 使う側は親要素に
+`position: relative` を指定した上で配置してください (`menuItemBase.root` は既に指定済み).
+`left: -6px` は `menuItemBase.root` の `margin: 0 6px` (バーがボタンと重ならず数px
+離れて収まるよう, 左右に用意した隙間) を前提にした値です — 別の場所で使う際, 親要素の
+左右の余白が 6px 分無い場合はこの値も調整してください. 現状 `MenuLink` の `.active`
+でのみ使っていますが, 名前の通りリスト行など他の「現在選択中」を示したい箇所でも
+流用できる想定です.
 
 `icon`+`label` の定型に収まらない行 (`NavDrawer` の「問題を報告」ボタン, `UserMenuButton` の
 プロフィール行) は `MenuLink` を使わず `menuItemBase.root` を直接 `<button>`/`<Link>` に適用して
