@@ -4,8 +4,9 @@ import { currentUser } from "@src/lib/currentUser";
 // これらのルートは階層が深くても1階層目だけを, 元のパス名ではなくこの表示名で示す
 const SPECIAL_ROOT_LABELS: Record<string, string> = {
   settings: "設定",
-  documents: "規則・資料",
-  organizations: "組織",
+  documents: "文書",
+  materials: "規則・資料",
+  orgs: "組織",
   meetings: "会議",
   books: "帳簿",
   issues: "指摘事項",

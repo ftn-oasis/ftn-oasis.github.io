@@ -72,16 +72,8 @@ function NavDrawer({ open, onClose }: NavDrawerProps) {
 
         <Divider />
 
-        <MenuLink
-          to="https://<subdomain>.io/documents"
-          icon={IconBook2}
-          label="規則･資料"
-        />
-        <MenuLink
-          to="https://<subdomain>.io/organizations"
-          icon={IconBuilding}
-          label="組織"
-        />
+        <MenuLink to="/materials" icon={IconBook2} label="規則･資料" />
+        <MenuLink to="/orgs" icon={IconBuilding} label="組織" />
 
         <div className={styles.spacer} />
 

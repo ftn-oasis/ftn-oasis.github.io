@@ -296,10 +296,18 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 プロフィール行) は `MenuLink` を使わず `menuItemBase.root` を直接 `<button>`/`<Link>` に適用して
 個別実装しています.
 
-`NavDrawer` 内の「規則･資料」「組織」は実際のドメインが未確定のため,
-`https://<subdomain>.io/{documents,organizations}` というプレースホルダーの外部URLを
-暫定的に使っています (バグではなく意図的な仮置きです — ルーティングを実装する際に
-実ドメインへ差し替えてください).
+`NavDrawer` 内の「規則･資料」(`/materials`)/「組織」(`/orgs`) は, 以前は実際のドメインが
+未確定のため `https://<subdomain>.io/{documents,organizations}` という外部URLの
+プレースホルダーでしたが, 内部ルーティングへ差し替え済みです. どちらも実ページは
+まだ無いため (前者は未着手, 後者は `/orgs/:orgId` はあっても一覧page `/orgs` 自体は
+無い), 現状はリンク先が `NotFoundPage` (404) になります.
+「規則･資料」は「文書」(`/documents`, `PrimaryNavLinks`/`CreateButton` の
+「全ての文書」「新たに文書を作成」が指す, 組織が作成する文書の機能) とは別物である
+点に注意してください — 当初 `getBreadcrumb.ts` の `documents` に「規則・資料」を
+割り当てていましたが, これは「規則･資料」がまだ外部URLだった頃の名残りで,
+実際には「文書」の方を指すべき値だったための誤りでした. 現在は `documents: "文書"`/
+`materials: "規則・資料"`/`orgs: "組織"` (`/orgs/:orgId` の判定より後に評価されるため,
+`/orgs` 単体のときだけ使われます) とそれぞれ独立させています.
 
 ### タブバー系: `tabBase.module.css`
 
@@ -387,7 +395,7 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 - **パンくず** (`Breadcrumb.tsx`) — `getBreadcrumb(pathname)` (`getBreadcrumb.ts`) が現在パスを
   `string[]` (各要素が1階層分の表示名) に変換し, `Breadcrumb` が `" / "` で結合して**配列の
   最後の要素だけ** `.current` (`font-weight: 700`) でボールド表示します. 既定では2階層まで
-  表示しますが, `settings`/`documents`/`organizations`/`meetings`/`books` は階層に関わらず
+  表示しますが, `settings`/`documents`/`materials`/`orgs`/`meetings`/`books` は階層に関わらず
   1階層目だけを日本語の表示名で表示します (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` に列挙—
   同様の性質を持つルートを新設したらここに追加). `/users/${userId}` (ユーザーのプロフィール
   ページ) も同様に1階層だけの特別扱いですが, `SPECIAL_ROOT_LABELS` とは別ロジックです —
