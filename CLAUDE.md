@@ -487,22 +487,43 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   `OrganizationListItem` の「組織アバター」+「組織名・役職」の行は, いずれも
   **アバターが先 (左), その右にテキスト**の順です (最初はユーザー側だけ逆順で実装し,
   後で揃える形になった経緯があります — 新しく同種の行を追加する際もこの順に揃えてください).
-  どちらのアバターも `Avater` (`src/components/ui/Avatar.tsx`) の `size="large"`
-  (50px, `aspect-ratio: 1` の正方形/円形) です. 組織アバターのみ `shape="square"`
-  (角丸 `--borderRadius-medium`, 既定は `shape="circle"`) を指定しています —
-  `border` (色・太さ) 自体は形状によらず共通の `.avatar` ルールにしているため,
-  「組織アバターのボーダーをユーザーアバターと揃える」という要件は自然に満たされます.
-  `size` は `"small"`/`"medium"`/`"large"` (よく使う大きさの preset) に加えて,
-  数値も直接受け付けます (例: `OrganizationHeaderBox` の `size={100}`,
-  `ActivityCard` の `size={40}`, `OrganizationSidebar` の `size={35}`)
-  — 1箇所でしか使わないような大きさのたびに新しい preset 名を増やすのを避けるための
-  設計です (`xlarge` という preset が一度作られましたが, 数値指定に置き換えて削除した
-  経緯があります). なお, 「隣接するテキストの2行分の高さに動的に合わせる」(`flex`
-  の stretch + `aspect-ratio` で幅を追従させる, `size="fill"` という名前で一時実装
-  していたもの) という案もありましたが, `.avatar` の `flex: none` や flex item
-  既定の `min-width`/`min-height: auto` (画像の実サイズが下限になる) の影響で
-  意図通りに縮まらず, 最終的に固定 50px に統一しました — 同様の動的サイジングを
-  試す際はこの実装がすでに一度うまくいかなかったことに注意してください.
+  ユーザーアバターは `Avater` (`src/components/ui/Avatar.tsx`) の `size="large"`
+  (50px), 組織アバターは `size="medium"` (40px, `OrganizationListItem` のみ
+  他より一回り小さい) で, どちらも `aspect-ratio: 1` の正方形/円形です.
+  組織アバターのみ `shape="square"` (角丸 `--borderRadius-medium`, 既定は
+  `shape="circle"`) を指定しています — `border` (色・太さ) 自体は形状によらず
+  共通の `.avatar` ルールにしているため, 「組織アバターのボーダーをユーザーアバターと
+  揃える」という要件は自然に満たされます. `size` は `"small"`/`"medium"`/`"large"`
+  (よく使う大きさの preset) に加えて, 数値も直接受け付けます (例:
+  `OrganizationHeaderBox` の `size={100}`, `ActivityCard` の `size={40}`,
+  `OrganizationSidebar` の `size={35}`) — 1箇所でしか使わないような大きさの
+  たびに新しい preset 名を増やすのを避けるための設計です (`xlarge` という
+  preset が一度作られましたが, 数値指定に置き換えて削除した経緯があります).
+  なお, 「隣接するテキストの高さに動的に合わせる」(`flex` の stretch +
+  `aspect-ratio` で幅を追従させる, `size="fill"` という名前で実装していたもの)
+  という案を, ユーザーアバター (2行分の高さ) →組織アバター (同じく2行分)
+  の順で**二度**試しましたが, どちらも最終的に固定サイズへ戻しています —
+  `.avatar` の `flex: none` や flex item 既定の `min-width`/`min-height: auto`
+  を上書きしてもなお, `width`/`height` が両方 `auto` かつ `aspect-ratio`
+  を持つ置換要素 (`<img>` など) は flexbox の仕様上 `align-items: stretch`
+  の対象外になる (画像本来の実サイズで描画される) ため, 単純な
+  `min-width/height: 0` だけでは解決しません. `height: 100%`
+  (`auto` を避けて stretch 対象にする) を試すと, 今度は逆にテキスト側
+  (`.text`, 同じく高さ `auto`) まで一緒に引き伸ばされて双方が異常に
+  巨大化する, 別の問題が発生しました. 動的サイジングを再挑戦する場合は
+  ResizeObserver 等での実測ベースのアプローチを検討してください —
+  純粋な CSS (flex stretch) でのアプローチはこれで二度とも実用に至って
+  いません.
+- `OrganizationListItem` はアイコン・組織名・役職の行全体が1つのボタンです —
+  `menuItemBase.root` (前述) を直接 `<Link to={`/orgs/${organization.id}`}>`
+  に適用しています (`UserMenuButton` のプロフィール行と同じパターン). `Organization`
+  (`features/user/types.ts`) の `id` は `features/organization/mockData.ts` の
+  `MOCK_ORGANIZATION.id` (`test-org`) と一致するものだけ実際のページが存在し,
+  それ以外 (`student-council`/`newspaper-club`) はダミーのリンク (404) です.
+  `menuItemBase.root` の `padding: 8px 12px` はアイコン1つ分の高さ (35px 前後)
+  を想定した値で, 40px のアバターを乗せるこの行には上下が余分だったため,
+  `a.root { padding-top: 0; padding-bottom: 0; }` (タグ込みセレクタで
+  `menuItemBase` とのカスケード順に依存せず確実に上書き) で打ち消しています.
 - `DocumentCard` は `.root` に `padding: 16px` (四方均等) を持たせ, タイトル行/説明文/
   メタ情報 (3行目) の間隔は個別の margin ではなく `.root` の `gap: 16px`
   で揃えて統一しています.
