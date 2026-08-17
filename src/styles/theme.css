@@ -95,6 +95,7 @@
   --color-body-body-em: var(--ctp-latte-text);
   --color-body-body-mono: var(--ctp-latte-text);
   --color-body-headline: var(--ctp-latte-text);
+  --color-body-subtext: var(--ctp-latte-subtext1);
   --color-body-background: var(--ctp-latte-base);
   --color-body-button-body: var(--ctp-latte-overlay2);
   --color-body-button-background: var(--color-header-background);
@@ -149,6 +150,7 @@
   --color-body-body-em: var(--ctp-mocha-text);
   --color-body-body-mono: var(--ctp-mocha-text);
   --color-body-headline: var(--ctp-mocha-text);
+  --color-body-subtext: var(--ctp-mocha-subtext1);
   --color-body-background: var(--ctp-mocha-base);
   --color-body-button-body: var(--ctp-mocha-overlay2);
   --color-body-button-background: var(--color-header-background);

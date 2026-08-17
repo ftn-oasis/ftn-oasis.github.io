@@ -22,8 +22,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   (`src/pages/`) を実装済みです. `currentUser.id` と一致しない `userId`
   (未知のユーザーや `/issues` のような他機能の予約パスなど) は「ユーザーが見つかりません」
   という結果になります — 実際のユーザー検索/存在チェックの API が無いための暫定挙動です.
-  `UserProfilePage` はアバター+ユーザー名と `ProfileTabs` を表示するのみで,
-  タブごとの本文切り替えはまだ実装していません.
+  `ProfileTabs` の「概要」タブの本文として `OverviewSection`
+  (`src/features/user/components/`, 詳細は「プロフィールページの概要タブ」を参照)
+  を実装済みですが, 「文書」「栞」タブの本文はまだ無く, タブを切り替えても何も表示されません.
 
 現状できていないこと (着手する際は要確認):
 
@@ -35,8 +36,9 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   (`/issues` などが「ユーザーが見つかりません」と表示されるのはこのためで, 実際に `/issues`
   ページを作る際に解消します).
 - 認証/バックエンド — 存在しません. `src/lib/currentUser.ts` に仮のユーザー情報
-  (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書/栞の件数も
-  ダミーの数値です (`DUMMY_DOCUMENT_COUNT`/`DUMMY_BOOKMARK_COUNT`).
+  (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書/栞の件数
+  (`DUMMY_DOCUMENT_COUNT`/`DUMMY_BOOKMARK_COUNT`) や, 「概要」タブの所属組織/文書一覧
+  (`src/features/user/mockData.ts`) も同様にダミーです.
 - テストスイート — 設定されていません.
 - `src/` 内の一部ファイルは空のスタブです (例: `SearchBar.tsx`). import
   されているからといって中身があるとは限らないので, 必ず内容を確認してください.
@@ -404,15 +406,97 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです (コンテナは
   `<nav>` ではなく `<div role="tablist">` — `<nav>` は landmark role のため `tablist` role
   と併用できません).
-- 選択状態は内部の `useState` で完結しており, 実際のページ本文の切り替えとはまだ接続されていません
-  (`onChange` prop はあるが `UserProfilePage` からは渡していません — 今のところタブを切り替えても
-  「概要」の本文が表示され続けます). タブごとの本文を実装する際に接続してください.
+- 選択状態自体は内部の `useState` で完結していますが (既定は先頭の `"overview"`),
+  `onChange` prop で選択キーを呼び出し元に通知します. `UserProfilePage` はこれを
+  自分の `useState` にミラーし, `selectedTab === "overview"` のときだけ
+  `OverviewSection` を描画する, という形で本文の切り替えに使っています —
+  「文書」「栞」タブは対応する本文コンポーネントがまだ無いため, 選択しても何も表示されません.
+  今後それらを実装する際は同じパターン (`selectedTab` の分岐を増やす) で接続してください.
 
 `src/pages/UserProfilePage.tsx` (`/:userId`) は `useParams()` で取った `userId` が
 `currentUser.id` と一致しない場合は「ユーザーが見つかりません」を表示します — 他ユーザーの実データが
 無いための暫定挙動で, 同時に `/issues` のような (まだページの無い) 他機能の予約パスが誤って
 プロフィールページとして表示されてしまうのも防いでいます (詳細は「プロジェクトについて」の
 「現状できていないこと」を参照).
+
+## プロフィールページの概要タブ (`OverviewSection`)
+
+`src/features/user/components/OverviewSection.tsx` は「概要」タブの本文です. README.md
+のファイル構造に合わせ, データ層は `features/user/` 直下に `types.ts` (`Organization`/
+`DocumentSummary`/`DocumentVisibility`)・`mockData.ts` (`MOCK_ORGANIZATIONS`/
+`MOCK_DOCUMENTS`, 実データ取得 API が無いためのダミーデータ. 他のページでも使い回せるよう
+`components/` の外, feature 直下に置いています) として置き, 表示側は
+`features/user/components/` 配下に分割しています (`ProfileSidebar`/
+`OrganizationListItem`/`PinnedDocuments`/`DocumentCard`).
+
+- `DocumentVisibility` (公開/非公開) は, `tsconfig.app.json` の `erasableSyntaxOnly`
+  により実際の TypeScript `enum` 構文が使えないため, `const オブジェクト + typeof
+  ... [keyof typeof ...]` で導出した union 型で enum 相当のものを表現しています —
+  `DocumentVisibility.Public` のように値としても, 型としても同じ名前で使えます.
+  真偽値ではなくこの形にしているのは, 将来公開範囲が増えても (例: 組織内限定など)
+  型を壊さず選択肢を追加できるようにするためです.
+- `OverviewSection.module.css` の `.root` が `max-width: 1280px; padding: 24px 16px;`
+  の `display: grid; grid-template-columns: 1fr 3fr;` で, 左をサイドバー
+  (`ProfileSidebar`), 右をメイン (`PinnedDocuments` を包む `<main>`) に1:3で分割します.
+  上下の `padding: 24px` はタブ直下に本文が詰まって見えないための独自の余白で,
+  指示された値ではありません.
+- `ProfileSidebar` の「ユーザーアバター」+「ユーザー名・メールアドレス」の行,
+  `OrganizationListItem` の「組織アバター」+「組織名・役職」の行は, いずれも
+  **アバターが先 (左), その右にテキスト**の順です (最初はユーザー側だけ逆順で実装し,
+  後で揃える形になった経緯があります — 新しく同種の行を追加する際もこの順に揃えてください).
+  どちらのアバターも `Avater` (`src/components/ui/Avatar.tsx`) の `size="large"`
+  (50px, `aspect-ratio: 1` の正方形/円形) です. 組織アバターのみ `shape="square"`
+  (角丸 `--borderRadius-medium`, 既定は `shape="circle"`) を指定しています —
+  `border` (色・太さ) 自体は形状によらず共通の `.avatar` ルールにしているため,
+  「組織アバターのボーダーをユーザーアバターと揃える」という要件は自然に満たされます.
+  元々 `large` は 300px でしたが呼び出し元が無かったため `xlarge` に改名して転用し,
+  `large` を 50px として使っています. なお, 「隣接するテキストの2行分の高さに
+  動的に合わせる」(`flex` の stretch + `aspect-ratio` で幅を追従させる, `size="fill"`
+  という名前で一時実装していたもの) という案もありましたが, `.avatar` の
+  `flex: none` や flex item 既定の `min-width`/`min-height: auto`
+  (画像の実サイズが下限になる) の影響で意図通りに縮まらず, 最終的に両方とも
+  固定 50px に統一しました — 同様の動的サイジングを試す際はこの実装がすでに
+  一度うまくいかなかったことに注意してください.
+- `DocumentCard` は `.root` に `padding: 16px` (四方均等) を持たせ, タイトル行/説明文/
+  メタ情報 (3行目) の間隔は個別の margin ではなく `.root` の `gap: 16px`
+  で揃えて統一しています.
+  - タイトル行: `IconFileText` (`size={20}`, リンクにはしない, 独立した要素) + 文書名
+    (`<Link>`, 太字・`--color-link` で青くしリンクであることを示す, サイズ `1rem`)
+    + 状態ラベル (`DocumentVisibility`, 背景透過+`--borderWidth-thin`のボーダー) を
+    左詰めで並べます (space-between で右に追いやらないよう, `.title` の `flex` は
+    `0 1 auto` — 伸びて後続の要素を右に追いやらないよう `flex-grow: 0`
+    のままにしています. 一度 `flex: 1 1 auto` にして省略記号 (`text-overflow:
+    ellipsis`) を効かせようとしたところ, 状態ラベルが右端に追いやられてしまったため
+    元に戻した経緯があります — 長い文書名の省略が必要になったら, ラベル側を
+    `flex-shrink: 0` で固定幅化した上で `.title` 側だけ伸縮させるなど,
+    左揃えを崩さない形で対応してください).
+  - 3行目 (`.meta`): 「`IconBuilding` (`size={16}`) + 組織名」と「`IconFile`
+    (`size={16}`) + ファイル種別」をそれぞれ `.metaGroup` としてまとめ, 2つの
+    `.metaGroup` 間の `gap` を通常のアイコン-文字間より広くとる (`24px`)
+    ことで別の情報であることを示しています. 組織名はボーダー無しのボタン
+    (`<Link>` にホバー背景だけを付けたもの) として `/${organizationId}`
+    (ホスト名を `~` と表記した場合の `~/組織名` 相当 — `~` の意味は下記コラムを参照)
+    にリンクします.
+  - 文書名の `<Link>` 以外の文字・アイコン (タイトル行の `IconFileText`, 状態ラベル,
+    説明文, 3行目一式) はすべて `--color-body-subtext` (Catppuccin `subtext1`,
+    `theme.css` に今回追加したトークン) で統一しています — 「これは実際にリンクである」
+    という視覚的な合図を `--color-link` の青に一本化するためです.
+  - リンク先はまだ実装していない文書ページ想定で `/${organizationId}/${documentId}`
+    の形にしています (`/${userId}/...` ではなく組織に紐付く点に注意). カード自体の
+    `border`/`border-radius` は指定が無かったため `--borderWidth-thin`/
+    `--borderRadius-medium` を流用しています.
+
+**`~` 表記について**: ユーザーからの指示文中の `~` はホスト名 (サイトのルート, 例:
+`https://fth-oasis.example`) を指します. `~/組織名` は「ホスト名直下の, その組織のパス」
+という意味です. 以降の指示でも同じ意味で使われる想定です.
+
+`DocumentCard` の説明文 (`.description`) が中央揃えに見える不具合を調べたところ,
+原因は Vite の React テンプレート由来の `src/App.css` (`#root { text-align: center;
+... }`, `App.tsx` から `import "./App.css"` されているだけで他に用途は無かった)
+が, 明示的に `text-align` を指定していない要素すべてに中央揃えを継承させていたためでした.
+個別のコンポーネント側で上書きするのではなく, 根本原因である `App.css`
+とその import ごと削除しています — 同様に「揃えたはずなのに揃わない」ことがあれば,
+まずこの手のグローバルな残骸が無いか (`src/index.css`/`src/styles/` 以下) 疑ってください.
 
 ## アイコン・emblem パイプライン
 

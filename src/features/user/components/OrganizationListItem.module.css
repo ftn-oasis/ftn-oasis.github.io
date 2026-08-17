@@ -1,0 +1,28 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.name {
+  overflow: hidden;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  overflow: hidden;
+  color: var(--color-body-body);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
