@@ -1,5 +1,6 @@
 import {
   IconBuildingPlus,
+  IconCalendarPlus,
   IconFileAlert,
   IconFilePlus,
   IconFileUpload,
@@ -52,6 +53,12 @@ function CreateButton() {
             to="/documents/new/upload"
             icon={IconFileUpload}
             label="文書をアップロード"
+            onClick={close}
+          />
+          <MenuLink
+            to="/meetings/new"
+            icon={IconCalendarPlus}
+            label="新たに会議を予定"
             onClick={close}
           />
 
