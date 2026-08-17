@@ -18,11 +18,10 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   の設定から自動検出し, 手動切り替えにも対応.
 - `NavDrawer` — 左からスライドインするメニュー (ホーム/各種申請/規則等/組織など).
 - ルーティングの土台と最初のページ — `App.tsx` に `<Routes>` を導入し, `AppLayout`
-  (`Header` + `<Outlet />`, 全ページ共通) 配下に `/:userId` → `UserProfilePage`
-  (`src/pages/`) を実装済みです. `currentUser.id` と一致しない `userId`
-  (未知のユーザーや `/issues` のような他機能の予約パスなど) は「ユーザーが見つかりません」
-  という結果になります — 実際のユーザー検索/存在チェックの API が無いための暫定挙動です.
-  `ProfileTabs` の「概要」タブの本文として `OverviewSection`
+  (`Header` + `<Outlet />`, 全ページ共通) 配下に `/users/:userId` → `UserProfilePage`
+  (`src/pages/`) を実装済みです. `currentUser.id` と一致しない `userId` (未知のユーザーなど)
+  は「ユーザーが見つかりません」という結果になります — 実際のユーザー検索/存在チェックの API
+  が無いための暫定挙動です. `ProfileTabs` の「概要」タブの本文として `OverviewSection`
   (`src/features/user/components/`, 詳細は「プロフィールページの概要タブ」を参照)
   を実装済みですが, 「文書」「栞」タブの本文はまだ無く, タブを切り替えても何も表示されません.
 
@@ -30,11 +29,11 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 - **上記以外のページ**は依然として存在しません. Header/Drawer 内のリンク先の大半は
   「まだページが存在しない」状態です. 新しいページを作る際, URL の命名は既存のリンク
-  (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など) と揃えてください. `/:userId`
-  という動的ルートが既に存在するため, 新しいトップレベルのページ (`/foo` 等) を追加する場合は
-  それより**前**に `<Route>` を並べてください — でないと `/:userId` に飲み込まれます
-  (`/issues` などが「ユーザーが見つかりません」と表示されるのはこのためで, 実際に `/issues`
-  ページを作る際に解消します).
+  (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など) と揃えてください. ユーザーの
+  プロフィールページは `/users/:userId` (`/` 直下ではなく `/users` 配下) に切り出してあるため,
+  新しいトップレベルのページ (`/foo` 等) を追加する際に `<Route>` の並び順を気にする必要は
+  ありません — 以前は `/:userId` という動的ルートが最上位にあり, 新しいページより前に置かないと
+  そちらに飲み込まれてしまう問題がありましたが, `/users` 配下に切り出したことで解消しています.
 - 認証/バックエンド — 存在しません. `src/lib/currentUser.ts` に仮のユーザー情報
   (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書/栞の件数
   (`DUMMY_DOCUMENT_COUNT`/`DUMMY_BOOKMARK_COUNT`) や, 「概要」タブの所属組織/文書一覧
@@ -142,7 +141,7 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   `features/user/components/` (`ProfileTabs`, README.md のファイル構造に合わせて `components/`
   を1段挟む配置 — `features/navigation/` とは階層が異なる点に注意) が存在.
 - `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
-  (`/:userId`) のみ存在.
+  (`/users/:userId`) のみ存在.
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
 - コンポーネントのスタイルは CSS Modules をコンポーネントと同じ場所に配置する方式です (`Foo.tsx` +
   `Foo.module.css`), `clsx` で合成します.
@@ -356,8 +355,11 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   最後の要素だけ** `.current` (`font-weight: 700`) でボールド表示します. 既定では2階層まで
   表示しますが, `settings`/`documents`/`organizations`/`meetings`/`books` は階層に関わらず
   1階層目だけを日本語の表示名で表示します (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` に列挙—
-  同様の性質を持つルートを新設したらここに追加). `/${currentUser.id}` (ユーザーのプロフィール
-  ページ) も同様に1階層だけの特別扱いで, パス文字列ではなく `currentUser.name` を表示します.
+  同様の性質を持つルートを新設したらここに追加). `/users/${userId}` (ユーザーのプロフィール
+  ページ) も同様に1階層だけの特別扱いですが, `SPECIAL_ROOT_LABELS` とは別ロジックです —
+  `userId` が `currentUser.id` と一致すればパス文字列ではなく `currentUser.name` を,
+  一致しなければ (実データが無いためどのみち「ユーザーが見つかりません」になりますが)
+  `userId` をそのまま表示します.
   `issues`/`pulls`/`notifications` も同様に追加済みで, それぞれ「指摘事項」「修正提案」「通知」
   です — `issues`/`pulls` は他の特殊パスと違い, パンくずだけでなく `PrimaryNavLinks`/`NavDrawer`
   のラベル (ヘッダーのツールチップ/ドロワーの表示文言) もこの表記に揃えるようユーザーから
@@ -392,7 +394,7 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 `src/features/user/components/ProfileTabs.tsx` (README.md のファイル構造に合わせ,
 `features/user/components/` に配置 — `features/navigation/` のようにフラットではなく `components/`
 を1段挟みます) は GitHub の User Profile ページを参考にしたタブバーです.
-`src/pages/UserProfilePage.tsx` (`/:userId`) がページの唯一の中身として,
+`src/pages/UserProfilePage.tsx` (`/users/:userId`) がページの唯一の中身として,
 `HeaderBottomPortal` (前述の「Header 固有の実装」を参照) 経由でグローバルヘッダー
 (`Header.tsx`) 内部のスロットへ描画しています — アバターやユーザー名などのプロフィール情報は
 表示しません. DOM 上でも実際に `<header>` の内側に含まれるため, `ProfileTabs.module.css`
@@ -420,11 +422,11 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   「文書」「栞」タブは対応する本文コンポーネントがまだ無いため, 選択しても何も表示されません.
   今後それらを実装する際は同じパターン (`selectedTab` の分岐を増やす) で接続してください.
 
-`src/pages/UserProfilePage.tsx` (`/:userId`) は `useParams()` で取った `userId` が
+`src/pages/UserProfilePage.tsx` (`/users/:userId`) は `useParams()` で取った `userId` が
 `currentUser.id` と一致しない場合は「ユーザーが見つかりません」を表示します — 他ユーザーの実データが
-無いための暫定挙動で, 同時に `/issues` のような (まだページの無い) 他機能の予約パスが誤って
-プロフィールページとして表示されてしまうのも防いでいます (詳細は「プロジェクトについて」の
-「現状できていないこと」を参照).
+無いための暫定挙動です. プロフィールページを `/` 直下ではなく `/users` 配下に切り出しているため,
+`/issues` のような (まだページの無い) 他機能の予約パスとの衝突は起きません (詳細は
+「プロジェクトについて」の「現状できていないこと」を参照).
 
 ## プロフィールページの概要タブ (`OverviewSection`)
 

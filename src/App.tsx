@@ -6,7 +6,7 @@ function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/:userId" element={<UserProfilePage />} />
+        <Route path="/users/:userId" element={<UserProfilePage />} />
       </Route>
     </Routes>
   );

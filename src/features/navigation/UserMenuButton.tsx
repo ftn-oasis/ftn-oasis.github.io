@@ -31,7 +31,7 @@ function UserMenuButton() {
       {open && (
         <div className={styles.menu}>
           <Link
-            to={`/${currentUser.id}`}
+            to={`/users/${currentUser.id}`}
             onClick={close}
             className={clsx(menuItemBase.root, styles.profileRow)}
           >

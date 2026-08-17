@@ -17,11 +17,12 @@ function getBreadcrumb(pathname: string): string[] {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) return [];
 
-  const [first] = segments;
+  const [first, second] = segments;
 
-  if (first === currentUser.id) {
-    // プロフィールページ: パス (ユーザーID) ではなくユーザー名を1階層だけ表示する
-    return [currentUser.name];
+  if (first === "users" && second) {
+    // プロフィールページ (/users/:userId): 自分自身なら ID ではなくユーザー名を,
+    // それ以外は ID をそのまま, どちらも1階層だけ表示する
+    return [second === currentUser.id ? currentUser.name : second];
   }
 
   const specialLabel = SPECIAL_ROOT_LABELS[first];
