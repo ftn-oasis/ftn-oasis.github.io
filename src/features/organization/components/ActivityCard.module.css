@@ -1,0 +1,88 @@
+/* カードの外形 (border/radius/padding) は DocumentCard と同じもの. あちらは
+   2列グリッドの1マス幅だが, こちらは幅いっぱいに引き延ばして使う */
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.actorName {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.timestamp {
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-body-headline);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+/* 会議の「日時」「開催場所」「出席者」をまとめる1行. 幅が足りない場合は
+   metaGroup 単位で折り返す (項目の途中では折り返さない) */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.metaGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ラベル (「日時」等) 自体は .meta の subtext のままにし, 値の部分だけ議題の
+   箇条書きと同じ色にする */
+.metaValue {
+  color: var(--color-body-body);
+}
+
+.list {
+  padding-left: 2rem;
+  margin: 0;
+  color: var(--color-body-body);
+  font-size: 0.875rem;
+}
+
+.readMore {
+  align-self: flex-start;
+  color: var(--color-link);
+  font-weight: 700;
+  text-decoration: underline;
+}

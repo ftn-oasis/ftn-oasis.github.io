@@ -1,3 +1,4 @@
+import { MOCK_ORGANIZATION } from "@src/features/organization/mockData";
 import { currentUser } from "@src/lib/currentUser";
 
 // これらのルートは階層が深くても1階層目だけを, 元のパス名ではなくこの表示名で示す
@@ -23,6 +24,11 @@ function getBreadcrumb(pathname: string): string[] {
     // プロフィールページ (/users/:userId): 自分自身なら ID ではなくユーザー名を,
     // それ以外は ID をそのまま, どちらも1階層だけ表示する
     return [second === currentUser.id ? currentUser.name : second];
+  }
+
+  if (first === "orgs" && second) {
+    // 組織プロフィールページ (/orgs/:orgId): 同様に ID ではなく組織名を1階層だけ表示する
+    return [second === MOCK_ORGANIZATION.id ? MOCK_ORGANIZATION.name : second];
   }
 
   const specialLabel = SPECIAL_ROOT_LABELS[first];

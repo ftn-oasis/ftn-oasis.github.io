@@ -24,25 +24,30 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   が無いための暫定挙動です. `ProfileTabs` の「概要」タブの本文として `OverviewSection`
   (`src/features/user/components/`, 詳細は「プロフィールページの概要タブ」を参照)
   を実装済みですが, 「文書」「栞」タブの本文はまだ無く, タブを切り替えても何も表示されません.
-  `path="*"` の catch-all として `NotFoundPage` (`src/pages/`, 詳細は「404 ページ
-  (`NotFoundPage`)」を参照) も実装済みで, `/users/:userId` 以外のどのパスにもマッチしない
-  URL は 404 ページになります (以前はここが完全な白紙になっていました).
+  同様に `/orgs/:orgId` → `OrganizationProfilePage` も実装済みです (詳細は
+  「組織プロフィールページ」を参照). `path="*"` の catch-all として `NotFoundPage`
+  (`src/pages/`, 詳細は「404 ページ (`NotFoundPage`)」を参照) も実装済みで,
+  `/users/:userId`/`/orgs/:orgId` 以外のどのパスにもマッチしない URL は 404 ページに
+  なります (以前はここが完全な白紙になっていました).
 
 現状できていないこと (着手する際は要確認):
 
-- **`/users/:userId` 以外の実ページ**は依然として存在しません — Header/Drawer 内のリンク先の
-  大半は実際には `NotFoundPage` (404) が表示されるだけの状態です. 新しいページを作る際, URL
-  の命名は既存のリンク (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など) と揃えてください.
-  ユーザーのプロフィールページは `/users/:userId` (`/` 直下ではなく `/users` 配下) に
-  切り出してあるため, 新しいトップレベルのページ (`/foo` 等) を追加する際に `<Route>`
-  の並び順を気にする必要はありません (`path="*"` の `NotFoundPage` より前に置く必要は
-  ありますが, それ以外の既存ルートとの前後関係は無関係です) — 以前は `/:userId` という
-  動的ルートが最上位にあり, 新しいページより前に置かないとそちらに飲み込まれてしまう問題が
-  ありましたが, `/users` 配下に切り出したことで解消しています.
+- **`/users/:userId`/`/orgs/:orgId` 以外の実ページ**は依然として存在しません —
+  Header/Drawer 内のリンク先の大半, および組織プロフィールページの「文書」「会計」「会議」
+  「設定」タブは実際には `NotFoundPage` (404) が表示されるだけの状態です. 新しいページを
+  作る際, URL の命名は既存のリンク (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など)
+  と揃えてください. ユーザー/組織のプロフィールページは `/users/:userId`/`/orgs/:orgId`
+  (`/` 直下ではなくそれぞれの配下) に切り出してあるため, 新しいトップレベルのページ
+  (`/foo` 等) を追加する際に `<Route>` の並び順を気にする必要はありません (`path="*"`
+  の `NotFoundPage` より前に置く必要はありますが, それ以外の既存ルートとの前後関係は
+  無関係です) — 以前は `/:userId` という動的ルートが最上位にあり, 新しいページより前に
+  置かないとそちらに飲み込まれてしまう問題がありましたが, 各々のプレフィックス配下に
+  切り出したことで解消しています.
 - 認証/バックエンド — 存在しません. `src/lib/currentUser.ts` に仮のユーザー情報
   (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書/栞の件数
   (`DUMMY_DOCUMENT_COUNT`/`DUMMY_BOOKMARK_COUNT`) や, 「概要」タブの所属組織/文書一覧
-  (`src/features/user/mockData.ts`) も同様にダミーです.
+  (`src/features/user/mockData.ts`), 組織プロフィールページの組織詳細/構成員/直近の動向
+  (`src/features/organization/mockData.ts`, `id: "test-org"` の1件のみ) も同様にダミーです.
 - テストスイート — 設定されていません.
 - `src/` 内の一部ファイルは空のスタブです (例: `SearchBar.tsx`). import
   されているからといって中身があるとは限らないので, 必ず内容を確認してください.
@@ -134,19 +139,23 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 ### ディレクトリの規約
 
 - `src/components/` — ドメインを知らない汎用部品.
-  - `ui/` — `Button`/`Avatar`/`IconLink`/`IconButton`/`MenuLink`/`Divider`/`CurrentContentBar`
-    などの原子的な部品と, それらが共有するフック (`useTooltipAlign`, `useDismissablePopover`,
-    `useEscapeKey`).
+  - `ui/` — `Button`/`Avatar`/`IconLink`/`IconButton`/`MenuLink`/`Divider`/`CurrentContentBar`/
+    `Label` などの原子的な部品と, それらが共有するフック (`useTooltipAlign`,
+    `useDismissablePopover`, `useEscapeKey`) や CSS Module (`controlBase`/`menuItemBase`/
+    `tabBase`, 「UI コンポーネントの共通パターン」を参照).
   - `layout/` — `Header` とその内部部品 (`Breadcrumb`, `PrimaryNavLinks`,
     `useHeaderResponsiveLayout`, `getBreadcrumb`, 下部ヘッダーのスロットを提供する
     `HeaderBottomSlotContext`/`HeaderBottomPortal`), 全ページ共通の `AppLayout`
     (`HeaderBottomSlotProvider` + `Header` + `<Outlet />`).
 - `src/features/<feature>/` — 機能ごとにまとまったコード. 現状 `features/navigation/` (`MenuButton`,
-  `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`, フラットに直下へ配置) と
-  `features/user/components/` (`ProfileTabs`, README.md のファイル構造に合わせて `components/`
-  を1段挟む配置 — `features/navigation/` とは階層が異なる点に注意) が存在.
+  `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`, フラットに直下へ配置),
+  `features/user/components/` (`ProfileTabs`/`OverviewSection` など, README.md のファイル構造に
+  合わせて `components/` を1段挟む配置 — `features/navigation/` とは階層が異なる点に注意),
+  `features/organization/components/` (`OrganizationTabs`/`OrganizationOverviewSection` など,
+  同じく `components/` を挟む配置. 詳細は「組織プロフィールページ」を参照) が存在.
 - `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
-  (`/users/:userId`) のみ存在.
+  (`/users/:userId`), `OrganizationProfilePage` (`/orgs/:orgId`), `NotFoundPage`
+  (`path="*"`) が存在.
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
 - コンポーネントのスタイルは CSS Modules をコンポーネントと同じ場所に配置する方式です (`Foo.tsx` +
   `Foo.module.css`), `clsx` で合成します.
@@ -292,6 +301,26 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 暫定的に使っています (バグではなく意図的な仮置きです — ルーティングを実装する際に
 実ドメインへ差し替えてください).
 
+### タブバー系: `tabBase.module.css`
+
+`ProfileTabs`/`OrganizationTabs` が使う, ヘッダー下部に隙間なく続けて表示するタブバー共通の
+見た目です (「Header 固有の実装」の「下部ヘッダーのスロット」を参照). `.root`
+(`padding: 0 16px` の横並び) / `.tab` (選択中以外は `--color-header-body-em`
+= Catppuccin `text`. 以前は `--color-header-body` = `overlay2` でしたが,
+選択中/非選択中を色ではなく太字+下線だけで区別するよう変更しました) / `.selected`
+(`::after` の絶対配置による下線. `CurrentContentBar` と同様, 親の `border-radius`
+を気にせず独立させるための構造で, 詳細は下記 `ProfileTabs` の実装解説を参照) /
+`.count` (件数バッジ, 背景は `--color-background`) を提供します. タグ非依存 (`class` の
+みで完結) なので, `ProfileTabs` (状態切り替えの `<button>`) と `OrganizationTabs`
+(実際にルーティングする `<NavLink>`) のどちらからも同じクラスをそのまま使えます —
+新しいタブバーを追加する際もこの土台を使ってください.
+
+`Label` (`src/components/ui/Label.tsx`) は背景透過+`--borderWidth-thin`のボーダーの
+丸いタグです. 元は `DocumentCard` の公開/非公開ラベル専用の CSS でしたが,
+`OrganizationHeaderBox` の組織種別ラベルでも同じ見た目が必要になったため汎用部品として
+切り出しました (README.md の `components/ui/Label.tsx` に対応). 種類を示す短いラベル
+全般 (状態, カテゴリなど) に使う想定です.
+
 ### ポップオーバー/ドロップダウンの共通パターン
 
 `CreateButton` (GitHub ヘッダーの New ボタンを参考にしたドロップダウン) と `UserMenuButton`
@@ -402,24 +431,16 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 `src/pages/UserProfilePage.tsx` (`/users/:userId`) がページの唯一の中身として,
 `HeaderBottomPortal` (前述の「Header 固有の実装」を参照) 経由でグローバルヘッダー
 (`Header.tsx`) 内部のスロットへ描画しています — アバターやユーザー名などのプロフィール情報は
-表示しません. DOM 上でも実際に `<header>` の内側に含まれるため, `ProfileTabs.module.css`
-の `.root` 自身は `background`/`border-bottom` を持たず (外側の `.header` が既に持っている
-ため二重に線が出てしまう), `padding: 0 16px` (`Header.module.css` の `.top` と揃えた値)
-だけを持ちます.
+表示しません. 見た目自体は `tabBase.module.css` (前述の「UI コンポーネントの共通パターン」を
+参照) を使っており, `ProfileTabs` 自身の CSS Module はありません.
 
 - `documentCount`/`bookmarkCount` prop (件数) が 0 または未指定の場合, 「文書」「栞」タブ
   自体を描画しません — 「概要」タブは常に表示されます. 件数はまだ実データが無いため,
   呼び出し側でダミーの数値を渡す想定です.
-- 選択中のタブは `.selected::after` の絶対配置 (`--color-link`, 太さ2px) と
-  `font-weight: 700` で強調し, それ以外はレギュラーのままにします. `.tab` 自身の
-  `border-bottom` にしていないのは, ボタンの `margin: 6px 0` の分だけ線が
-  ヘッダー下部の境界線より上に浮いて見えてしまうためで, `bottom: -6px`
-  でボタンの margin の外側 = ヘッダー下部の境界線の位置まで伸ばすことで沿わせています.
-  ホバー時は `menuItemBase` の行と同じ背景色 (`--color-header-button-hover`) のみで示し,
-  独自の box-shadow などは使っていません.
-  `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです (コンテナは
+- `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです (コンテナは
   `<nav>` ではなく `<div role="tablist">` — `<nav>` は landmark role のため `tablist` role
-  と併用できません).
+  と併用できません). `OrganizationTabs` (後述) と違い実際のルーティングは伴わない,
+  内部 `useState` だけの状態切り替えのため, `<button role="tab">` を使っています.
 - 選択状態自体は内部の `useState` で完結していますが (既定は先頭の `"overview"`),
   `onChange` prop で選択キーを呼び出し元に通知します. `UserProfilePage` はこれを
   自分の `useState` にミラーし, `selectedTab === "overview"` のときだけ
@@ -463,21 +484,24 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   (角丸 `--borderRadius-medium`, 既定は `shape="circle"`) を指定しています —
   `border` (色・太さ) 自体は形状によらず共通の `.avatar` ルールにしているため,
   「組織アバターのボーダーをユーザーアバターと揃える」という要件は自然に満たされます.
-  元々 `large` は 300px でしたが呼び出し元が無かったため `xlarge` に改名して転用し,
-  `large` を 50px として使っています. なお, 「隣接するテキストの2行分の高さに
-  動的に合わせる」(`flex` の stretch + `aspect-ratio` で幅を追従させる, `size="fill"`
-  という名前で一時実装していたもの) という案もありましたが, `.avatar` の
-  `flex: none` や flex item 既定の `min-width`/`min-height: auto`
-  (画像の実サイズが下限になる) の影響で意図通りに縮まらず, 最終的に両方とも
-  固定 50px に統一しました — 同様の動的サイジングを試す際はこの実装がすでに
-  一度うまくいかなかったことに注意してください.
+  `size` は `"small"`/`"medium"`/`"large"` (よく使う大きさの preset) に加えて,
+  数値も直接受け付けます (例: `OrganizationHeaderBox` の `size={100}`,
+  `ActivityCard` の `size={40}`, `OrganizationSidebar` の `size={35}`)
+  — 1箇所でしか使わないような大きさのたびに新しい preset 名を増やすのを避けるための
+  設計です (`xlarge` という preset が一度作られましたが, 数値指定に置き換えて削除した
+  経緯があります). なお, 「隣接するテキストの2行分の高さに動的に合わせる」(`flex`
+  の stretch + `aspect-ratio` で幅を追従させる, `size="fill"` という名前で一時実装
+  していたもの) という案もありましたが, `.avatar` の `flex: none` や flex item
+  既定の `min-width`/`min-height: auto` (画像の実サイズが下限になる) の影響で
+  意図通りに縮まらず, 最終的に固定 50px に統一しました — 同様の動的サイジングを
+  試す際はこの実装がすでに一度うまくいかなかったことに注意してください.
 - `DocumentCard` は `.root` に `padding: 16px` (四方均等) を持たせ, タイトル行/説明文/
   メタ情報 (3行目) の間隔は個別の margin ではなく `.root` の `gap: 16px`
   で揃えて統一しています.
   - タイトル行: `IconFileText` (`size={20}`, リンクにはしない, 独立した要素) + 文書名
     (`<Link>`, 太字・`--color-link` で青くしリンクであることを示す, サイズ `1rem`)
-    + 状態ラベル (`DocumentVisibility`, 背景透過+`--borderWidth-thin`のボーダー) を
-    左詰めで並べます (space-between で右に追いやらないよう, `.title` の `flex` は
+    + 状態ラベル (`DocumentVisibility`, `Label` (前述の「UI コンポーネントの共通パターン」
+    を参照) を使用) を左詰めで並べます (space-between で右に追いやらないよう, `.title` の `flex` は
     `0 1 auto` — 伸びて後続の要素を右に追いやらないよう `flex-grow: 0`
     のままにしています. 一度 `flex: 1 1 auto` にして省略記号 (`text-overflow:
     ellipsis`) を効かせようとしたところ, 状態ラベルが右端に追いやられてしまったため
@@ -485,20 +509,24 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
     `flex-shrink: 0` で固定幅化した上で `.title` 側だけ伸縮させるなど,
     左揃えを崩さない形で対応してください).
   - 3行目 (`.meta`): 「`IconBuilding` (`size={16}`) + 組織名」と「`IconFile`
-    (`size={16}`) + ファイル種別」をそれぞれ `.metaGroup` としてまとめ, 2つの
+    (`size={16}`) + ファイル種別」, さらに `document.lastEditedBy`
+    (組織プロフィールページの節を参照) がある場合のみ「`IconPencil`
+    (`size={16}`) + 「{name}が編集」」をそれぞれ `.metaGroup` としてまとめ,
     `.metaGroup` 間の `gap` を通常のアイコン-文字間より広くとる (`24px`)
     ことで別の情報であることを示しています. 組織名はボーダー無しのボタン
-    (`<Link>` にホバー背景だけを付けたもの) として `/${organizationId}`
-    (ホスト名を `~` と表記した場合の `~/組織名` 相当 — `~` の意味は下記コラムを参照)
-    にリンクします.
+    (`<Link>` にホバー背景だけを付けたもの) として `/orgs/${organizationId}`
+    (ホスト名を `~` と表記した場合の `~/orgs/組織ID` 相当 — `~` の意味は下記コラムを参照)
+    にリンクします. 組織プロフィールページ (`/orgs/:orgId`, 詳細は「組織プロフィールページ」
+    を参照) を実装した際に, 実在しない `/${organizationId}` だった旧リンクを
+    この実際のルートへ差し替えています.
   - 文書名の `<Link>` 以外の文字・アイコン (タイトル行の `IconFileText`, 状態ラベル,
     説明文, 3行目一式) はすべて `--color-body-subtext` (Catppuccin `subtext1`,
     `theme.css` に今回追加したトークン) で統一しています — 「これは実際にリンクである」
     という視覚的な合図を `--color-link` の青に一本化するためです.
-  - リンク先はまだ実装していない文書ページ想定で `/${organizationId}/${documentId}`
-    の形にしています (`/${userId}/...` ではなく組織に紐付く点に注意). カード自体の
-    `border`/`border-radius` は指定が無かったため `--borderWidth-thin`/
-    `--borderRadius-medium` を流用しています.
+  - リンク先はまだ実装していない文書ページ想定で `/orgs/${organizationId}/documents/${documentId}`
+    の形にしています (`/${userId}/...` ではなく組織に紐付く点に注意. こちらも組織プロフィール
+    ページ実装時に `/orgs/` 配下へ差し替えています). カード自体の `border`/`border-radius`
+    は指定が無かったため `--borderWidth-thin`/`--borderRadius-medium` を流用しています.
 
 **`~` 表記について**: ユーザーからの指示文中の `~` はホスト名 (サイトのルート, 例:
 `https://fth-oasis.example`) を指します. `~/組織名` は「ホスト名直下の, その組織のパス」
@@ -511,6 +539,108 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 個別のコンポーネント側で上書きするのではなく, 根本原因である `App.css`
 とその import ごと削除しています — 同様に「揃えたはずなのに揃わない」ことがあれば,
 まずこの手のグローバルな残骸が無いか (`src/index.css`/`src/styles/` 以下) 疑ってください.
+
+## 組織プロフィールページ
+
+`src/pages/OrganizationProfilePage.tsx` (`/orgs/:orgId`) は `UserProfilePage` と対になる
+ページです. `orgId` が `MOCK_ORGANIZATION.id` (`"test-org"`) と一致しない場合は
+「組織が見つかりません」を表示する, という判定も同じ考え方です. データ層は
+`features/organization/` 直下に `types.ts`/`mockData.ts`, 表示側は
+`features/organization/components/` 配下に分割しています.
+
+- **タブ (`OrganizationTabs`)** は `ProfileTabs` と見た目こそ `tabBase.module.css`
+  (前述) を共有していますが, 実装は別物です. `ProfileTabs` は本文切り替えが
+  `useState` だけで完結する (URL が変わらない) のに対し, `OrganizationTabs`
+  は各タブが実際の `<NavLink>` (概要 `/orgs/:orgId` (`end` 必須 — 無いと他の全タブでも
+  概要が選択中に見えてしまいます)/文書 `/orgs/:orgId/documents`/会計
+  `/orgs/:orgId/book`/会議 `/orgs/:orgId/meetings`/構成員 `/orgs/:orgId/members`/
+  設定 `/orgs/:orgId/settings`) です — 概要以外はいずれもまだ実ページが無いため,
+  選択すると `NotFoundPage` (404) が表示されます (ヘッダーの下部スロットも失われます.
+  「プロジェクトについて」の「現状できていないこと」を参照). **「設定」のリンク先は
+  依頼文に明記が無かったため, 他のタブと同じ `/orgs/:orgId/設定パス` の形で
+  `/orgs/:orgId/settings` と推測しています** — 別のパスにしたい場合は
+  `OrganizationTabs.tsx` の `tabs` 配列を修正してください.
+- **ヘッダーの Box (`OrganizationHeaderBox`)** は `height: 116px; margin: 24px 0;`
+  の横並びで, 左に組織アバター (`size={100} shape="square"`), 右にパンくず/組織名+
+  種別バッジ/概要文/メタ情報の4行を `justify-content: center` で縦に並べています.
+  - パンくず (`ancestorNames` + 自分の名前を `IconChevronRight` で繋いだもの) は
+    依頼文の「「組織の概要」と同じ大きさ」という指定の意図が明確ではなかったため,
+    説明文などと同じ二次的なテキストサイズ (`0.875rem`) として実装しました —
+    意図と違う場合は `OrganizationHeaderBox.module.css` の `.breadcrumb` を
+    調整してください. `organization.type === OrganizationType.Volunteer`
+    (有志) の場合と `ancestorNames` が空の場合はパンくず自体を描画しません.
+  - 種別バッジは `OrganizationType` (学級/執行機関/議決機関/独立委員会/クラブ/有志.
+    `DocumentVisibility` と同じ, `erasableSyntaxOnly` 対応の const オブジェクト +
+    union 型) を `Label` で表示します.
+  - 設立日 (`foundedAt?: string`) が無い場合は `IconCalendarWeek` ごとメタ情報の
+    その項目自体を描画しません (所属人数は常に表示).
+- **本文** は `OrganizationOverviewSection.module.css` の `.root` で
+  `max-width: 1280px; padding: 0 16px; margin: 0 auto;` として `OverviewSection`
+  と揃え, `.body` を `display: grid; grid-template-columns: 3fr 1fr;` で
+  左をメイン (`OrganizationActivityFeed`), 右をサイドバー (`OrganizationSidebar`)
+  に3:1で分割しています — `OverviewSection` の 1:3 (サイドバー:メイン, サイドバーが左)
+  とは列の比率も左右も逆なので, 実装する際に混同しないよう注意してください.
+  - `OrganizationSidebar` は「構成員」見出し + 参加ユーザーのアバター
+    (`size={35}`) を `flex-wrap: wrap` で左詰めに並べたものです.
+  - `OrganizationActivityFeed` は `IconClock` + 「直近の動向」見出し + `ActivityCard`
+    の一覧です. カードの外形 (`border`/`border-radius`/`padding: 16px`) は
+    `DocumentCard` と同じものを流用し, 幅だけ 100% に引き延ばしています. `.root`
+    には `box-sizing: border-box` を明示しています — これが無いと `width: 100%`
+    に `padding`/`border` が上乗せされて `main` の幅からはみ出す不具合になっていました
+    (`menuItemBase.root` の同種の注意書きを参照. `DocumentCard` はグリッドの stretch
+    に幅を委ねているため元々この問題が起きません).
+- **`ActivityCard`** はユーザーアバター (`size={40}`) + 名前 (太字) + 日時 (小さく,
+  名前の下) の共通ヘッダーの下に, `activity.type` ごとに異なる本文
+  (`MeetingActivityBody`/`MoneyActivityBody`/`DocumentActivityBody`,
+  `ActivityCard.tsx` 内の非 export のローカル関数) を出し分ける構成です.
+  - 会議作成: 「日時」「開催場所」「出席者」は鉤括弧を付けず `ラベル: 値` とし,
+    3つをまとめて1行 (`.meta`/`.metaGroup`, `DocumentCard` の `.meta`/`.metaGroup`
+    と同じ命名・考え方) にしています — `flex-wrap: wrap` なので, 画面が狭く1行に
+    収まらない場合は `metaGroup` 単位 (項目の途中ではなく) で折り返します.
+    「議題」だけ他とは別行のまま複数件のときに特別な形式になります (こちらも
+    鉤括弧は付けません) — 1件なら他と同じ `議題: 値`, 2件以上なら `議題:`
+    の行の下に箇条書きを続けます. `ラベル:` の部分 (「日時」等) は
+    `.meta`/`.fieldRow` の `--color-body-subtext` のままですが, 値の部分だけ
+    `.metaValue` (`--color-body-body`) で囲んで, 議題の箇条書き (`.list`,
+    同じく `--color-body-body`) と色を揃えています — ラベルより値を目立たせる
+    ための区別です. `.list` の `padding-left` は `2rem` (既定の `1.25em`
+    (約20px) から拡大した値) にしています.
+  - 金銭の出納: アイコンは `IconCreditCard` (当初 `IconCurrencyYen` でしたが変更).
+    金額は「収入」(`amount >= 0`)/「支出」(負) をコロンで数値に繋ぎ, 符号は付けず
+    絶対値 (`Math.abs`) で表示します (当初 `+`/`-` の符号付きで実装していましたが変更).
+    `toLocaleString()` 等でのカンマ区切りはせず (依頼文で明示的に「コンマ無し」),
+    末尾に「円」を付けています.
+  - 会議の議題/出納の項目/文書の変更点の箇条書きは, いずれも見出しの直下に
+    そのまま描画します (当初は出納/文書の2つだけ `padding: 16px` の Mantle 背景
+    Box で囲んでいましたが, 依頼により箇条書きは全種類とも Box 無しの
+    `.list` に統一しました — 会議の議題はもともと Box 無しだったため, これで
+    3種類の見た目が揃っています). 一覧が `ActivityCard.tsx` の
+    `READ_MORE_THRESHOLD` (= 5) 件以上のとき, 表示自体は先頭5件で打ち切り,
+    代わりに太字下線の「詳しく見る」(`ReadMoreLink`, 非 export のローカル関数)
+    を末尾に出します — 依頼文の会議/出納/文書それぞれのリンク先
+    (`/orgs/:orgId/meetings/:meetingId` など) に対応するページはまだ無いため,
+    実際にクリックすると 404 になります.
+- **データモデリング**: 依頼文に「上記にある ID などは組織とは分離して考え, データベースで
+  見た際には木構造ではなくなっている可能性があることに注意」という指示があったため,
+  `types.ts` の `Activity` (会議作成/金銭の出納/文書の変更) は組織の子要素として
+  ネストさせず, `MOCK_DOCUMENTS` (`features/user/mockData.ts`) と同じように
+  それぞれ独立した `id` + `organizationId` (参照用の外部キー相当のフィールド)
+  を持つフラットな配列として表現しています. 会議/出納/文書側の ID
+  (`meetingId`/`transactionId`/`documentId`/`versionId`) も同様に, 組織 ID
+  から導出/prefix したりせず, 完全に独立した文字列にしています — 実際の DB
+  設計でもこの形 (別テーブル + 外部キー) を想定した実装です.
+- **`currentUser` (test-user) との繋がり**: `/users/:userId` 側から組織プロフィール
+  ページの見え方を確認できるよう, `features/user/mockData.ts` の
+  `MOCK_ORGANIZATIONS` の1件を `test-org` (`features/organization/mockData.ts`
+  の `MOCK_ORGANIZATION` と同じ組織) にし, `MOCK_DOCUMENTS` の `bunkasai-plan`
+  (文化祭実行計画書) を `test-org` の所有にした上で `lastEditedBy: currentUser.name`
+  を設定しています. `DocumentSummary.lastEditedBy?: string` (無ければ非表示)
+  は今回追加したフィールドで, `DocumentCard` の3行目に `IconPencil` +
+  「{name}が編集」として表示します. `features/organization/mockData.ts` 側の
+  `bunkasai-plan` を編集した `DocumentChangeActivity` の `actorName` も
+  `currentUser.name` を直接参照しており (ハードコードした文字列を2箇所に
+  置いて食い違うのを防ぐため), 組織プロフィールページの「直近の動向」と
+  ユーザープロフィールページのカードが同じ編集を指しているのを確認できます.
 
 ## 404 ページ (`NotFoundPage`)
 

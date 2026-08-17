@@ -1,0 +1,8 @@
+.root {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}

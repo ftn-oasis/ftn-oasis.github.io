@@ -21,12 +21,6 @@
   width: 40px;
 }
 
-/* 50x50px. 300px だった旧 large の意味は xlarge へ移した
-   (呼び出し元が無かったため破壊的変更にはならない) */
 .large {
   width: 50px;
-}
-
-.xlarge {
-  width: 300px;
 }

@@ -1,5 +1,11 @@
 import { Icon } from "@src/components/ui/Icon";
-import { IconBuilding, IconFile, IconFileText } from "@tabler/icons-react";
+import { Label } from "@src/components/ui/Label";
+import {
+  IconBuilding,
+  IconFile,
+  IconFileText,
+  IconPencil,
+} from "@tabler/icons-react";
 import { Link } from "react-router";
 
 import { DocumentVisibility, type DocumentSummary } from "../types";
@@ -28,14 +34,12 @@ function DocumentCard({ document }: DocumentCardProps) {
           className={styles.titleIcon}
         />
         <Link
-          to={`/${document.organizationId}/${document.id}`}
+          to={`/orgs/${document.organizationId}/documents/${document.id}`}
           className={styles.title}
         >
           {document.title}
         </Link>
-        <span className={styles.visibility}>
-          {VISIBILITY_LABEL[document.visibility]}
-        </span>
+        <Label>{VISIBILITY_LABEL[document.visibility]}</Label>
       </div>
 
       <p className={styles.description}>{document.description}</p>
@@ -44,7 +48,7 @@ function DocumentCard({ document }: DocumentCardProps) {
         <div className={styles.metaGroup}>
           <Icon icon={IconBuilding} size={16} aria-hidden="true" />
           <Link
-            to={`/${document.organizationId}`}
+            to={`/orgs/${document.organizationId}`}
             className={styles.organizationLink}
           >
             {document.organizationName}
@@ -54,6 +58,12 @@ function DocumentCard({ document }: DocumentCardProps) {
           <Icon icon={IconFile} size={16} aria-hidden="true" />
           <span>{document.fileType}</span>
         </div>
+        {document.lastEditedBy && (
+          <div className={styles.metaGroup}>
+            <Icon icon={IconPencil} size={16} aria-hidden="true" />
+            <span>{document.lastEditedBy}が編集</span>
+          </div>
+        )}
       </div>
     </div>
   );

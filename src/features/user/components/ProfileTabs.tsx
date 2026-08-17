@@ -1,7 +1,6 @@
+import styles from "@src/components/ui/tabBase.module.css";
 import clsx from "clsx";
 import { useState } from "react";
-
-import styles from "./ProfileTabs.module.css";
 
 type Tab = {
   key: string;

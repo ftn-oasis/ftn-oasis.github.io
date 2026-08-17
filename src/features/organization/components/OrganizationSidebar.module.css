@@ -1,0 +1,15 @@
+.root {
+  min-width: 0;
+}
+
+.heading {
+  margin: 0 0 8px;
+  color: var(--color-body-headline);
+  font-size: 1rem;
+}
+
+.memberList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

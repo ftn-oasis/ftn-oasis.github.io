@@ -1,0 +1,16 @@
+.root {
+  max-width: 1280px;
+  padding: 0 16px;
+  margin: 0 auto;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 24px;
+  padding: 24px 0;
+}
+
+.main {
+  min-width: 0;
+}

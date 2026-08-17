@@ -1,22 +1,28 @@
 // 実データを取得する API が無いため, 概要タブなどで使うダミーデータをまとめて置く場所
 
+import { currentUser } from "@src/lib/currentUser";
+
 import { DocumentVisibility, type DocumentSummary, type Organization } from "./types";
 
+// test-org (文化祭実行委員会) は features/organization/mockData.ts の
+// MOCK_ORGANIZATION と同じ組織を指す — 組織プロフィールページからユーザーの
+// プロフィールページへの繋がりを確認できるように, 同じ id で参照している
 const MOCK_ORGANIZATIONS: Organization[] = [
   { id: "student-council", name: "生徒会", role: "書記" },
   { id: "newspaper-club", name: "新聞部", role: "部長" },
-  { id: "library-committee", name: "図書委員会", role: "委員" },
+  { id: "test-org", name: "文化祭実行委員会", role: "委員" },
 ];
 
 const MOCK_DOCUMENTS: DocumentSummary[] = [
   {
     id: "bunkasai-plan",
-    organizationId: "student-council",
-    organizationName: "生徒会",
+    organizationId: "test-org",
+    organizationName: "文化祭実行委員会",
     title: "文化祭実行計画書",
     description: "今年度の文化祭の日程・予算・役割分担についてまとめた計画書です.",
     visibility: DocumentVisibility.Public,
     fileType: "PDF",
+    lastEditedBy: currentUser.name,
   },
   {
     id: "council-minutes-2026-08",
