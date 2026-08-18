@@ -1,7 +1,5 @@
 // 実データを取得する API が無いため, 概要タブなどで使うダミーデータをまとめて置く場所
 
-import { currentUser } from "@src/lib/currentUser";
-
 import { DocumentVisibility, type DocumentSummary, type Organization } from "./types";
 
 // test-org (文化祭実行委員会) は features/organization/mockData.ts の
@@ -22,7 +20,6 @@ const MOCK_DOCUMENTS: DocumentSummary[] = [
     description: "今年度の文化祭の日程・予算・役割分担についてまとめた計画書です.",
     visibility: DocumentVisibility.Public,
     fileType: "PDF",
-    lastEditedBy: currentUser.name,
   },
   {
     id: "council-minutes-2026-08",

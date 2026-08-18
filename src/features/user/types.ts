@@ -24,8 +24,6 @@ type DocumentSummary = {
   visibility: DocumentVisibility;
   // "PDF"/"Markdown"/"Text"/"MP4" など. 種類を限定しないため string
   fileType: string;
-  // 直近の編集者. 無い場合はカードに表示しない
-  lastEditedBy?: string;
 };
 
 export {

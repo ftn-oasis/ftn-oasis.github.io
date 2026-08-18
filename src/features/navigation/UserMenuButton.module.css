@@ -45,14 +45,15 @@
 .profileText {
   display: flex;
   flex-direction: column;
-  min-width: 0;
 }
 
 .userName {
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .userEmail {
-  font-size: 0.85em;
   color: var(--color-overlay1);
+  font-size: 0.85em;
+  white-space: nowrap;
 }

@@ -348,6 +348,12 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 - 中身の各行は `menuItemBase.module.css` (`MenuLink`, または独自の `<button>`) を使い,
   区切りが要る場合は `Divider` を挟みます.
 - トリガーが `IconButton` の場合は `hideTooltip={open}` を渡してください (「正方形アイコン系」参照).
+- `UserMenuButton` のプロフィール行 (`.userName`/`.userEmail`) は `white-space: nowrap`
+  にしています — `.menu` は `min-width: 240px` (最小値のみで `width`/`max-width`
+  は指定していない) なので, 折り返しさえ起きなければ内容が長いときにパネル自体が
+  自然に (block/flex の shrink-to-fit で) 広がります. 折り返しを許すと, 長いメール
+  アドレスなどが `min-width` の範囲内で複数行に割れてしまうため, 折り返さずパネルの
+  幅で吸収する方針にしています.
 
 `NavDrawer` (`open`/`onClose` を外部から制御される, 左からスライドインする全画面ドロワー) は
 上記と構造が違うため同じフックは使いませんが, Escape 処理だけ `useEscapeKey(open, onClose)`
@@ -538,9 +544,7 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
     `flex-shrink: 0` で固定幅化した上で `.title` 側だけ伸縮させるなど,
     左揃えを崩さない形で対応してください).
   - 3行目 (`.meta`): 「`IconBuilding` (`size={16}`) + 組織名」と「`IconFile`
-    (`size={16}`) + ファイル種別」, さらに `document.lastEditedBy`
-    (組織プロフィールページの節を参照) がある場合のみ「`IconPencil`
-    (`size={16}`) + 「{name}が編集」」をそれぞれ `.metaGroup` としてまとめ,
+    (`size={16}`) + ファイル種別」をそれぞれ `.metaGroup` としてまとめ,
     `.metaGroup` 間の `gap` を通常のアイコン-文字間より広くとる (`24px`)
     ことで別の情報であることを示しています. 組織名はボーダー無しのボタン
     (`<Link>` にホバー背景だけを付けたもの) として `/orgs/${organizationId}`
@@ -662,14 +666,15 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   ページの見え方を確認できるよう, `features/user/mockData.ts` の
   `MOCK_ORGANIZATIONS` の1件を `test-org` (`features/organization/mockData.ts`
   の `MOCK_ORGANIZATION` と同じ組織) にし, `MOCK_DOCUMENTS` の `bunkasai-plan`
-  (文化祭実行計画書) を `test-org` の所有にした上で `lastEditedBy: currentUser.name`
-  を設定しています. `DocumentSummary.lastEditedBy?: string` (無ければ非表示)
-  は今回追加したフィールドで, `DocumentCard` の3行目に `IconPencil` +
-  「{name}が編集」として表示します. `features/organization/mockData.ts` 側の
-  `bunkasai-plan` を編集した `DocumentChangeActivity` の `actorName` も
-  `currentUser.name` を直接参照しており (ハードコードした文字列を2箇所に
-  置いて食い違うのを防ぐため), 組織プロフィールページの「直近の動向」と
-  ユーザープロフィールページのカードが同じ編集を指しているのを確認できます.
+  (文化祭実行計画書) を `test-org` の所有にしています.
+  `features/organization/mockData.ts` 側の `bunkasai-plan` を編集した
+  `DocumentChangeActivity` の `actorName` は `currentUser.name` を直接
+  参照しています (ハードコードした文字列を2箇所に置いて食い違うのを防ぐため).
+  当初は `DocumentSummary` に `lastEditedBy?: string` を追加し,
+  `DocumentCard` の3行目にも `IconPencil` + 「{name}が編集」として同じ編集を
+  表示していましたが, 自分自身のプロフィールページで「自分が編集した」と
+  表示するのは自明で不要と判断し, `lastEditedBy` フィールドごと削除しました
+  (`ActivityCard` 側の表示は組織のページなので引き続き有用です).
 
 ## 404 ページ (`NotFoundPage`)
 

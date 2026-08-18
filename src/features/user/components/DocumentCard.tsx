@@ -1,11 +1,6 @@
 import { Icon } from "@src/components/ui/Icon";
 import { Label } from "@src/components/ui/Label";
-import {
-  IconBuilding,
-  IconFile,
-  IconFileText,
-  IconPencil,
-} from "@tabler/icons-react";
+import { IconBuilding, IconFile, IconFileText } from "@tabler/icons-react";
 import { Link } from "react-router";
 
 import { DocumentVisibility, type DocumentSummary } from "../types";
@@ -58,12 +53,6 @@ function DocumentCard({ document }: DocumentCardProps) {
           <Icon icon={IconFile} size={16} aria-hidden="true" />
           <span>{document.fileType}</span>
         </div>
-        {document.lastEditedBy && (
-          <div className={styles.metaGroup}>
-            <Icon icon={IconPencil} size={16} aria-hidden="true" />
-            <span>{document.lastEditedBy}が編集</span>
-          </div>
-        )}
       </div>
     </div>
   );
