@@ -23,7 +23,8 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   は「ユーザーが見つかりません」という結果になります — 実際のユーザー検索/存在チェックの API
   が無いための暫定挙動です. `ProfileTabs` の「概要」タブの本文として `OverviewSection`
   (`src/features/user/components/`, 詳細は「プロフィールページの概要タブ」を参照)
-  を実装済みですが, 「文書」「栞」タブの本文はまだ無く, タブを切り替えても何も表示されません.
+  を実装済みですが, 「文書」タブの本文はまだ無く, タブを切り替えても何も表示されません
+  (「栞」タブは依頼により削除済みです).
   同様に `/orgs/:orgId` (概要タブ) と `/orgs/:orgId/documents` (文書タブ)
   も実装済みです (詳細は「組織プロフィールページ」「組織の文書一覧
   (`OrganizationDocumentsSection`)」を参照) — この2つは `OrganizationLayout`
@@ -49,8 +50,8 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   置かないとそちらに飲み込まれてしまう問題がありましたが, 各々のプレフィックス配下に
   切り出したことで解消しています.
 - 認証/バックエンド — 存在しません. `src/lib/currentUser.ts` に仮のユーザー情報
-  (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書/栞の件数
-  (`DUMMY_DOCUMENT_COUNT`/`DUMMY_BOOKMARK_COUNT`) や, 「概要」タブの所属組織/文書一覧
+  (`id`/`name`/`email`) を置いているだけです. `UserProfilePage` の文書の件数
+  (`DUMMY_DOCUMENT_COUNT`) や, 「概要」タブの所属組織/文書一覧
   (`src/features/user/mockData.ts`), 組織プロフィールページの組織詳細/構成員/直近の動向
   (`src/features/organization/mockData.ts`, `id: "test-org"` の1件のみ) も同様にダミーです.
 - テストスイート — 設定されていません.
@@ -472,9 +473,16 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 表示しません. 見た目自体は `tabBase.module.css` (前述の「UI コンポーネントの共通パターン」を
 参照) を使っており, `ProfileTabs` 自身の CSS Module はありません.
 
-- `documentCount`/`bookmarkCount` prop (件数) が 0 または未指定の場合, 「文書」「栞」タブ
-  自体を描画しません — 「概要」タブは常に表示されます. 件数はまだ実データが無いため,
-  呼び出し側でダミーの数値を渡す想定です.
+- `documentCount` prop (件数) が 0 または未指定の場合, 「文書」タブ自体を描画しません
+  — 「概要」タブは常に表示されます. 件数はまだ実データが無いため, 呼び出し側でダミーの
+  数値を渡す想定です. **「栞」タブは依頼により削除しました** — 以前は `bookmarkCount`
+  prop で同様に出し分けていましたが, `ProfileTabsProps`/`tabs` 配列/呼び出し元
+  (`UserProfilePage.tsx` の `DUMMY_BOOKMARK_COUNT`) ごと削除しています.
+- 各タブはラベルの左に `Icon` (`size={16}`, `aria-hidden="true"`) を表示します —
+  概要 `IconHome`/文書 `IconFileText` (組織側の同名タブと共通), 会計
+  `IconReceiptYen`/会議 `IconCalendarTime`/構成員 `IconUsers`/設定 `IconSettings`
+  (いずれも `OrganizationTabs`, 後述). `tabBase.module.css` の `.tab` は元々
+  `gap: 6px` を持っていた (アイコン追加を見越した値) ため, 追加の CSS 変更は不要でした.
 - `role="tablist"`/`role="tab"`/`aria-selected` を持たせた素朴な ARIA Tabs パターンです (コンテナは
   `<nav>` ではなく `<div role="tablist">` — `<nav>` は landmark role のため `tablist` role
   と併用できません). `OrganizationTabs` (後述) と違い実際のルーティングは伴わない,
@@ -483,8 +491,8 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   `onChange` prop で選択キーを呼び出し元に通知します. `UserProfilePage` はこれを
   自分の `useState` にミラーし, `selectedTab === "overview"` のときだけ
   `OverviewSection` を描画する, という形で本文の切り替えに使っています —
-  「文書」「栞」タブは対応する本文コンポーネントがまだ無いため, 選択しても何も表示されません.
-  今後それらを実装する際は同じパターン (`selectedTab` の分岐を増やす) で接続してください.
+  「文書」タブは対応する本文コンポーネントがまだ無いため, 選択しても何も表示されません.
+  今後実装する際は同じパターン (`selectedTab` の分岐を増やす) で接続してください.
 
 `src/pages/UserProfilePage.tsx` (`/users/:userId`) は `useParams()` で取った `userId` が
 `currentUser.id` と一致しない場合は「ユーザーが見つかりません」を表示します — 他ユーザーの実データが
@@ -627,7 +635,14 @@ React Router のネストしたルートでは, 親ルート (`/orgs/:orgId`) �
   「プロジェクトについて」の「現状できていないこと」を参照). **「設定」のリンク先は
   依頼文に明記が無かったため, 他のタブと同じ `/orgs/:orgId/設定パス` の形で
   `/orgs/:orgId/settings` と推測しています** — 別のパスにしたい場合は
-  `OrganizationTabs.tsx` の `tabs` 配列を修正してください.
+  `OrganizationTabs.tsx` の `tabs` 配列を修正してください. 各タブはラベルの左に
+  `Icon` (`size={16}`, `aria-hidden="true"`) を表示します — 概要 `IconHome`/文書
+  `IconFileText`/会計 `IconReceiptYen`/会議 `IconCalendarTime`/構成員 `IconUsers`/
+  設定 `IconSettings` (`ProfileTabs` の項も参照. 依頼文の `IconRecipientYen`/
+  `IconSetting` は `@tabler/icons-react` に存在しない名称だったため, それぞれ
+  実在する `IconReceiptYen`/`IconSettings` に読み替えています — 前者は
+  `CreateButton` の「新たに会計申請を作成」, 後者は `DocumentFilterSidebar`
+  の「管理下」フィルターで既に使われているアイコンと同じです).
 - **ヘッダーの Box (`OrganizationHeaderBox`)** は `height: 116px; margin: 24px 0;`
   の横並びで, 左に組織アバター (`size={100} shape="square"`), 右にパンくず/組織名+
   種別バッジ/概要文/メタ情報の4行を `justify-content: center` で縦に並べています.

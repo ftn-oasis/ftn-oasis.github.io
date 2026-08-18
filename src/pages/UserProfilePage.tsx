@@ -7,10 +7,9 @@ import { useParams } from "react-router";
 
 import styles from "./UserProfilePage.module.css";
 
-// 文書/栞の件数はまだ実データが無いため, ダミーの数値を渡している
-// (ProfileTabs.tsx の documentCount/bookmarkCount の説明を参照)
+// 文書の件数はまだ実データが無いため, ダミーの数値を渡している
+// (ProfileTabs.tsx の documentCount の説明を参照)
 const DUMMY_DOCUMENT_COUNT = 3;
-const DUMMY_BOOKMARK_COUNT = 2;
 
 function UserProfilePage() {
   const { userId } = useParams();
@@ -28,7 +27,6 @@ function UserProfilePage() {
       <HeaderBottomPortal>
         <ProfileTabs
           documentCount={DUMMY_DOCUMENT_COUNT}
-          bookmarkCount={DUMMY_BOOKMARK_COUNT}
           onChange={setSelectedTab}
         />
       </HeaderBottomPortal>
