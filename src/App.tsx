@@ -1,5 +1,6 @@
 import { AppLayout } from "@src/components/layout/AppLayout";
 import { NotFoundPage } from "@src/pages/NotFoundPage";
+import { OrganizationBookPage } from "@src/pages/OrganizationBookPage";
 import { OrganizationDocumentsPage } from "@src/pages/OrganizationDocumentsPage";
 import { OrganizationLayout } from "@src/pages/OrganizationLayout";
 import { OrganizationOverviewPage } from "@src/pages/OrganizationOverviewPage";
@@ -14,6 +15,7 @@ function App() {
         <Route path="/orgs/:orgId" element={<OrganizationLayout />}>
           <Route index element={<OrganizationOverviewPage />} />
           <Route path="documents" element={<OrganizationDocumentsPage />} />
+          <Route path="book" element={<OrganizationBookPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>

@@ -1,0 +1,37 @@
+.root {
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  background: var(--color-secondary1);
+}
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.count {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.totalAmount {
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+/* ページ切り替え時にフォーカスが当たる (TransactionListBox.tsx) — 一覧の内容が
+   変わったことに気付けるよう, 枠の内側に青い outline を出す */
+.list:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

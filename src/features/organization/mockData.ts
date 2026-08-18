@@ -8,7 +8,9 @@ import {
   type OrganizationDetail,
   type OrganizationDocument,
   type OrganizationMember,
+  type OrganizationTransaction,
   OrganizationType,
+  PaymentMethod,
 } from "./types";
 
 const MOCK_ORGANIZATION: OrganizationDetail = {
@@ -155,10 +157,74 @@ const MOCK_ORGANIZATION_DOCUMENTS: OrganizationDocument[] = Array.from(
   },
 );
 
+// 入出金一覧 (/orgs/:orgId/book) 用のダミーデータ. ページネーションを実際に確認
+// できるよう, 支出/収入それぞれの理由を組み合わせて50件を機械的に生成している
+// (index % 3 === 0 のときだけ収入, それ以外は支出 — 実際のクラブ活動は支出の方が
+// 多いだろうという想定の比率)
+const TRANSACTION_EXPENSE_REASONS = [
+  "装飾用の布地",
+  "ガムテープ・養生テープ",
+  "油性マーカー",
+  "印刷用紙・インク",
+  "ポスター制作費",
+  "差し入れ菓子",
+  "備品修理費",
+  "交通費",
+  "会場使用料",
+  "景品購入費",
+];
+const TRANSACTION_INCOME_REASONS = [
+  "生徒会からの活動費支給",
+  "参加費徴収",
+  "廃品回収収益",
+  "PTA からの寄付金",
+  "前年度繰越金",
+];
+const TRANSACTION_METHODS = [
+  PaymentMethod.Cash,
+  PaymentMethod.BankTransfer,
+  PaymentMethod.DirectDebit,
+];
+
+// 2025/08/01 を起点に, index が進むほど新しい (作成/編集日時が後ろにずれる) ものとする
+const MOCK_TRANSACTION_LIST_BASE_DAY = Date.UTC(2025, 7, 1) / (24 * 60 * 60 * 1000);
+
+const MOCK_ORGANIZATION_TRANSACTIONS: OrganizationTransaction[] = Array.from(
+  { length: 50 },
+  (_, index) => {
+    const isIncome = index % 3 === 0;
+    const reasons = isIncome
+      ? TRANSACTION_INCOME_REASONS
+      : TRANSACTION_EXPENSE_REASONS;
+    const reason = reasons[index % reasons.length];
+    // 収入は 3000-30000円, 支出は 500-8500円 程度の範囲に収まるよう機械的に散らす
+    const amountAbs = isIncome
+      ? 3000 + (index % 10) * 3000
+      : 500 + (index % 9) * 1000;
+    const amount = isIncome ? amountAbs : -amountAbs;
+    const method = TRANSACTION_METHODS[index % TRANSACTION_METHODS.length];
+    const createdDay = MOCK_TRANSACTION_LIST_BASE_DAY + index;
+    // 編集日は作成日と同じか, 数日後
+    const editedDay = createdDay + (index % 3);
+
+    return {
+      id: `test-org-transaction-${index + 1}`,
+      organizationId: "test-org",
+      title: `${amountAbs}円`,
+      description: reason,
+      amount,
+      method,
+      createdAt: toIsoDate(createdDay),
+      editedAt: toIsoDate(editedDay),
+    };
+  },
+);
+
 export {
   MOCK_ACTIVITIES,
   MOCK_MEMBERS,
   MOCK_ORGANIZATION,
   MOCK_ORGANIZATION_DOCUMENTS,
+  MOCK_ORGANIZATION_TRANSACTIONS,
   MOCK_TAB_COUNTS,
 };

@@ -1,0 +1,33 @@
+/* 高さは固定せず, 中身 (文字) の高さにそのまま合わせる.
+   OrganizationOverviewSection の OrganizationHeaderBox と同様, サイドバー/メイン
+   の分割 (OrganizationBookSection.module.css の .body) より外側 (.root 直下)
+   に置き, 2列を跨いで表示する */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-body-headline);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

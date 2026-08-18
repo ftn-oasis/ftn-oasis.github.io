@@ -111,6 +111,49 @@ const DocumentSortDirection = {
 type DocumentSortDirection =
   (typeof DocumentSortDirection)[keyof typeof DocumentSortDirection];
 
+const PaymentMethod = {
+  Cash: "cash",
+  BankTransfer: "bank-transfer",
+  DirectDebit: "direct-debit",
+} as const;
+
+type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
+
+// 組織の入出金一覧 (/orgs/:orgId/book) の1件. amount は 収入: 正の数 / 支出: 負の数
+// (MoneyTransactionActivity と同じ約束). title は表示用に整形済みの金額文字列
+// (絶対値+円, 符号無し. 符号は一覧側で行頭の +/- アイコンとして表現する) を
+// 持たせ, OrganizationDocument.title と同じ扱いでソート/表示できるようにしている.
+// フィルター (子組織/種別/有効フラグなど) はまだ実装しないため, 対応するフィールドは
+// まだ持たせていない
+type OrganizationTransaction = {
+  id: string;
+  organizationId: string;
+  title: string;
+  description: string;
+  amount: number;
+  method: PaymentMethod;
+  // ソート用. 画面には表示しないため, 比較さえできれば良い ISO 形式の文字列
+  createdAt: string;
+  editedAt: string;
+};
+
+const TransactionSortField = {
+  EditedAt: "editedAt",
+  CreatedAt: "createdAt",
+  Title: "title",
+} as const;
+
+type TransactionSortField =
+  (typeof TransactionSortField)[keyof typeof TransactionSortField];
+
+const TransactionSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type TransactionSortDirection =
+  (typeof TransactionSortDirection)[keyof typeof TransactionSortDirection];
+
 export {
   ActivityType,
   type Activity,
@@ -120,7 +163,11 @@ export {
   type MeetingCreatedActivity,
   type MoneyTransactionActivity,
   type OrganizationDocument,
+  type OrganizationTransaction,
   OrganizationType,
   type OrganizationDetail,
   type OrganizationMember,
+  PaymentMethod,
+  TransactionSortDirection,
+  TransactionSortField,
 };
