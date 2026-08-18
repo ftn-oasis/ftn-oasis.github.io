@@ -3,6 +3,7 @@ import { NotFoundPage } from "@src/pages/NotFoundPage";
 import { OrganizationBookPage } from "@src/pages/OrganizationBookPage";
 import { OrganizationDocumentsPage } from "@src/pages/OrganizationDocumentsPage";
 import { OrganizationLayout } from "@src/pages/OrganizationLayout";
+import { OrganizationMembersPage } from "@src/pages/OrganizationMembersPage";
 import { OrganizationOverviewPage } from "@src/pages/OrganizationOverviewPage";
 import { UserProfilePage } from "@src/pages/UserProfilePage";
 import { Route, Routes } from "react-router";
@@ -16,6 +17,7 @@ function App() {
           <Route index element={<OrganizationOverviewPage />} />
           <Route path="documents" element={<OrganizationDocumentsPage />} />
           <Route path="book" element={<OrganizationBookPage />} />
+          <Route path="members" element={<OrganizationMembersPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>

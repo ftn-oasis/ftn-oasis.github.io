@@ -24,11 +24,25 @@ const MOCK_ORGANIZATION: OrganizationDetail = {
   ancestorNames: ["生徒会", "代表委員会"],
 };
 
+const MEMBER_ROLE_BY_INDEX: Record<number, string> = {
+  0: "委員長",
+  1: "副委員長",
+};
+const MEMBER_CLASSES = ["A", "B", "C", "D"];
+
+// 構成員一覧 (/orgs/:orgId/members) の動作確認も兼ねるため, 学年/学級/役職を
+// index から機械的に散らして生成している (実際の所属人数と一致させたいため,
+// documents/book のような大きめの件数は生成していない)
 const MOCK_MEMBERS: OrganizationMember[] = Array.from(
   { length: 12 },
   (_, index) => ({
     id: `test-org-member-${index + 1}`,
+    organizationId: "test-org",
     name: `委員${index + 1}`,
+    role: MEMBER_ROLE_BY_INDEX[index] ?? "委員",
+    email: `member${index + 1}@example.com`,
+    grade: (index % 3) + 1,
+    class: MEMBER_CLASSES[index % MEMBER_CLASSES.length],
   }),
 );
 

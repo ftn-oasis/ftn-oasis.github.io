@@ -26,9 +26,11 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   を実装済みですが, 「文書」タブの本文はまだ無く, タブを切り替えても何も表示されません
   (「栞」タブは依頼により削除済みです).
   同様に `/orgs/:orgId` (概要タブ) と `/orgs/:orgId/documents` (文書タブ)/
-  `/orgs/:orgId/book` (会計タブ) も実装済みです (詳細は「組織プロフィールページ」
-  「組織の文書一覧 (`OrganizationDocumentsSection`)」「組織の入出金一覧
-  (`OrganizationBookSection`)」を参照) — この3つは `OrganizationLayout`
+  `/orgs/:orgId/book` (会計タブ)/`/orgs/:orgId/members` (構成員タブ)
+  も実装済みです (詳細は「組織プロフィールページ」「組織の文書一覧
+  (`OrganizationDocumentsSection`)」「組織の入出金一覧
+  (`OrganizationBookSection`)」「組織の構成員一覧
+  (`OrganizationMembersSection`)」を参照) — この4つは `OrganizationLayout`
   (`src/pages/`) という共通の親ルートの下にネストしたルートとして実装しており,
   組織の存在チェックと `OrganizationTabs` の表示はそちらに集約されています.
   `path="*"` の catch-all として `NotFoundPage`
@@ -38,10 +40,11 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 現状できていないこと (着手する際は要確認):
 
-- **`/users/:userId`/`/orgs/:orgId`/`/orgs/:orgId/documents`/`/orgs/:orgId/book`
-  以外の実ページ**は依然として存在しません — Header/Drawer 内のリンク先の大半,
-  および組織プロフィールページの「会議」「設定」タブは実際には `NotFoundPage`
-  (404) が表示されるだけの状態です. 新しいページを
+- **`/users/:userId`/`/orgs/:orgId`/`/orgs/:orgId/documents`/`/orgs/:orgId/book`/
+  `/orgs/:orgId/members` 以外の実ページ**は依然として存在しません —
+  Header/Drawer 内のリンク先の大半, および組織プロフィールページの「会議」
+  「設定」タブは実際には `NotFoundPage` (404) が表示されるだけの状態です.
+  新しいページを
   作る際, URL の命名は既存のリンク (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など)
   と揃えてください. ユーザー/組織のプロフィールページは `/users/:userId`/`/orgs/:orgId`
   (`/` 直下ではなくそれぞれの配下) に切り出してあるため, 新しいトップレベルのページ
@@ -159,15 +162,17 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   `features/user/components/` (`ProfileTabs`/`OverviewSection` など, README.md のファイル構造に
   合わせて `components/` を1段挟む配置 — `features/navigation/` とは階層が異なる点に注意),
   `features/organization/components/` (`OrganizationTabs`/`OrganizationOverviewSection`/
-  `OrganizationDocumentsSection`/`OrganizationBookSection` など, 同じく `components/`
-  を挟む配置. 詳細は「組織プロフィールページ」「組織の文書一覧
-  (`OrganizationDocumentsSection`)」「組織の入出金一覧 (`OrganizationBookSection`)」
-  を参照) が存在.
+  `OrganizationDocumentsSection`/`OrganizationBookSection`/
+  `OrganizationMembersSection` など, 同じく `components/` を挟む配置. 詳細は
+  「組織プロフィールページ」「組織の文書一覧 (`OrganizationDocumentsSection`)」
+  「組織の入出金一覧 (`OrganizationBookSection`)」「組織の構成員一覧
+  (`OrganizationMembersSection`)」を参照) が存在.
 - `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
   (`/users/:userId`), `OrganizationLayout` (`/orgs/:orgId` の親ルート, 「組織が見つかりません」
   判定と `OrganizationTabs` の表示を担う) とその子ルート `OrganizationOverviewPage`
   (`/orgs/:orgId`, index route)/`OrganizationDocumentsPage`
-  (`/orgs/:orgId/documents`)/`OrganizationBookPage` (`/orgs/:orgId/book`),
+  (`/orgs/:orgId/documents`)/`OrganizationBookPage` (`/orgs/:orgId/book`)/
+  `OrganizationMembersPage` (`/orgs/:orgId/members`),
   `NotFoundPage` (`path="*"`) が存在.
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
 - コンポーネントのスタイルは CSS Modules をコンポーネントと同じ場所に配置する方式です (`Foo.tsx` +
@@ -1053,6 +1058,79 @@ gap: 16px; padding: 24px 0;`, サイドバー/`Divider`/メインは元の `.roo
   少なめですが, ページネーション (20件/ページで3ページ) の動作確認には十分な件数
   です). 収入は3000〜30000円, 支出は500〜8500円程度の範囲にそれぞれ収まるよう
   振れ幅を持たせています.
+
+## 組織の構成員一覧 (`OrganizationMembersSection`)
+
+`src/features/organization/components/OrganizationMembersSection.tsx` は
+`/orgs/:orgId/members` (「組織プロフィールページ」参照) の本文です. 文書一覧/
+入出金一覧と同様「基本的な構造は文書一覧と同じで, そこからの変更点」という
+依頼文の通り, `Document*` 系のコンポーネント一式を `Member*` として並行複製し,
+以下の差分だけを反映しています (レイアウトは `OrganizationBookSection`
+のような全幅の summary box を挟まない, `OrganizationDocumentsSection`
+と同じ1段のグリッドです — 依頼に無いため追加していません).
+
+- **`type OrganizationMember` の拡張**: 元々 `OrganizationSidebar`
+  (概要タブのアバター一覧) だけが使っていた `{ id: string; name: string; }`
+  という簡素な型に, 構成員一覧に必要な `organizationId`/`role`/`email`/
+  `grade` (学年, 1-3)/`class` (学級, "A"-"D") を追加する形で拡張しました
+  — `OrganizationDocument`/`OrganizationTransaction` のように別の型を
+  新設しなかったのは, 「構成員」という同一の実体を指しており, 概要タブ側は
+  拡張後の型のうち `id`/`name` だけを引き続き使えば済む (構造的部分型なので
+  そのままコンパイルが通る) ためです. `class` はフィールド名として
+  (TypeScript の予約語ですが, プロパティ名としては問題無く使えます) そのまま
+  採用しています. フィルター (子組織/参加状態など) はまだ実装しないため,
+  対応するフィールドは持たせていません.
+- **`MemberFilterSidebar`**: 依頼文で明示された3件 (`IconHome` 全て/
+  `IconBinaryTree` 組織内のみ/`IconUserOff` 退出済 (`query: "参加: false"`))
+  だけを持ちます. 構造は `DocumentFilterSidebar`/`TransactionFilterSidebar`
+  と同一です.
+- **`MemberListRow`**: 「1つの項目を2行にする」という依頼のため,
+  `DocumentListRow`/`TransactionListRow` (横一列3列) とは構成が異なります
+  — 先頭に `Avater size="medium"` (40px), 中央に名前 (`.title`, 太字)/
+  役職 (`.description`) を縦に並べた `.info`, 右端に右揃えでメールアドレス/
+  学年学級を縦に並べた `.meta` を配置し, `.info`/`.meta` がそれぞれ2行
+  になることで行全体が2行の高さになります. アイコンは
+  `IconMail` (メールアドレス) と `IconUserSquare`
+  (学年学級. 当初 `IconChalkboardTeacher` でしたが依頼により変更) です.
+  リンク先は `DocumentListRow`/`TransactionListRow` (組織に紐付く独自の
+  未実装ページ) とは異なり, 依頼により実在するユーザープロフィールページ
+  (`/users/:userId`, `member.id` をそのまま `userId` として使う) にしています
+  — `currentUser.id` と一致しない構成員 (現状ほぼ全員) は「ユーザーが
+  見つかりません」になりますが, これは `/users/:userId` 自体の既存の仕様
+  (他ユーザーの実データが無い) によるもので, `MemberListRow` 側の実装は
+  単純に `to={`/users/${member.id}`}` とするだけです.
+- **`MemberListBox`**: `DocumentListBox`/`TransactionListBox` と全く同じ構造
+  (ページ切り替え時の自動フォーカス, 矢印キーでの行移動, `role="listbox"`
+  + `tabIndex={-1}` を含む) です. 上部の件数表示は「n人の構成員」にしています
+  (`OrganizationHeaderBox` の「所属人数: n人」と同じ, 人を数える単位).
+- **`MemberSortDropdown`**: 依頼文で明示された3種類, 学年/学級/名前
+  (`MemberSortField.Grade`/`Class`/`Name`) です — `DocumentSortDropdown`
+  の日付2種+名称という構成とは全く異なる (共通点が無い) ため, 型
+  (`MemberSortField`/`MemberSortDirection`) も含めて独立して定義しています.
+  ソートの実装は `field === Name` なら `localeCompare("ja")`, `field ===
+  Class` なら学級を `localeCompare("ja")` (A<B<C<D の文字コード順で十分),
+  それ以外 (`Grade`) は数値の引き算です. **別フィールドを選び直した際の既定方向は
+  昇順 (`Asc`) にしています** — `DocumentSortDropdown`/`TransactionSortDropdown`
+  は日付の「新しい順」が自然な既定だったため降順でしたが, 学年/学級/名前は
+  「1年→3年」「A→D」「あ→ん」のような昇順が自然な既定だろうという判断です
+  (同じフィールドを選び直した場合に昇順/降順をトグルする挙動自体は同じです).
+  一覧の初期ソートも同じ理由で学年昇順 (`MemberSortField.Grade`/
+  `MemberSortDirection.Asc`) にしています.
+- **`MemberSearchBar`**: `DocumentSearchBar` と同一構造で, プレースホルダーの
+  みを「構成員を検索」にしています.
+- **モックデータ**: 「構成員」タブのバッジ (`MOCK_TAB_COUNTS.members`) が
+  `MOCK_ORGANIZATION.memberCount` と意図的に揃えてある (documents/book の
+  バッジとは異なり, 実際の人数を表す値として扱われている) 既存の設計方針を
+  踏まえ, 文書/入出金のように件数を大きく水増しした別データセットは作らず,
+  既存の `MOCK_MEMBERS` (12件, 元々 `OrganizationSidebar` 用) 自体を
+  `role`/`email`/`grade`/`class` を持つよう拡張して, 構成員一覧ページからも
+  同じ配列をそのまま使っています. 12件のみのためページネーションは
+  (`showPagination = pageCount > 1` の判定により) 表示されません — これは
+  「実際の所属人数と一致させる」ことを優先した結果で, ページネーションの
+  動作確認自体は文書一覧/入出金一覧の300件・50件で既に行っているため,
+  ここで改めて大きなダミーセットを作る必要は無いという判断です. 学年は
+  `(index % 3) + 1`, 学級は `["A","B","C","D"][index % 4]`, 役職は先頭2件を
+  「委員長」「副委員長」, 残りを「委員」としています.
 
 `src/pages/NotFoundPage.tsx` は `App.tsx` の `path="*"` (`/users/:userId` の次, 一番最後の
 `<Route>`) に紐づく catch-all です. `AppLayout` 配下なので `Header` (上部の1行) は

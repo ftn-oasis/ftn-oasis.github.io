@@ -23,10 +23,35 @@ type OrganizationDetail = {
   ancestorNames: string[];
 };
 
+// 構成員一覧 (/orgs/:orgId/members) の1件だが, OrganizationSidebar (概要タブの
+// アバター一覧) でも id/name だけを使う形で共用している. フィルター (子組織/参加
+// 状態など) はまだ実装しないため, 対応するフィールドはまだ持たせていない
 type OrganizationMember = {
   id: string;
+  organizationId: string;
   name: string;
+  role: string;
+  email: string;
+  // 学年 (1-3), 学級 ("A"-"D")
+  grade: number;
+  class: string;
 };
+
+const MemberSortField = {
+  Grade: "grade",
+  Class: "class",
+  Name: "name",
+} as const;
+
+type MemberSortField = (typeof MemberSortField)[keyof typeof MemberSortField];
+
+const MemberSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type MemberSortDirection =
+  (typeof MemberSortDirection)[keyof typeof MemberSortDirection];
 
 // 「直近の動向」の各カード. 実際のデータでは文書/会議/出納の ID は組織の子要素として
 // ツリー構造で持たれているとは限らないため, それぞれ独立した ID + organizationId の
@@ -160,6 +185,8 @@ export {
   type DocumentChangeActivity,
   DocumentSortDirection,
   DocumentSortField,
+  MemberSortDirection,
+  MemberSortField,
   type MeetingCreatedActivity,
   type MoneyTransactionActivity,
   type OrganizationDocument,
