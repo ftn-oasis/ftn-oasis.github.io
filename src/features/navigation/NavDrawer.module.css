@@ -28,6 +28,11 @@
   gap: 2px;
   padding: 8px;
   background: var(--color-header-background);
+
+  /* ヘッダーのパンくず (Breadcrumb.module.css) と同じ文字サイズに揃える.
+     menuItemBase.root/.closeButton/.reportButton はいずれも font: inherit
+     (または相対単位) のため, ここでカスケードするだけで反映される */
+  font-size: 0.9rem;
   border-right: 1px solid var(--color-border);
   border-radius: 0 8px 8px 0;
   transform: translateX(-100%);

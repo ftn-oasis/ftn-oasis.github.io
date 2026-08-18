@@ -270,10 +270,19 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 ### 横並びリスト行系: `menuItemBase.module.css`
 
-`NavDrawer`/`CreateButton`/`UserMenuButton` の中の各行が使う, `controlBase` とは別系統の土台です.
-正方形ではなく横幅 100%・中身は左揃え・ボーダーは通常時もhover時も常に非表示 (hoverは背景色の
-変化のみ) です. `.root` には `box-sizing: border-box` を明示しています (`<a>`/`<Link>` は既定で
-`content-box` のため, これがないと `width: 100%` に `padding` が上乗せしてはみ出します).
+`NavDrawer`/`CreateButton`/`UserMenuButton`/`DocumentFilterSidebar` の中の各行が使う,
+`controlBase` とは別系統の土台です. 正方形ではなく横幅 100%・中身は左揃え・ボーダーは
+通常時もhover時も常に非表示 (hoverは背景色の変化のみ) です. `.root` には
+`box-sizing: border-box` を明示しています (`<a>`/`<Link>` は既定で `content-box`
+のため, これがないと `width: 100%` に `padding` が上乗せしてはみ出します). `font-size`
+は `.root` 自体には持たせず `font: inherit` のままにしています — `NavDrawer.module.css`
+の `.drawer`/`DocumentFilterSidebar.module.css` の `.root` (呼び出し側のコンテナ) で
+`font-size: 0.9rem` (ヘッダーのパンくず, `Breadcrumb.module.css` と同じ値) を指定し,
+カスケードで反映させる形にしています — `CreateButton`/`UserMenuButton`
+のメニューなど, この指定をしていない呼び出し元は引き続き既定サイズ (1rem)
+のままです (「サイドバーとメニュードロワーの文字サイズをパンくずと揃えてほしい」
+という依頼が対象を明示していたため, 共有する `menuItemBase.root` 自体を
+変更せず, 対象の呼び出し元だけスコープする形にしています).
 
 `MenuLink` (`src/components/ui/MenuLink.tsx`) はこの土台の上にアイコン+可視ラベルを乗せた
 リンクです. `to` が `/^https?:\/\//` にマッチすれば `<a href>` (外部リンク), それ以外は
@@ -281,7 +290,11 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 なのは, 現在のパスと `to` が一致する項目を強調するためです. `end` を付けているのは, 付けないと
 `to="/"` が常にどのパスでも一致してしまう (NavLink は既定でプレフィックス一致) ためで,
 現状ネストしたサブページが無いこととも合わせ, 完全一致で揃えています. 一致する項目には
-`.active` (menuItemBase 側で定義, hover と同じ背景) を付けつつ, `NavLink`
+`.active` (menuItemBase 側で定義. 背景は hover と同じ, 文字は太字+`--color-header-body-em`
+(Catppuccin `text`) — 元は背景のみで区別していましたが, 「選択中の項目の文字を太字に,
+text色にしてほしい」という依頼で追加しました. `DocumentFilterSidebar`/
+`DocumentSortDropdown` も同じ `menuItemBase.active` を使うため, 併せて同じ見た目になります)
+を付けつつ, `NavLink`
 の children-as-function (`{({ isActive }) => ...}`) で `isActive` が真の場合のみ
 `CurrentContentBar` (後述) を差し込みます. 外部リンク (`<a href>`) 側は URL
 がそもそも現在のパスと一致し得ないため対象外です. `onClick?: () => void`
@@ -323,7 +336,10 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 見た目です (「Header 固有の実装」の「下部ヘッダーのスロット」を参照). `.root`
 (`padding: 0 16px` の横並び) / `.tab` (選択中以外は `--color-header-body-em`
 = Catppuccin `text`. 以前は `--color-header-body` = `overlay2` でしたが,
-選択中/非選択中を色ではなく太字+下線だけで区別するよう変更しました) / `.selected`
+選択中/非選択中を色ではなく太字+下線だけで区別するよう変更しました. `font-size`
+はヘッダーのパンくず (`Breadcrumb.module.css`) と同じ `0.9rem`
+にしています — 「ヘッダーのタブテキストのサイズをパンくずと揃えてほしい,
+文字色はそのまま」という依頼のため, `color` はそのまま変更していません) / `.selected`
 (`::after` の絶対配置による下線. `CurrentContentBar` と同様, 親の `border-radius`
 を気にせず独立させるための構造で, 詳細は下記 `ProfileTabs` の実装解説を参照) /
 `.count` (件数バッジ, 背景は `--color-background`) を提供します. タグ非依存 (`class` の

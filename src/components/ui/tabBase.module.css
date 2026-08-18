@@ -21,6 +21,9 @@
   background: transparent;
   color: var(--color-header-body-em);
   font: inherit;
+
+  /* ヘッダーのパンくず (Breadcrumb.module.css) と同じ文字サイズに揃える */
+  font-size: 0.9rem;
   text-decoration: none;
   cursor: pointer;
 }
