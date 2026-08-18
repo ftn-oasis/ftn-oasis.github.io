@@ -4,6 +4,9 @@ import menuItemBase from "@src/components/ui/menuItemBase.module.css";
 import { IconBinaryTree, IconHome, IconUserOff } from "@tabler/icons-react";
 import type { TablerIcon } from "@tabler/icons-react";
 import clsx from "clsx";
+import { useRef } from "react";
+
+import { useFixedSidebarPosition } from "../useFixedSidebarPosition";
 
 import styles from "./MemberFilterSidebar.module.css";
 
@@ -42,24 +45,33 @@ type MemberFilterSidebarProps = {
 // 選択中は検索欄の文字列と query が一致しているかどうかで判定する (フィルター自体は
 // まだ実装しないため, 選択してもメイン側の一覧は絞り込まれない)
 function MemberFilterSidebar({ searchText, onSelect }: MemberFilterSidebarProps) {
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  const position = useFixedSidebarPosition(placeholderRef);
+
   return (
-    <nav aria-label="構成員の絞り込み" className={styles.root}>
-      {MEMBER_FILTERS.map((filter) => {
-        const isActive = filter.query === searchText;
-        return (
-          <button
-            key={filter.key}
-            type="button"
-            className={clsx(menuItemBase.root, isActive && menuItemBase.active)}
-            onClick={() => onSelect(filter.query)}
-          >
-            {isActive && <CurrentContentBar />}
-            <Icon icon={filter.icon} aria-hidden="true" />
-            <span>{filter.label}</span>
-          </button>
-        );
-      })}
-    </nav>
+    <div ref={placeholderRef} className={styles.placeholder}>
+      <nav
+        aria-label="構成員の絞り込み"
+        className={styles.root}
+        style={position}
+      >
+        {MEMBER_FILTERS.map((filter) => {
+          const isActive = filter.query === searchText;
+          return (
+            <button
+              key={filter.key}
+              type="button"
+              className={clsx(menuItemBase.root, isActive && menuItemBase.active)}
+              onClick={() => onSelect(filter.query)}
+            >
+              {isActive && <CurrentContentBar />}
+              <Icon icon={filter.icon} aria-hidden="true" />
+              <span>{filter.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
 

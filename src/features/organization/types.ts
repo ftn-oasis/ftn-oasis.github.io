@@ -179,6 +179,47 @@ const TransactionSortDirection = {
 type TransactionSortDirection =
   (typeof TransactionSortDirection)[keyof typeof TransactionSortDirection];
 
+// 通常/延会 (mauve のラベル)/流会 (sky のラベル). 一覧の項目タイトル横のラベルに使う
+const MeetingStatus = {
+  Normal: "normal",
+  Postponed: "postponed",
+  Canceled: "canceled",
+} as const;
+
+type MeetingStatus = (typeof MeetingStatus)[keyof typeof MeetingStatus];
+
+// 組織の会議一覧 (/orgs/:orgId/meetings) の1件. フィルター (子組織/参加者/開催日
+// 前後など) はまだ実装しないため, 対応するフィールドはまだ持たせていない.
+// MeetingCreatedActivity (「直近の動向」用) とは別の, 一覧表示専用のフラットな型
+type OrganizationMeeting = {
+  id: string;
+  organizationId: string;
+  title: string;
+  agenda: string[];
+  location: string;
+  status: MeetingStatus;
+  // ソート/カレンダー表示用. 画面にはそのまま表示せず, 都度整形して使う
+  // ISO 形式 ("YYYY-MM-DDTHH:mm") の文字列
+  startsAt: string;
+  scheduledAt: string;
+};
+
+const MeetingSortField = {
+  StartsAt: "startsAt",
+  ScheduledAt: "scheduledAt",
+  Title: "title",
+} as const;
+
+type MeetingSortField = (typeof MeetingSortField)[keyof typeof MeetingSortField];
+
+const MeetingSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type MeetingSortDirection =
+  (typeof MeetingSortDirection)[keyof typeof MeetingSortDirection];
+
 export {
   ActivityType,
   type Activity,
@@ -188,8 +229,12 @@ export {
   MemberSortDirection,
   MemberSortField,
   type MeetingCreatedActivity,
+  MeetingSortDirection,
+  MeetingSortField,
+  MeetingStatus,
   type MoneyTransactionActivity,
   type OrganizationDocument,
+  type OrganizationMeeting,
   type OrganizationTransaction,
   OrganizationType,
   type OrganizationDetail,

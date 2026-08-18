@@ -1,0 +1,168 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  font-size: 0.75rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 4px;
+}
+
+/* サイドバーの他の文字 (フィルターボタンなど, MeetingFilterSidebar.module.css の
+   font-size: 0.9rem) と揃える */
+.headerLabel {
+  color: var(--color-body-headline);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* border/border-radius は持たない — calendarNavGroup.module.css の .root
+   (外枠) + .item (区切り線) がそれを担う. border は指定しない (`border: none;`
+   を書くと import 順序の都合で .item の border-left をここが上書きしてしまい,
+   区切り線が消えてしまう不具合になっていました — button の border 自体は
+   src/index.css のグローバルなベースラインで既に none になっているため,
+   ここで再指定する必要はありません) */
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.navButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.todayButton {
+  height: 20px;
+  padding: 0 6px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+}
+
+.todayButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.todayButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+/* 曜日の行/日付のグリッドは, サイドバーの幅いっぱいに引き伸ばさず
+   (align-items: stretch の既定を上書き) 内容の幅ぴったりに収めた上で
+   中央寄せにする — こうしないと週の枠線 (.weekHighlighted)
+   がサイドバーの余白領域まで囲んでしまう */
+.weekdayRow {
+  display: flex;
+  align-self: center;
+}
+
+.weeks {
+  align-self: center;
+}
+
+.weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  color: var(--color-body-subtext);
+}
+
+/* 週の行 (実体は <button> — クリックでその週を選択する). 2週間分の枠
+   (weekHighlighted 系, HIGHLIGHT_WEEK_COUNT@MiniCalendar.tsx) はここに直接
+   ボーダーを付け, 行間の隙間を無くすことで2行分がひとつながりの角丸長方形に
+   見えるようにしている. border-radius は :hover に付けない — weekHighlightTop/
+   Bottom の角だけを丸める指定と衝突し, ハイライト中の行をホバーした際に
+   四隅すべてが丸まってしまうため */
+.week {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+}
+
+.week:hover {
+  background: var(--color-body-button-hover);
+}
+
+.week:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.weekHighlighted {
+  border-right: var(--borderWidth-thin) solid var(--color-focus);
+  border-left: var(--borderWidth-thin) solid var(--color-focus);
+}
+
+.weekHighlightTop {
+  border-top: var(--borderWidth-thin) solid var(--color-focus);
+  border-top-left-radius: var(--borderRadius-medium);
+  border-top-right-radius: var(--borderRadius-medium);
+}
+
+.weekHighlightBottom {
+  border-bottom: var(--borderWidth-thin) solid var(--color-focus);
+  border-bottom-right-radius: var(--borderRadius-medium);
+  border-bottom-left-radius: var(--borderRadius-medium);
+}
+
+/* 1マスの固定サイズ. 横幅いっぱいの均等割り→20pxに詰める→22pxに戻す, と
+   経て, 「数字同士の間隔を1.5倍程度に」という依頼で 33px (22px の1.5倍)
+   にしています */
+.day {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  height: 33px;
+}
+
+/* 実際に文字/背景を持つ内側の円. 外側の .day (33px) より一回り小さくして,
+   「今日」の丸背景がマスの境界 (= 週の枠線) に接触しないよう余白を持たせている
+   (.day との比率は元の 22px:16px を保っています) */
+.dayInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--color-body-body);
+}
+
+/* 当月内の土日 (weekday: 通常の文字色のままなので指定無し) */
+.dayWeekend {
+  color: var(--color-body-subtext);
+}
+
+/* 前後月の日付 (土日かどうかは区別しない) */
+.dayOutside {
+  color: var(--color-overlay1);
+}
+
+.dayToday {
+  background: var(--color-link);
+  color: var(--color-background);
+  font-weight: 700;
+}

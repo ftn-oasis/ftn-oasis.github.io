@@ -2,11 +2,14 @@
 
 import { currentUser } from "@src/lib/currentUser";
 
+import { addDays } from "./calendarUtils";
 import {
   ActivityType,
   type Activity,
+  MeetingStatus,
   type OrganizationDetail,
   type OrganizationDocument,
+  type OrganizationMeeting,
   type OrganizationMember,
   type OrganizationTransaction,
   OrganizationType,
@@ -234,11 +237,86 @@ const MOCK_ORGANIZATION_TRANSACTIONS: OrganizationTransaction[] = Array.from(
   },
 );
 
+// 会議一覧 (/orgs/:orgId/meetings) 用のダミーデータ. カレンダー表示 (今日を含む
+// 前後の週) の動作確認も兼ねるため, 今日を基準に -10日〜+9日の20日間, 1日2件ずつ
+// (同じ日に複数件を重ねて表示できることも確認できるように) 40件を機械的に生成している
+const MEETING_TITLES = [
+  "定例会議",
+  "実行委員会",
+  "予算会議",
+  "進捗確認会議",
+  "打ち合わせ",
+  "全体会議",
+  "リーダー会議",
+  "反省会",
+  "企画会議",
+  "調整会議",
+];
+const MEETING_AGENDA_ITEMS = [
+  "前回議事録の確認",
+  "進捗報告",
+  "予算執行状況の確認",
+  "当日の役割分担",
+  "備品発注の確認",
+  "広報物の確認",
+  "スケジュール調整",
+  "連絡事項",
+  "次回日程の調整",
+  "アンケート結果の共有",
+];
+const MEETING_LOCATIONS = ["第一会議室", "第二会議室", "視聴覚室", "多目的室", "オンライン"];
+
+const MEETING_ANCHOR = new Date();
+MEETING_ANCHOR.setHours(0, 0, 0, 0);
+
+function pad2(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+function toIsoDateTime(date: Date): string {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+}
+
+const MOCK_ORGANIZATION_MEETINGS: OrganizationMeeting[] = Array.from(
+  { length: 40 },
+  (_, index) => {
+    const dayOffset = Math.floor(index / 2) - 10;
+    const startsAt = addDays(MEETING_ANCHOR, dayOffset);
+    startsAt.setHours(15 + (index % 3), index % 2 === 0 ? 0 : 30, 0, 0);
+    // 予定日時 (会議が登録された日時) は開催の1週間前としている
+    const scheduledAt = addDays(startsAt, -7);
+
+    const status =
+      index % 9 === 0
+        ? MeetingStatus.Postponed
+        : index % 11 === 0
+          ? MeetingStatus.Canceled
+          : MeetingStatus.Normal;
+    const agendaCount = 2 + (index % 3);
+    const agenda = Array.from(
+      { length: agendaCount },
+      (_, i) => MEETING_AGENDA_ITEMS[(index + i) % MEETING_AGENDA_ITEMS.length],
+    );
+
+    return {
+      id: `test-org-meeting-${index + 1}`,
+      organizationId: "test-org",
+      title: MEETING_TITLES[index % MEETING_TITLES.length],
+      agenda,
+      location: MEETING_LOCATIONS[index % MEETING_LOCATIONS.length],
+      status,
+      startsAt: toIsoDateTime(startsAt),
+      scheduledAt: toIsoDateTime(scheduledAt),
+    };
+  },
+);
+
 export {
   MOCK_ACTIVITIES,
   MOCK_MEMBERS,
   MOCK_ORGANIZATION,
   MOCK_ORGANIZATION_DOCUMENTS,
+  MOCK_ORGANIZATION_MEETINGS,
   MOCK_ORGANIZATION_TRANSACTIONS,
   MOCK_TAB_COUNTS,
 };

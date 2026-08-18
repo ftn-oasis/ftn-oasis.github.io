@@ -10,6 +10,9 @@ import {
 } from "@tabler/icons-react";
 import type { TablerIcon } from "@tabler/icons-react";
 import clsx from "clsx";
+import { useRef } from "react";
+
+import { useFixedSidebarPosition } from "../useFixedSidebarPosition";
 
 import styles from "./TransactionFilterSidebar.module.css";
 
@@ -63,24 +66,33 @@ function TransactionFilterSidebar({
   searchText,
   onSelect,
 }: TransactionFilterSidebarProps) {
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  const position = useFixedSidebarPosition(placeholderRef);
+
   return (
-    <nav aria-label="入出金の絞り込み" className={styles.root}>
-      {TRANSACTION_FILTERS.map((filter) => {
-        const isActive = filter.query === searchText;
-        return (
-          <button
-            key={filter.key}
-            type="button"
-            className={clsx(menuItemBase.root, isActive && menuItemBase.active)}
-            onClick={() => onSelect(filter.query)}
-          >
-            {isActive && <CurrentContentBar />}
-            <Icon icon={filter.icon} aria-hidden="true" />
-            <span>{filter.label}</span>
-          </button>
-        );
-      })}
-    </nav>
+    <div ref={placeholderRef} className={styles.placeholder}>
+      <nav
+        aria-label="入出金の絞り込み"
+        className={styles.root}
+        style={position}
+      >
+        {TRANSACTION_FILTERS.map((filter) => {
+          const isActive = filter.query === searchText;
+          return (
+            <button
+              key={filter.key}
+              type="button"
+              className={clsx(menuItemBase.root, isActive && menuItemBase.active)}
+              onClick={() => onSelect(filter.query)}
+            >
+              {isActive && <CurrentContentBar />}
+              <Icon icon={filter.icon} aria-hidden="true" />
+              <span>{filter.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
 

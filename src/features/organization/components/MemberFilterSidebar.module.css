@@ -1,8 +1,17 @@
+/* グリッドのセル位置 (幅) だけを保持する, 見た目を持たないプレースホルダー
+   (DocumentFilterSidebar と同じ理由 — 詳細は useFixedSidebarPosition.ts を参照) */
+.placeholder {
+  min-width: 0;
+}
+
+/* position: fixed — スクロールしてもサイドバーが画面上部を基準として
+   留まるようにする. top/left/width は useFixedSidebarPosition が実測して
+   inline style で設定する (DocumentFilterSidebar と同じ理由) */
 .root {
   display: flex;
+  position: fixed;
   flex-direction: column;
   gap: 2px;
-  min-width: 0;
 
   /* ヘッダーのパンくず (Breadcrumb.module.css) と同じ文字サイズに揃える.
      menuItemBase.root は font: inherit のため, ここでカスケードするだけで反映される */

@@ -78,6 +78,8 @@
   --color-selection-background: hsl(var(--ctp-latte-overlay2) / 25%);
   --color-border: var(--ctp-latte-surface1);
   --color-current-content-bar: var(--ctp-latte-blue);
+  --color-label-sky: var(--ctp-latte-sky);
+  --color-label-mauve: var(--ctp-latte-mauve);
 
   /* header */
   --color-header-body: var(--ctp-latte-overlay2);
@@ -133,6 +135,8 @@
   --color-selection-background: hsl(var(--ctp-mocha-overlay2) / 25%);
   --color-border: var(--ctp-mocha-surface1);
   --color-current-content-bar: var(--ctp-mocha-blue);
+  --color-label-sky: var(--ctp-mocha-sky);
+  --color-label-mauve: var(--ctp-mocha-mauve);
 
   /* header */
   --color-header-body: var(--ctp-mocha-overlay2);
