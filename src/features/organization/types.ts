@@ -81,12 +81,45 @@ type Activity =
   | MoneyTransactionActivity
   | DocumentChangeActivity;
 
+// 組織の文書一覧 (/orgs/:orgId/documents) の1件. フィルター (子組織/関与/管理権限
+// など) はまだ実装しないため, 対応するフィールドはまだ持たせていない
+type OrganizationDocument = {
+  id: string;
+  organizationId: string;
+  title: string;
+  description: string;
+  fileType: string;
+  // ソート用. 画面には表示しないため, 比較さえできれば良い ISO 形式の文字列
+  createdAt: string;
+  editedAt: string;
+};
+
+const DocumentSortField = {
+  EditedAt: "editedAt",
+  CreatedAt: "createdAt",
+  Title: "title",
+} as const;
+
+type DocumentSortField =
+  (typeof DocumentSortField)[keyof typeof DocumentSortField];
+
+const DocumentSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type DocumentSortDirection =
+  (typeof DocumentSortDirection)[keyof typeof DocumentSortDirection];
+
 export {
   ActivityType,
   type Activity,
   type DocumentChangeActivity,
+  DocumentSortDirection,
+  DocumentSortField,
   type MeetingCreatedActivity,
   type MoneyTransactionActivity,
+  type OrganizationDocument,
   OrganizationType,
   type OrganizationDetail,
   type OrganizationMember,

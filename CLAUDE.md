@@ -24,17 +24,22 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   が無いための暫定挙動です. `ProfileTabs` の「概要」タブの本文として `OverviewSection`
   (`src/features/user/components/`, 詳細は「プロフィールページの概要タブ」を参照)
   を実装済みですが, 「文書」「栞」タブの本文はまだ無く, タブを切り替えても何も表示されません.
-  同様に `/orgs/:orgId` → `OrganizationProfilePage` も実装済みです (詳細は
-  「組織プロフィールページ」を参照). `path="*"` の catch-all として `NotFoundPage`
+  同様に `/orgs/:orgId` (概要タブ) と `/orgs/:orgId/documents` (文書タブ)
+  も実装済みです (詳細は「組織プロフィールページ」「組織の文書一覧
+  (`OrganizationDocumentsSection`)」を参照) — この2つは `OrganizationLayout`
+  (`src/pages/`) という共通の親ルートの下にネストしたルートとして実装しており,
+  組織の存在チェックと `OrganizationTabs` の表示はそちらに集約されています.
+  `path="*"` の catch-all として `NotFoundPage`
   (`src/pages/`, 詳細は「404 ページ (`NotFoundPage`)」を参照) も実装済みで,
   `/users/:userId`/`/orgs/:orgId` 以外のどのパスにもマッチしない URL は 404 ページに
   なります (以前はここが完全な白紙になっていました).
 
 現状できていないこと (着手する際は要確認):
 
-- **`/users/:userId`/`/orgs/:orgId` 以外の実ページ**は依然として存在しません —
-  Header/Drawer 内のリンク先の大半, および組織プロフィールページの「文書」「会計」「会議」
-  「設定」タブは実際には `NotFoundPage` (404) が表示されるだけの状態です. 新しいページを
+- **`/users/:userId`/`/orgs/:orgId`/`/orgs/:orgId/documents` 以外の実ページ**は
+  依然として存在しません — Header/Drawer 内のリンク先の大半, および組織プロフィール
+  ページの「会計」「会議」「設定」タブは実際には `NotFoundPage` (404) が表示される
+  だけの状態です. 新しいページを
   作る際, URL の命名は既存のリンク (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など)
   と揃えてください. ユーザー/組織のプロフィールページは `/users/:userId`/`/orgs/:orgId`
   (`/` 直下ではなくそれぞれの配下) に切り出してあるため, 新しいトップレベルのページ
@@ -151,11 +156,14 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   `NavDrawer`, `CreateButton`, `UserMenuButton`, `ToggleThemeButton`, フラットに直下へ配置),
   `features/user/components/` (`ProfileTabs`/`OverviewSection` など, README.md のファイル構造に
   合わせて `components/` を1段挟む配置 — `features/navigation/` とは階層が異なる点に注意),
-  `features/organization/components/` (`OrganizationTabs`/`OrganizationOverviewSection` など,
-  同じく `components/` を挟む配置. 詳細は「組織プロフィールページ」を参照) が存在.
+  `features/organization/components/` (`OrganizationTabs`/`OrganizationOverviewSection`/
+  `OrganizationDocumentsSection` など, 同じく `components/` を挟む配置. 詳細は
+  「組織プロフィールページ」「組織の文書一覧 (`OrganizationDocumentsSection`)」を参照) が存在.
 - `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
-  (`/users/:userId`), `OrganizationProfilePage` (`/orgs/:orgId`), `NotFoundPage`
-  (`path="*"`) が存在.
+  (`/users/:userId`), `OrganizationLayout` (`/orgs/:orgId` の親ルート, 「組織が見つかりません」
+  判定と `OrganizationTabs` の表示を担う) とその子ルート `OrganizationOverviewPage`
+  (`/orgs/:orgId`, index route)/`OrganizationDocumentsPage`
+  (`/orgs/:orgId/documents`), `NotFoundPage` (`path="*"`) が存在.
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
 - コンポーネントのスタイルは CSS Modules をコンポーネントと同じ場所に配置する方式です (`Foo.tsx` +
   `Foo.module.css`), `clsx` で合成します.
@@ -575,10 +583,21 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 
 ## 組織プロフィールページ
 
-`src/pages/OrganizationProfilePage.tsx` (`/orgs/:orgId`) は `UserProfilePage` と対になる
-ページです. `orgId` が `MOCK_ORGANIZATION.id` (`"test-org"`) と一致しない場合は
-「組織が見つかりません」を表示する, という判定も同じ考え方です. データ層は
-`features/organization/` 直下に `types.ts`/`mockData.ts`, 表示側は
+`/orgs/:orgId` 配下は `src/pages/OrganizationLayout.tsx` を親ルートとする
+ネストしたルートです (`App.tsx` の `<Route path="/orgs/:orgId" element={<OrganizationLayout />}>`
+配下に index route `OrganizationOverviewPage`/`path="documents"` の
+`OrganizationDocumentsPage` を並べています). `OrganizationLayout` が
+`UserProfilePage` の「見つからない」判定 (`orgId` が `MOCK_ORGANIZATION.id`
+(`"test-org"`) と一致しない場合に「組織が見つかりません」を表示) と
+`OrganizationTabs` (下記) の表示をまとめて担い, 各ページ (`OrganizationOverviewPage`/
+`OrganizationDocumentsPage`) は本文コンポーネントを描画するだけの薄いラッパーです —
+`/orgs/:orgId` 配下のページが増えるたびに同じ判定/タブ表示を書き直さずに済むよう,
+文書タブ (`OrganizationDocumentsPage`) を追加したタイミングでこの形に切り出しました
+(切り出す前は `OrganizationProfilePage.tsx` という1ファイルが両方を兼ねていました).
+React Router のネストしたルートでは, 親ルート (`/orgs/:orgId`) の `useParams()`
+の結果は `<Outlet />` 経由で描画される子ルート側でもそのまま (マージされた形で)
+取得できるため, `OrganizationDocumentsPage` 自身は `orgId` を扱う必要がありません.
+データ層は `features/organization/` 直下に `types.ts`/`mockData.ts`, 表示側は
 `features/organization/components/` 配下に分割しています.
 
 - **タブ (`OrganizationTabs`)** は `ProfileTabs` と見た目こそ `tabBase.module.css`
@@ -587,7 +606,7 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   は各タブが実際の `<NavLink>` (概要 `/orgs/:orgId` (`end` 必須 — 無いと他の全タブでも
   概要が選択中に見えてしまいます)/文書 `/orgs/:orgId/documents`/会計
   `/orgs/:orgId/book`/会議 `/orgs/:orgId/meetings`/構成員 `/orgs/:orgId/members`/
-  設定 `/orgs/:orgId/settings`) です — 概要以外はいずれもまだ実ページが無いため,
+  設定 `/orgs/:orgId/settings`) です — 概要/文書以外はいずれもまだ実ページが無いため,
   選択すると `NotFoundPage` (404) が表示されます (ヘッダーの下部スロットも失われます.
   「プロジェクトについて」の「現状できていないこと」を参照). **「設定」のリンク先は
   依頼文に明記が無かったため, 他のタブと同じ `/orgs/:orgId/設定パス` の形で
@@ -676,7 +695,222 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   表示するのは自明で不要と判断し, `lastEditedBy` フィールドごと削除しました
   (`ActivityCard` 側の表示は組織のページなので引き続き有用です).
 
-## 404 ページ (`NotFoundPage`)
+## 組織の文書一覧 (`OrganizationDocumentsSection`)
+
+`src/features/organization/components/OrganizationDocumentsSection.tsx` は
+`/orgs/:orgId/documents` (「組織プロフィールページ」参照) の本文です. GitHub
+のリポジトリ一覧ページ (検索バー + フィルターサイドバー + ページネーション付きの
+一覧 Box) を参考にした構成で, `.root` を `display: grid;
+grid-template-columns: 1fr auto 3fr;` として左をサイドバー, 中央を縦の `Divider`,
+右をメインに1:3で分割しています (概要タブの `OrganizationOverviewSection`
+と同じ列比率・左右関係ですが, 分割線を挟む点が異なります). **当初は左をメイン
+右をサイドバーとして実装していましたが, 依頼により左右を逆転しています** —
+`OrganizationDocumentsSection.tsx` の JSX 上も `DocumentFilterSidebar` →
+`Divider` → `<main>` の順に変更済みです.
+
+- **状態は `OrganizationDocumentsSection` 1箇所に集約**しています —
+  `searchText`/`sortField`/`sortDirection`/`page` の4つの `useState` をこの
+  コンポーネントだけが持ち, 子コンポーネント (`DocumentFilterSidebar`/
+  `DocumentSearchBar`/`DocumentListBox`) はすべて値と `onChange` 系コールバックを
+  受け取るだけの制御コンポーネントです. 見出し・検索欄・サイドバーの選択状態は
+  いずれもこの単一の `searchText` から導出しています (下記).
+- **`DocumentFilterSidebar`**: `NavDrawer` などと同じ `menuItemBase.module.css`
+  を土台にした, フィルター選択の役割を持つボタンの縦リストです. フィルター自体
+  (「子組織: false」などのクエリ文字列によるドキュメントの絞り込み) はまだ実装して
+  いないため, ボタンを押すと `DOCUMENT_FILTERS` (`DocumentFilterSidebar.tsx` で
+  export) の対応する `query` 文字列を検索欄にそのまま入れるだけです — 一覧の中身は
+  絞り込まれません. 選択中の判定は `filter.query === searchText` の完全一致で行い,
+  一致するボタンにだけ `menuItemBase.active` (背景グレー) と `CurrentContentBar`
+  (左の青線) を付けます.
+- **`DocumentSearchBar`**: Header の検索ボタン (リンクのみで入力欄を持たない)
+  とは別物の, 実際に入力できるテキストボックスです. 文字が入っているときだけ
+  `IconCircleXFilled` の clear ボタン (`aria-label="検索文字列をクリア"`, クリックで
+  `onChange("")`) を表示し, 右端に `border-left` で区切った `surface0` 背景の
+  検索ボタン (`IconSearch`, クリックしても何もしません — フィルター自体が未実装のため)
+  を配置しています. `IconSearch` は `size` を明示せず `Icon` の既定値 (22px)
+  のままにしています — 当初 `size={18}` を指定していましたが, `IconButton`
+  内部のアイコン (同じく既定の22px) より小さく見えるという指摘を受けました.
+  実際に小さく見えていた原因は `size` の指定そのものではなく, `.searchButton`
+  に `padding` を明示していなかったために当時の `src/index.css` にあった
+  `button { padding: 8px 16px; ... }` (Vite テンプレート由来の, グローバルな
+  素の `button` セレクタへの残骸 — `DocumentCard` の説明文が中央揃えに見えた
+  `App.css` の `#root { text-align: center; }` と同じ系統の問題) が効いてしまい,
+  `width: 40px` の `.searchButton` の中身が実質8pxほどしか残らず, アイコンが
+  `flex-shrink` で潰れていたことでした. この `button {}` 残骸自体は後述の
+  「グローバル CSS のクリーンアップ」でサイト用のベースラインに置き換え済みですが,
+  `.searchButton` 側にも `padding: 0;` を明示したままにしています (他のボタンと
+  同様, 自身の見た目を自身の CSS Module 内で完結させる方針に揃えるため).
+- **見出しの導出**: `DOCUMENT_FILTERS.find((f) => f.query === searchText)` が
+  見つかればそのフィルターの `label` を, 見つからなければ (サイドバーのボタン
+  以外から検索欄に任意の文字列を入力した場合を含む) 「全て」を見出しとして
+  表示します — `DocumentFilterSidebar` の選択中判定と同じロジックをここでも
+  独立して行っています (両方とも同じ `DOCUMENT_FILTERS`/`searchText` を参照する
+  ため, サイドバーの選択状態と見出しは常に一致します).
+- **`DocumentSortDropdown`**: `CreateButton`/`UserMenuButton` と同じ
+  `useDismissablePopover` ベースのポップオーバーです. 現在の並び替え条件
+  (`DocumentSortField`: 最新編集日時/作成日/名称, `DocumentSortDirection`:
+  昇順/降順) に応じて `IconSortAscendingLetters`/`IconSortDescendingLetters`
+  を出し分けます. メニューでは3つの `DocumentSortField` だけを選べます — **同じ
+  項目を選び直すと昇順/降順がトグルし, 別の項目を選ぶとその項目の降順
+  (`DocumentSortDirection.Desc`) から始まります** (最新順/新しい順を既定とする
+  ほうが自然だろうという判断で, 明示的な依頼ではありません — 昇順を既定にしたい
+  場合は `OrganizationDocumentsSection.tsx` の `onSortChange` 呼び出し元
+  (`DocumentSortDropdown.tsx` 内) を調整してください). トリガーの末尾には
+  `IconCaretDownFilled` (`size={13}`) を付けています — `controlBase` の
+  `dropdown` prop (`IconButton`/`IconLink` の右隣に同じアイコンを添える仕組み,
+  「正方形アイコン系」参照) と同じ見た目の意図ですが, `DocumentSortDropdown`
+  のトリガーは正方形ではなく「アイコン+文字ラベル」の横長ボタンで `controlBase`
+  を使っていないため, 同じアイコンを個別に描画する形で揃えています.
+- **`DocumentListBox`**: 一覧全体を包む枠線付きの Box です. 上部の `.toolbar`
+  (`background: var(--color-secondary1)`) に「n本の文書」(検索にマッチする件数.
+  太字) と `DocumentSortDropdown` を並べます. 各行は `DocumentListRow` —
+  文書名 (太字)/概要/`IconFile` + ファイル種別を横並びにした, 行全体が1つの
+  `<Link to={`/${document.organizationId}/${document.id}`}>` になっている
+  ボタンです. リンク先はまだ実装していない文書ページ想定で, `OverviewSection`
+  の `DocumentCard` と同じ形式です. **`Pagination` はこの Box の内部ではなく,
+  呼び出し元 (`OrganizationDocumentsSection`) が Box の外側 (上下) に配置します**
+  — 当初は Box 内部の `.toolbar` 直下/一覧末尾に組み込んでいましたが,
+  「Box の外に出してほしい」という依頼を受け, `DocumentListBox` からは
+  `Pagination` の import と `page`/`pageCount`/`onPageChange` props
+  を削除し, `OrganizationDocumentsSection` 側で `pageCount > 1`
+  のときだけ `<Pagination>` を `<DocumentSearchBar>` の下と
+  `<DocumentListBox>` の下に直接並べる形にしています (`.main`
+  の `flex-direction: column; gap: 16px;` にそのまま乗るため,
+  `DocumentListBox.module.css` 側の `.paginationTop`/`.paginationBottom`
+  (区切り線付きの内部ラッパー) は不要になり削除しました).
+- **一覧のキーボード操作**: 「キーボードショートカットやコマンドなどでページを
+  変化させた際に, リストが変化したことが判るようにしてほしい」「リスト内の要素に
+  Tab フォーカスした際, 矢印キーで上下にフォーカス移動できるようにしてほしい」
+  という依頼により, `DocumentListRow` を並べる内側の `<div>`
+  (`DocumentListBox.tsx`) 自体をプログラム的にフォーカス可能にしています —
+  **`tabIndex={-1}` なので Tab キーの通常の移動順には含まれません**
+  (「Tab で移動している時はリスト全体にフォーカスが当たらないようにしてほしい」
+  という依頼のため, 当初の `tabIndex={0}` から変更しました). そのため Tab
+  で辿り着くのは常に個々の行 (`DocumentListRow`, 実体は `<a>`, 本来から
+  フォーカス可能) のほうで, 一覧自体へのフォーカスは下記の「ページ切り替え時の
+  自動フォーカス」など `.focus()` の明示的な呼び出し経由でのみ起こります.
+  - **ページ切り替え時に一覧へ自動フォーカス**: `page` prop
+    (`OrganizationDocumentsSection` から新たに渡すようにしたもの.
+    `Pagination` の props とは別に, この一覧の `useEffect` の依存目的だけで
+    渡しています) を前回値と比較する `useEffect` で, 実際に値が変わった
+    ときだけ一覧に `.focus()` します (`biome` の `useExhaustiveDependencies`
+    が「参照していない依存」を指摘するため, 単に `if (isFirstRender) return`
+    で済ませず `previousPageRef` と比較する形にして `page`
+    を実際にエフェクト内で参照するようにしています — 副作用として,
+    初回マウント時は前回値と同じなので自動的にフォーカスされません).
+    フォーカスが当たると `:focus-visible` で青い枠 (`--color-focus`)
+    が表示され, ページの内容が変わったことに気付けます.
+  - **`role="listbox"`**: 素の `<div>` に `tabIndex`/`onKeyDown`
+    を付けるだけだと biome の `lint/a11y/noStaticElementInteractions`/
+    `noNoninteractiveTabindex` に抵触するため, ARIA 上「操作可能」に
+    分類される役割が必要でした. `role="group"` はいずれも「非対話的」
+    扱いで同じ指摘が残ったため, ウィジェット役割である `role="listbox"`
+    にしています — 本来の listbox パターン (`role="option"` の子要素 +
+    `aria-selected`) までは実装していません (行は実際のページ遷移リンクの
+    ままにしたい — `role="option"` にすると Vimium 等からのリンク認識に
+    影響しかねないため) が, biome の a11y チェックを満たしつつ
+    「フォーカス可能なグループ」を表現する現実的な妥協です.
+  - **矢印キーでの行移動**: 一覧の `onKeyDown` で, フォーカスが行
+    (`<a>`) 上にあるとき (`document.activeElement` が一覧内の `<a>`
+    のいずれかと一致するとき) は ArrowUp/ArrowDown で前後の行へ
+    `.focus()` します (先頭/末尾の行では `Math.min`/`Math.max`
+    でそれ以上動かないようにしています). **一覧自体 (行以外, つまり
+    `role="listbox"` の `<div>` 自身) にフォーカスがある場合は,
+    下矢印で一番下の行, 上矢印で一番上の行へ直接ジャンプします**
+    (`currentIndex === -1` — `document.activeElement` が一覧内の
+    どの `<a>` とも一致しない — の場合の分岐) — 一覧全体にフォーカスが
+    当たった直後 (ページ切り替え時の自動フォーカスなど) から, 内容を
+    一通り確認したい場合に応じて先頭/末尾どちらからでもすぐ辿れるように
+    という依頼によるものです. `DocumentListRow` (`.root`, 実体は `<a>`)
+    にも `:focus-visible` (`outline: 2px solid var(--color-focus);
+    outline-offset: -2px;`) を追加しています — 一覧全体の枠
+    (`role="listbox"` の `<div>` 自身が持つ, 前述の `:focus-visible`)
+    とは別に, 個々の行が現在フォーカスされていることも青枠でわかるように
+    するためです.
+- **`Pagination`** (`src/components/ui/Pagination.tsx`) — 文書一覧専用ではなく
+  再利用可能な汎用コンポーネントとして `components/ui/` に置いています. 依頼文の
+  例示 (`1 … 3 4 5 6 7 8 9 10 11 12 … 15`, 現在ページ8/全15ページ, 中央に
+  常に10個の数字) を元に当初 `WINDOW_SIZE = 10` として実装しましたが,
+  「前へ/次へをできるだけ中央の数字に寄せたい (両端に固定するのではなく)」
+  「中央に常に表示する数字を10個から5個に」という依頼により, **`WINDOW_SIZE
+  = 5`** に変更し, 前へ/次へも番号の並びに直接隣接させる (両端固定はしない)
+  単一の `justify-content: center` な行に戻しています — 表示数を絞ったことで
+  ページ間の要素数の変動幅そのものが小さくなり, 中央寄せのままでも前へ/次への
+  位置のずれが目立ちにくくなります. `getPageItems` は現在ページの前後を
+  `halfBefore = Math.ceil((WINDOW_SIZE - 1) / 2)`/`halfAfter =
+  Math.floor((WINDOW_SIZE - 1) / 2)` で (奇数の `WINDOW_SIZE`
+  でも前寄り優先で) 均等に割り振り, 中央の数字がちょうど `WINDOW_SIZE`
+  個になるようにしています — 元の `WINDOW_SIZE = 10` の入力でも
+  依頼文の例示と完全一致することを確認した上でのリファクタリングです.
+  全ページ数が `WINDOW_SIZE + 2` 以下のときは省略記号を使わずすべての番号を
+  並べます. **番号ボタン/前へ/次へはいずれも `<button>` ではなく `<a>`
+  にしています** — 「Vimium などのキーボード拡張の "]]"/"[[" (次/前ページへの
+  移動) やリンクとして追従できるようにしてほしい」という依頼のためで,
+  Vimium/Tridactyl 等の "]]"/"[[" は `rel="next"`/`rel="prev"` を持つ `<a>`
+  を探して操作する仕様のため, 前へ/次へには `href="#prev"`/`href="#next"`
+  と合わせて `rel="prev"`/`rel="next"` を付けています (`<button>` のままだと
+  この仕組みから一切検出されず, 実際に Firefox 上の拡張で動作しないことが
+  確認されたため `<a>` 化が必須でした). 番号ボタンは `href={`#${item}`}`
+  のみ (`rel` 属性は無し) で, どちらもクリック時は `event.preventDefault()`
+  で実際のハッシュ遷移 (URL 変化・スクロール) を打ち消した上で `onChange`
+  だけを呼ぶため, 見た目・挙動は従来のボタンと変わりません (`<a>` は既定で
+  `display: inline` のため, `.page`/`.step` に `display: inline-flex`
+  を明示しないと `width` 指定などが効かない点に注意. `<a>` には
+  `disabled` 属性が無いため, 前へ/次への無効化は `aria-disabled`
+  + `.stepDisabled` (`onClick` 内でも実際のページ変更を止めている)
+  で表現しています — 元は `<button disabled>` の `:disabled`
+  疑似クラスを使っていましたが, `<a>` 化に伴いクラスベースに置き換えました).
+  数字ボタン (`key={item}`, 選択中は背景 `--color-link`/文字
+  `--color-background`, それ以外は背景透過/文字 `--color-body-headline`)
+  と省略記号 (`key={`ellipsis-${index}`}` — 単純な `index` だけを key
+  にすると, 同じ数値がページ番号ボタンの `key={item}` と衝突し React が
+  「重複した key」の警告を出して描画が不安定になることがあったため,
+  接頭辞で名前空間を分けています) は前へ/次へ (`IconChevronLeft`/
+  `IconChevronRight`, 枠線無しの青文字リンク, 先頭/末尾ページでは
+  `aria-disabled="true"` + `--color-overlay1` + `cursor: not-allowed`)
+  を挟みます. **数字ボタンの幅は, ページ数全体の最大桁数 (`String(pageCount).length`,
+  常に描画される末尾ページ番号を含む) に固定しています** — 元は
+  `min-width: 2rem` のみだったため, 1桁のページ番号は 2rem に収まる一方
+  2桁のページ番号はそれより広がってしまい, 桁数の異なるページを跨いで
+  「次へ」を押すたびにボタン幅がわずかに変わって見える不具合になっていました.
+  `maxDigits = String(pageCount).length` を `Pagination.tsx` で計算し,
+  `<nav>` に `style={{ "--page-digits": maxDigits }}` として渡して
+  `.page { width: calc(var(--page-digits, 1) * 1ch + 16px); }`
+  で全ての数字ボタンに同じ幅を適用しています (`font-variant-numeric:
+  tabular-nums` も併せて指定 — 等幅フォントではないため, これが無いと
+  同じ桁数でも数字の種類によって `ch` 基準の幅計算がわずかにずれ得ます).
+- **グローバル CSS のクリーンアップ**: `DocumentSearchBar` の検索アイコンが潰れる
+  不具合の調査で `src/index.css` に Vite テンプレート由来の残骸
+  (`button { padding: 8px 16px; font-size: 1rem; cursor: pointer; }`/
+  `nav a { margin-right: 16px; }`) が見つかったため, 「テンプレート由来の設定は
+  全て削除し, このサイト用に適したものを使用してほしい」という依頼を受け,
+  削除した上で `button` セレクタだけこのサイトに適した最小限のベースライン
+  (`padding: 0; border: none; background: none; color: inherit;
+  cursor: pointer; font: inherit;` — ブラウザ既定の見た目だけを打ち消し,
+  実際の色/余白は `controlBase`/`menuItemBase`/`tabBase`
+  や各コンポーネント自身の CSS Module に委ねる, という既存の方針をそのまま
+  グローバル側にも反映した内容) に置き換えました. `nav a` 側は, この
+  アプリの `<nav>` 内のリンク/ボタンの間隔がすべて `gap`
+  (flex/grid) で統一的に確保されており, どこにも依存されていなかったため
+  置き換えずに削除のみです. 変更後, ヘッダー/`NavDrawer`/`ProfileTabs`
+  など既存の全ボタンが (すべて自前で見た目を定義しているため) 見た目に
+  変化が無いことを Playwright で確認済みです — 唯一 `ToggleThemeButton`
+  (`features/navigation/`, 「アプリの構成」参照) だけは自身の CSS
+  を持たないプロトタイプのため, 素の `<button>` の見た目が変わりますが,
+  どこからも呼び出されていない (呼び出し元が無い) ため実害はありません.
+- **`Divider` の `orientation` 拡張**: メイン/サイドバー間の縦の区切り線のため,
+  元は横線専用だった `Divider` (`src/components/ui/Divider.tsx`) に
+  `orientation?: "horizontal" | "vertical"` (既定 `"horizontal"`, 既存の呼び出し元は
+  無変更で動作) を追加しました. `.vertical` は `align-self: stretch;
+  height: auto;` — 高さ0の `<hr>` でも, 親が flex/grid (既定で `align-items:
+  stretch`) であれば `align-self: stretch` だけで縦幅いっぱいまで伸びます
+  (`border-left` に切り替え, `margin` も `4px 0` → `0 4px` に転置).
+- **モックデータ**: `MOCK_ORGANIZATION_DOCUMENTS` (`features/organization/mockData.ts`)
+  はページネーションの動作を実際に確認できるよう, 10種類の話題 (`DOCUMENT_TOPICS`)
+  ×10種類の文書テンプレート (`DOCUMENT_TITLE_TEMPLATES`) の組み合わせを
+  機械的に繰り返して300件 (20件/ページ×15ページ) 生成しています. `type: OrganizationDocument`
+  はフィルター (子組織/関与/管理権限など) がまだ実装されていないため, それらに
+  対応するフィールドは持たせていません.
 
 `src/pages/NotFoundPage.tsx` は `App.tsx` の `path="*"` (`/users/:userId` の次, 一番最後の
 `<Route>`) に紐づく catch-all です. `AppLayout` 配下なので `Header` (上部の1行) は

@@ -21,12 +21,15 @@ samp {
   font-family: var(--font-mono), monospace;
 }
 
+/* 実際のボタンはすべて controlBase/menuItemBase/tabBase や各コンポーネント自身の
+   CSS Module で border/background/padding/font を明示しているため, ここでは
+   ブラウザ既定の見た目 (グレーの背景・立体的な枠線・独自フォント) だけを
+   打ち消す最小限のベースラインにしている */
 button {
-  padding: 8px 16px;
-  font-size: 1rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
   cursor: pointer;
-}
-
-nav a {
-  margin-right: 16px;
+  font: inherit;
 }

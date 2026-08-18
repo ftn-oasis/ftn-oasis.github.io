@@ -6,6 +6,7 @@ import {
   ActivityType,
   type Activity,
   type OrganizationDetail,
+  type OrganizationDocument,
   type OrganizationMember,
   OrganizationType,
 } from "./types";
@@ -72,9 +73,9 @@ const MOCK_ACTIVITIES: Activity[] = [
   {
     id: "activity-3",
     organizationId: "test-org",
-    // features/user/mockData.ts の MOCK_DOCUMENTS (bunkasai-plan) の
-    // lastEditedBy と揃えている — /users/test-user のカードとこの活動が
-    // 同じ編集を指している, というつながりを確認できるようにするため
+    // features/user/mockData.ts の MOCK_DOCUMENTS (bunkasai-plan) と組織/文書が
+    // 同じなので, currentUser.name にしている — /users/test-user 側の
+    // 「所属する組織」からこの組織に辿り着けるという繋がりを示すため
     actorName: currentUser.name,
     occurredAt: "2026/08/12 09:40",
     type: ActivityType.DocumentChange,
@@ -95,4 +96,69 @@ const MOCK_ACTIVITIES: Activity[] = [
   },
 ];
 
-export { MOCK_ACTIVITIES, MOCK_MEMBERS, MOCK_ORGANIZATION, MOCK_TAB_COUNTS };
+// 文書一覧 (/orgs/:orgId/documents) 用のダミーデータ. ページネーションを実際に
+// 確認できるよう, 20件/ページで15ページ分 (300件) を組み合わせで機械的に生成している
+const DOCUMENT_TOPICS = [
+  "文化祭",
+  "体育祭",
+  "新入生歓迎会",
+  "予算執行",
+  "備品管理",
+  "広報",
+  "安全対策",
+  "清掃分担",
+  "当日運営",
+  "反省会",
+];
+const DOCUMENT_TITLE_TEMPLATES = [
+  "議事録",
+  "実施要項",
+  "予算案",
+  "報告書",
+  "企画書",
+  "案内文",
+  "アンケート集計",
+  "マニュアル",
+  "チェックリスト",
+  "台本",
+];
+const DOCUMENT_FILE_TYPES = ["PDF", "Markdown", "Text", "MP4"];
+
+// 2025/08/01 を起点に, index が進むほど新しい (作成/編集日時が後ろにずれる) ものとする
+const MOCK_DOCUMENT_LIST_BASE_DAY = Date.UTC(2025, 7, 1) / (24 * 60 * 60 * 1000);
+
+function toIsoDate(daysFromEpoch: number): string {
+  return new Date(daysFromEpoch * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+const MOCK_ORGANIZATION_DOCUMENTS: OrganizationDocument[] = Array.from(
+  { length: 300 },
+  (_, index) => {
+    const topic = DOCUMENT_TOPICS[index % DOCUMENT_TOPICS.length];
+    const templateIndex =
+      Math.floor(index / DOCUMENT_TOPICS.length) % DOCUMENT_TITLE_TEMPLATES.length;
+    const template = DOCUMENT_TITLE_TEMPLATES[templateIndex];
+    const fileType = DOCUMENT_FILE_TYPES[index % DOCUMENT_FILE_TYPES.length];
+    const createdDay = MOCK_DOCUMENT_LIST_BASE_DAY + index;
+    // 編集日は作成日と同じか, 数日後
+    const editedDay = createdDay + (index % 5);
+
+    return {
+      id: `test-org-doc-${index + 1}`,
+      organizationId: "test-org",
+      title: `${topic}${template} ${Math.floor(index / DOCUMENT_TOPICS.length) + 1}`,
+      description: `${topic}に関する${template}です.`,
+      fileType,
+      createdAt: toIsoDate(createdDay),
+      editedAt: toIsoDate(editedDay),
+    };
+  },
+);
+
+export {
+  MOCK_ACTIVITIES,
+  MOCK_MEMBERS,
+  MOCK_ORGANIZATION,
+  MOCK_ORGANIZATION_DOCUMENTS,
+  MOCK_TAB_COUNTS,
+};

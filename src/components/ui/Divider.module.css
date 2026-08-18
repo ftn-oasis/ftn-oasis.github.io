@@ -5,3 +5,14 @@
   border: none;
   border-top: 1px solid var(--color-border);
 }
+
+/* 親要素が flex/grid で align-items: stretch (既定) であれば, 高さ0の
+   auto (align-self: stretch) だけで縦幅いっぱいまで伸びる */
+.vertical {
+  align-self: stretch;
+  width: 0;
+  height: auto;
+  margin: 0 4px;
+  border-top: none;
+  border-left: 1px solid var(--color-border);
+}

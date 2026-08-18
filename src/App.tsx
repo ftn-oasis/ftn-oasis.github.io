@@ -1,6 +1,8 @@
 import { AppLayout } from "@src/components/layout/AppLayout";
 import { NotFoundPage } from "@src/pages/NotFoundPage";
-import { OrganizationProfilePage } from "@src/pages/OrganizationProfilePage";
+import { OrganizationDocumentsPage } from "@src/pages/OrganizationDocumentsPage";
+import { OrganizationLayout } from "@src/pages/OrganizationLayout";
+import { OrganizationOverviewPage } from "@src/pages/OrganizationOverviewPage";
 import { UserProfilePage } from "@src/pages/UserProfilePage";
 import { Route, Routes } from "react-router";
 
@@ -9,7 +11,10 @@ function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/users/:userId" element={<UserProfilePage />} />
-        <Route path="/orgs/:orgId" element={<OrganizationProfilePage />} />
+        <Route path="/orgs/:orgId" element={<OrganizationLayout />}>
+          <Route index element={<OrganizationOverviewPage />} />
+          <Route path="documents" element={<OrganizationDocumentsPage />} />
+        </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

@@ -1,0 +1,84 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 12px;
+}
+
+/* 全ページ中の最大桁数 (--page-digits, Pagination.tsx が設定) に幅を固定し,
+   桁数の異なる番号ボタンが混在してもクリックのたびに並びがずれないようにする.
+   tabular-nums で数字の字幅も揃えている (等幅フォントではないため, これが無いと
+   同じ桁数でも数字の種類によってわずかに幅が変わり得る) */
+.page {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--page-digits, 1) * 1ch + 16px);
+  min-width: 2rem;
+  padding: 4px 0;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-body-headline);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.page:hover {
+  background: var(--color-body-button-hover);
+}
+
+.page:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.current,
+.current:hover {
+  background: var(--color-link);
+  color: var(--color-background);
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  color: var(--color-body-subtext);
+}
+
+.step {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-link);
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.step:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+/* <a> には disabled 属性が無いため, aria-disabled と対応する専用クラスで
+   見た目を切り替える (Pagination.tsx 側で onClick も無効化している) */
+.stepDisabled {
+  color: var(--color-overlay1);
+  cursor: not-allowed;
+}
+
+.step:hover:not(.stepDisabled) {
+  background: var(--color-body-button-hover);
+}
