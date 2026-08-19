@@ -1,0 +1,12 @@
+/* UserNameLink.module.css と同じ考え方 (:where() で詳細度を 0 にし, 呼び出し
+   側の色指定が常に優先されるようにしている) */
+:where(.root) {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.root:hover {
+  text-decoration: underline;
+}

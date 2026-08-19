@@ -1,0 +1,26 @@
+/* NavDrawer の全画面オーバーレイ (position: fixed の透過ボタン) と同じ手法 —
+   外側クリックで onClose (呼び出し側が割り当てた, 安全な側の閉じ方) を呼ぶ */
+.overlay {
+  appearance: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  margin: 0;
+  border: none;
+  background: rgb(0 0 0 / 40%);
+}
+
+.panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 51;
+  box-sizing: border-box;
+  width: min(480px, calc(100vw - 32px));
+  padding: 24px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-background);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+  transform: translate(-50%, -50%);
+}

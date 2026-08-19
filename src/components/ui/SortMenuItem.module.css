@@ -1,0 +1,7 @@
+.check {
+  flex-shrink: 0;
+}
+
+.checkHidden {
+  visibility: hidden;
+}

@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@src/contexts/ThemeContext";
+import { ToastProvider } from "@src/contexts/ToastContext";
 import type { ReactNode } from "react";
 import { BrowserRouter } from "react-router";
 
@@ -9,7 +10,9 @@ type AppProvidersProps = {
 function AppProviders({ children }: AppProvidersProps) {
   return (
     <BrowserRouter>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
