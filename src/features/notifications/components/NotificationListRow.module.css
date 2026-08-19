@@ -1,0 +1,65 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  color: inherit;
+  text-decoration: none;
+}
+
+.root:last-child {
+  border-bottom: none;
+}
+
+.root:hover {
+  background: var(--color-body-button-hover);
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+/* 未読のときだけ表示するドット. 既読時も同じ幅を確保しておき, タイトルの
+   開始位置が既読/未読で揃うようにしている */
+.unreadDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.unreadDotVisible {
+  background: var(--color-link);
+}
+
+.title {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--color-body-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleUnread {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: flex-end;
+  gap: 2px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

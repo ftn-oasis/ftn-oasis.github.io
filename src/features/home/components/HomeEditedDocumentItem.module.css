@@ -1,0 +1,22 @@
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.title {
+  overflow: hidden;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editedAt {
+  overflow: hidden;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,29 @@
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+
+.title {
+  overflow: hidden;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.amount {
+  overflow: hidden;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 「購入可」/「仮払可」— 承認済である旨を表す teal のラベル.
+   TransactionStatusBadge の見た目 (root/compact) をそのまま流用し, 色だけ
+   ここで上書きする */
+.availabilityBadge {
+  flex-shrink: 0;
+  background: var(--color-status-teal);
+}

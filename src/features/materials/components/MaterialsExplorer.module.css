@@ -1,0 +1,45 @@
+.root {
+  display: flex;
+  min-height: 320px;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 280px;
+  overflow-y: auto;
+  padding: 8px;
+  border-right: var(--borderWidth-thin) solid var(--color-border);
+  background: var(--color-secondary1);
+}
+
+/* ファイルビューワのディレクトリのように, ファイル行 (.fileRow) だけ
+   フォルダ行より1段インデントする */
+.fileRow {
+  padding-left: 24px;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-overlay1);
+}
+
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 24px;
+  overflow: auto;
+}
+
+.empty {
+  color: var(--color-body-subtext);
+}
+
+/* MarkdownFileViewer (bordered={false}) 用 — .main の padding: 24px を
+   負の margin で打ち消し, ツールバーが .root の外枠に直接接するようにする
+   (2重に囲われるのを避けるため. MeetingMaterialsExplorer と同じ考え方) */
+.markdownContent {
+  margin: -24px;
+}

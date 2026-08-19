@@ -1,0 +1,22 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 24px 0 16px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.link {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.current {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
