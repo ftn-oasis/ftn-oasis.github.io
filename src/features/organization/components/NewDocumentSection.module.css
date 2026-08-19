@@ -1,0 +1,130 @@
+.root {
+  max-width: 700px;
+  padding: 24px 16px;
+  margin: 0 auto;
+}
+
+.heading {
+  margin: 0 0 4px;
+  color: var(--color-body-headline);
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.field {
+  margin-bottom: 24px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-body-headline);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.required {
+  margin-left: 2px;
+  color: var(--color-status-red);
+}
+
+.select,
+.input,
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-background);
+  color: var(--color-body-body);
+  font: inherit;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.select:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -1px;
+}
+
+.inputError {
+  border-color: var(--color-status-red);
+}
+
+.hint {
+  margin: 4px 0 0;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.error {
+  margin: 4px 0 0;
+  color: var(--color-status-red);
+  font-size: 0.75rem;
+}
+
+.textareaFooter {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.charCount {
+  flex-shrink: 0;
+  margin-top: 4px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.visibilityOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.visibilityOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  cursor: pointer;
+}
+
+.visibilityOptionSelected {
+  border-color: var(--color-link);
+}
+
+.radio {
+  flex-shrink: 0;
+  margin: 3px 0 0;
+}
+
+.visibilityText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.visibilityLabel {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.visibilityDescription {
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
