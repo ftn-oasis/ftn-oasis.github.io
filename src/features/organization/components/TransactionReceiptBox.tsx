@@ -1,6 +1,8 @@
 import { Icon } from "@src/components/ui/Icon";
+import { UserNameLink } from "@src/components/ui/UserNameLink";
 import { IconFileTypePdf, IconPhoto, IconUpload } from "@tabler/icons-react";
 
+import { resolveMemberId } from "../resolveMemberId";
 import { ReceiptFileType, type TransactionReceipt } from "../types";
 
 import styles from "./TransactionReceiptBox.module.css";
@@ -33,7 +35,11 @@ function TransactionReceiptBox({ receipt }: TransactionReceiptBoxProps) {
         <span className={styles.documentId}>{receipt.documentId}</span>
         <span className={styles.meta}>
           <Icon icon={IconUpload} size={14} aria-hidden="true" />
-          {receipt.uploaderName} がアップロード ・ {receipt.uploadedAt}
+          <UserNameLink
+            userId={resolveMemberId(receipt.uploaderName)}
+            name={receipt.uploaderName}
+          />{" "}
+          がアップロード ・ {receipt.uploadedAt}
         </span>
       </div>
 

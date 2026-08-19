@@ -1,0 +1,216 @@
+/* 会計申請作成フォーム (支出/予算執行/寄付の3種類) 共通のフィールドの見た目.
+   元々は NewTransactionSection (支出のみ) 専用の CSS Module でしたが,
+   「申請の最上部に3種類のラジオボタンを配置し, 選択された種類に応じて別々の
+   フォームを表示する」という依頼で予算執行/寄付それぞれの入力画面
+   (BudgetExecutionRequestForm/DonationRequestForm) が増えたため, 3フォーム
+   +申請種類選択 (NewTransactionSection) から共通で読み込む土台として切り出した */
+.root {
+  max-width: 900px;
+  padding: 24px 16px;
+  margin: 0 auto;
+}
+
+.heading {
+  margin: 0 0 4px;
+  color: var(--color-body-headline);
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.field {
+  margin-bottom: 24px;
+}
+
+/* .field の中にさらに独立した項目 (支払先の下の「参考となる画像」など) を
+   挟む場合の, 上だけ間隔を空けたバリアント */
+.nestedField {
+  margin-top: 16px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-body-headline);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.required {
+  margin-left: 2px;
+  color: var(--color-status-red);
+}
+
+.input,
+.select,
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-background);
+  color: var(--color-body-body);
+  font: inherit;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -1px;
+}
+
+.inputError {
+  border-color: var(--color-status-red);
+}
+
+.hints {
+  margin: 4px 0 0;
+  padding-left: 1.25em;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.error {
+  margin: 4px 0 0;
+  color: var(--color-status-red);
+  font-size: 0.75rem;
+}
+
+/* 横に並ぶ入力欄2つ (銀行口座の口座番号+名義など) */
+.fieldRow {
+  display: flex;
+  gap: 12px;
+}
+
+.fieldRow > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.requestTypeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 申請の最上部に横並びで配置する「支出/予算執行/寄付の申請」— 見た目は
+   .requestTypeOption を流用しつつ, 3つが均等幅で横に並ぶようにする */
+.modeOptions {
+  display: flex;
+  gap: 8px;
+}
+
+.modeOptions > * {
+  flex: 1 1 0;
+}
+
+.requestTypeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  cursor: pointer;
+}
+
+.requestTypeOptionSelected {
+  border-color: var(--color-link);
+}
+
+/* 寄付が選択された場合だけ, 青ではなく緑を強調色にする依頼のため */
+.requestTypeOptionSelectedGreen {
+  border-color: var(--color-status-green);
+}
+
+/* 「仮払と立替の間よりも広く, 別の項目であると判るように」という依頼のため,
+   寄付の項目だけ .requestTypeOptions の gap (8px) に追加でこの分の余白を足す
+   (8px + 24px = 32px, 仮払-立替間の4倍) */
+.requestTypeOptionSeparated {
+  margin-top: 24px;
+}
+
+/* https://preview.tabler.io/form-elements.html のラジオボタンに似せた, 少し
+   大きめの円+青のアクセントカラー (accent-color はブラウザ標準の描画のまま
+   チェック時の色だけ変えられるため, 独自の appearance: none 実装より
+   ブラウザ間の見た目の差異が小さい) */
+.radio {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 2px 0 0;
+  accent-color: var(--color-link);
+  cursor: pointer;
+}
+
+.radioGreen {
+  accent-color: var(--color-status-green);
+}
+
+.requestTypeText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.requestTypeLabel {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.requestTypeDescription {
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+/* RequestConfirmDialog.module.css の .actions と同じ配置
+   (キャンセル: 背景透過/左, 送信: 緑/右) */
+.formActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 金額の入力欄+右側の "円" 表記 */
+.amountFieldWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.amountField {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.currencySuffix {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+}
+
+/* 決済手段/支払方法の選択肢 (現金/銀行口座など) — 銀行口座が設定されている
+   組織の場合だけ表示する等, 条件付きで出し分ける */
+.paymentMethodOptions {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.paymentMethodOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-body-body);
+  cursor: pointer;
+}

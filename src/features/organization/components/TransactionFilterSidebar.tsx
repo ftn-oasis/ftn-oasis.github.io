@@ -1,62 +1,20 @@
 import { CurrentContentBar } from "@src/components/ui/CurrentContentBar";
 import { Icon } from "@src/components/ui/Icon";
 import menuItemBase from "@src/components/ui/menuItemBase.module.css";
-import {
-  IconArchive,
-  IconBinaryTree,
-  IconHome,
-  IconMoneybagMinus,
-  IconMoneybagPlus,
-} from "@tabler/icons-react";
-import type { TablerIcon } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRef } from "react";
 
+import { getTransactionFilters } from "../transactionFilters";
 import { useFixedSidebarPosition } from "../useFixedSidebarPosition";
 
 import styles from "./TransactionFilterSidebar.module.css";
 
-type TransactionFilter = {
-  key: string;
-  icon: TablerIcon;
-  label: string;
-  // フィルターの実装はまだ無いため, 選択すると検索欄にこの文字列を入れるだけ
-  query: string;
-};
-
-// 選択中の判定 (検索欄の文字列と query の一致) は呼び出し元 (親コンポーネント) が
-// この配列を見て行うため export する
-const TRANSACTION_FILTERS: TransactionFilter[] = [
-  { key: "all", icon: IconHome, label: "全て", query: "" },
-  {
-    key: "own-org-only",
-    icon: IconBinaryTree,
-    label: "組織内のみ",
-    query: "子組織: false",
-  },
-  {
-    key: "expense",
-    icon: IconMoneybagMinus,
-    label: "支出",
-    query: "種別: 支出 有効: true",
-  },
-  {
-    key: "income",
-    icon: IconMoneybagPlus,
-    label: "収入",
-    query: "種別: 収入 有効: true",
-  },
-  {
-    key: "archived",
-    icon: IconArchive,
-    label: "無効化済",
-    query: "有効: false",
-  },
-];
-
 type TransactionFilterSidebarProps = {
   searchText: string;
   onSelect: (query: string) => void;
+  // 組織プロフィールページ配下 (/orgs/:orgId/book) から使う場合は true
+  // (getTransactionFilters@transactionFilters.ts を参照)
+  scopedToOrganization?: boolean;
 };
 
 // メニュードロワーと同じ土台 (menuItemBase) を使った, 入出金一覧の絞り込みボタン一覧.
@@ -65,9 +23,11 @@ type TransactionFilterSidebarProps = {
 function TransactionFilterSidebar({
   searchText,
   onSelect,
+  scopedToOrganization,
 }: TransactionFilterSidebarProps) {
   const placeholderRef = useRef<HTMLDivElement>(null);
   const position = useFixedSidebarPosition(placeholderRef);
+  const filters = getTransactionFilters(Boolean(scopedToOrganization));
 
   return (
     <div ref={placeholderRef} className={styles.placeholder}>
@@ -76,7 +36,7 @@ function TransactionFilterSidebar({
         className={styles.root}
         style={position}
       >
-        {TRANSACTION_FILTERS.map((filter) => {
+        {filters.map((filter) => {
           const isActive = filter.query === searchText;
           return (
             <button
@@ -96,4 +56,4 @@ function TransactionFilterSidebar({
   );
 }
 
-export { TRANSACTION_FILTERS, TransactionFilterSidebar };
+export { TransactionFilterSidebar };

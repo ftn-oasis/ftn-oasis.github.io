@@ -21,9 +21,8 @@
   outline-offset: -2px;
 }
 
-.sign {
+.statusBadge {
   flex-shrink: 0;
-  color: var(--color-body-subtext);
 }
 
 .title {

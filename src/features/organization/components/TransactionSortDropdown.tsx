@@ -1,12 +1,12 @@
+import { Divider } from "@src/components/ui/Divider";
 import { Icon } from "@src/components/ui/Icon";
-import menuItemBase from "@src/components/ui/menuItemBase.module.css";
+import { SortMenuItem } from "@src/components/ui/SortMenuItem";
 import { useDismissablePopover } from "@src/components/ui/useDismissablePopover";
 import {
   IconCaretDownFilled,
   IconSortAscendingLetters,
   IconSortDescendingLetters,
 } from "@tabler/icons-react";
-import clsx from "clsx";
 
 import { TransactionSortDirection, TransactionSortField } from "../types";
 
@@ -36,7 +36,9 @@ type TransactionSortDropdownProps = {
 };
 
 // 枠線無しのドロップダウン. 開いている一覧で選択中のフィールドをもう一度選ぶと
-// 昇順/降順を切り替え, 別のフィールドを選ぶと降順で選び直す
+// 昇順/降順を切り替え, 別のフィールドを選ぶと降順で選び直す. 末尾には分割線を
+// 挟み, フィールドに関わらず直接昇順/降順を選べる項目を追加している
+// (DocumentSortDropdown と同じ依頼のため)
 function TransactionSortDropdown({
   field,
   direction,
@@ -56,6 +58,11 @@ function TransactionSortDropdown({
     } else {
       onChange(selectedField, TransactionSortDirection.Desc);
     }
+    close();
+  };
+
+  const handleSelectDirection = (selectedDirection: TransactionSortDirection) => {
+    onChange(field, selectedDirection);
     close();
   };
 
@@ -84,20 +91,28 @@ function TransactionSortDropdown({
       {open && (
         <div className={styles.menu} role="menu">
           {SORT_FIELDS.map((sortField) => (
-            <button
+            <SortMenuItem
               key={sortField}
-              type="button"
-              role="menuitemradio"
-              aria-checked={sortField === field}
+              label={SORT_FIELD_LABEL[sortField]}
+              isActive={sortField === field}
               onClick={() => handleSelect(sortField)}
-              className={clsx(
-                menuItemBase.root,
-                sortField === field && menuItemBase.active,
-              )}
-            >
-              {SORT_FIELD_LABEL[sortField]}
-            </button>
+            />
           ))}
+
+          <Divider />
+
+          <SortMenuItem
+            label="昇順"
+            icon={IconSortDescendingLetters}
+            isActive={direction === TransactionSortDirection.Asc}
+            onClick={() => handleSelectDirection(TransactionSortDirection.Asc)}
+          />
+          <SortMenuItem
+            label="降順"
+            icon={IconSortAscendingLetters}
+            isActive={direction === TransactionSortDirection.Desc}
+            onClick={() => handleSelectDirection(TransactionSortDirection.Desc)}
+          />
         </div>
       )}
     </div>

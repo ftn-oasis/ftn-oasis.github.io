@@ -2,15 +2,13 @@ import { Divider } from "@src/components/ui/Divider";
 import { Pagination } from "@src/components/ui/Pagination";
 import { useMemo, useState } from "react";
 
+import { getTransactionFilters } from "../transactionFilters";
 import {
   type OrganizationTransaction,
   TransactionSortDirection,
   TransactionSortField,
 } from "../types";
-import {
-  TRANSACTION_FILTERS,
-  TransactionFilterSidebar,
-} from "./TransactionFilterSidebar";
+import { TransactionFilterSidebar } from "./TransactionFilterSidebar";
 import { TransactionListBox } from "./TransactionListBox";
 import { TransactionSearchBar } from "./TransactionSearchBar";
 import { TransactionSummaryBox } from "./TransactionSummaryBox";
@@ -35,11 +33,17 @@ function sortTransactions(
 
 type OrganizationBookSectionProps = {
   transactions: OrganizationTransaction[];
+  // 組織プロフィールページ配下 (/orgs/:orgId/book) から使う場合は true.
+  // TransactionFilterSidebar にそのまま渡す (getTransactionFilters を参照)
+  scopedToOrganization?: boolean;
 };
 
 // OrganizationDocumentsSection と同じ構造 (検索バー + フィルターサイドバー +
 // ページネーション付きの一覧 Box) の, 入出金一覧 (/orgs/:orgId/book) の本文
-function OrganizationBookSection({ transactions }: OrganizationBookSectionProps) {
+function OrganizationBookSection({
+  transactions,
+  scopedToOrganization,
+}: OrganizationBookSectionProps) {
   const [searchText, setSearchText] = useState("");
   const [sortField, setSortField] = useState<TransactionSortField>(
     TransactionSortField.EditedAt,
@@ -51,7 +55,7 @@ function OrganizationBookSection({ transactions }: OrganizationBookSectionProps)
 
   // 検索欄の文字列がサイドバーのいずれかのフィルターと完全一致する場合だけ,
   // その見出しを表示する (フィルター自体はまだ実装しないため, 一覧は絞り込まれない)
-  const matchedFilter = TRANSACTION_FILTERS.find(
+  const matchedFilter = getTransactionFilters(Boolean(scopedToOrganization)).find(
     (filter) => filter.query === searchText,
   );
   const heading = matchedFilter ? matchedFilter.label : "全て";
@@ -105,6 +109,7 @@ function OrganizationBookSection({ transactions }: OrganizationBookSectionProps)
         <TransactionFilterSidebar
           searchText={searchText}
           onSelect={handleSearchChange}
+          scopedToOrganization={scopedToOrganization}
         />
 
         <Divider orientation="vertical" />

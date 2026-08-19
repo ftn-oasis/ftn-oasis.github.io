@@ -3,7 +3,10 @@ import { MOCK_ORGANIZATION_TRANSACTIONS } from "@src/features/organization/mockD
 
 function OrganizationBookPage() {
   return (
-    <OrganizationBookSection transactions={MOCK_ORGANIZATION_TRANSACTIONS} />
+    <OrganizationBookSection
+      transactions={MOCK_ORGANIZATION_TRANSACTIONS}
+      scopedToOrganization
+    />
   );
 }
 

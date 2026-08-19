@@ -31,3 +31,8 @@
 .denied {
   background: var(--color-status-red);
 }
+
+.compact {
+  padding: 1px 8px;
+  font-size: 0.75rem;
+}

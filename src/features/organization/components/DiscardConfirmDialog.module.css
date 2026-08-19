@@ -1,0 +1,14 @@
+.heading {
+  margin: 0 0 16px;
+  color: var(--color-body-headline);
+  font-size: 1.25rem;
+}
+
+/* 「右側に入力画面に戻る (青), 左側に入力内容を破棄する (背景透過)」という
+   依頼どおりの並び順のまま横並びにしている (RequestConfirmDialog の
+   .actions とは異なり, こちらは縦並びの指定を受けていない) */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}

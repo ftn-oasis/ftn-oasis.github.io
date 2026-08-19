@@ -1,7 +1,9 @@
 import { Icon } from "@src/components/ui/Icon";
+import { UserNameLink } from "@src/components/ui/UserNameLink";
 import { IconCircleCheckFilled, IconCircleXFilled, IconUser } from "@tabler/icons-react";
 import clsx from "clsx";
 
+import { resolveMemberId } from "../resolveMemberId";
 import {
   type TransactionProcedureStep,
   TransactionProcedureStepKey,
@@ -22,7 +24,7 @@ type TransactionProcedureTimelineProps = {
 // 手続状況タブ (/orgs/:orgId/book/:transactionId/procedure) の本文.
 // 縦のタイムラインで, 手順を専用の矢印 (IconArrowDown などの汎用アイコンでは
 // なく, 線+CSSで描いた矢頭) で繋いで時系列順に表示する. 未完了の手順はただの円,
-// 完了済は緑のチェック, 否認は赤いバツで表現する (否認の場合は起案の直後で
+// 完了済は緑のチェック, 却下は赤いバツで表現する (却下の場合は起案の直後で
 // 手順自体がそこで打ち切られている — 生成側の generateTransactionProcedure@
 // mockData.ts を参照).
 //
@@ -133,7 +135,13 @@ function TransactionProcedureTimeline({
               {step.completed && (
                 <span className={clsx(styles.meta, isPast && styles.metaMuted)}>
                   <Icon icon={IconUser} size={14} aria-hidden="true" />
-                  {step.actorName} ・ {step.occurredAt}
+                  {step.actorName && (
+                    <UserNameLink
+                      userId={resolveMemberId(step.actorName)}
+                      name={step.actorName}
+                    />
+                  )}{" "}
+                  ・ {step.occurredAt}
                 </span>
               )}
             </div>
