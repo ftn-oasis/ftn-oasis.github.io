@@ -9,15 +9,20 @@ const SPECIAL_ROOT_LABELS: Record<string, string> = {
   orgs: "組織",
   meetings: "会議",
   books: "帳簿",
+  book: "帳簿",
   issues: "指摘事項",
   pulls: "修正提案",
   notifications: "通知",
+  "print-queue": "印刷状況",
+  "room-reservations": "新館予約状況",
+  "equipment-loans": "備品貸出状況",
 };
 
 // 表示する各階層の文字列を返す. 最後の要素が現在表示中のページ (呼び出し側でボールドにする)
 function getBreadcrumb(pathname: string): string[] {
   const segments = pathname.split("/").filter(Boolean);
-  if (segments.length === 0) return [];
+  // ~ (ホーム) — 他の特殊パスと同様, 1階層だけの表示名にする
+  if (segments.length === 0) return ["ホーム"];
 
   const [first, second] = segments;
 

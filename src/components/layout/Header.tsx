@@ -51,7 +51,7 @@ function Header() {
             data-tooltip-align={homeAlign}
             className={styles.homeLink}
           >
-            <Emblem name="fth-oasis-icon" height={40} />
+            <Emblem name="fth-oasis-icon" height={35} />
           </Link>
           <Breadcrumb ref={breadcrumbRef} segments={breadcrumb} />
         </div>

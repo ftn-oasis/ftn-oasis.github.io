@@ -25,8 +25,8 @@ const MEMBER_FILTERS: MemberFilter[] = [
   {
     key: "own-org-only",
     icon: IconBinaryTree,
-    label: "組織内のみ",
-    query: "子組織: false",
+    label: "子組織を含む",
+    query: "子組織: true",
   },
   {
     key: "inactive",

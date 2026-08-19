@@ -1,15 +1,17 @@
 import { Divider } from "@src/components/ui/Divider";
 import { Pagination } from "@src/components/ui/Pagination";
+import clsx from "clsx";
 import { useMemo, useState } from "react";
 
 import { addDays, formatDate, startOfWeek } from "../calendarUtils";
+import { getMeetingFilters } from "../meetingFilters";
 import {
   MeetingSortDirection,
   MeetingSortField,
   type OrganizationMeeting,
 } from "../types";
 import { MeetingCalendarView } from "./MeetingCalendarView";
-import { MEETING_FILTERS, MeetingFilterSidebar } from "./MeetingFilterSidebar";
+import { MeetingFilterSidebar } from "./MeetingFilterSidebar";
 import { MeetingListBox } from "./MeetingListBox";
 import { MeetingSearchBar } from "./MeetingSearchBar";
 import { ViewMode, ViewModeToggle } from "./ViewModeToggle";
@@ -34,6 +36,9 @@ function sortMeetings(
 
 type OrganizationMeetingsSectionProps = {
   meetings: OrganizationMeeting[];
+  // 組織プロフィールページ配下 (/orgs/:orgId/meetings) から使う場合は true.
+  // MeetingFilterSidebar にそのまま渡す (getMeetingFilters を参照)
+  scopedToOrganization?: boolean;
 };
 
 // OrganizationDocumentsSection と同じ構造 (検索バー + フィルターサイドバー +
@@ -41,6 +46,7 @@ type OrganizationMeetingsSectionProps = {
 // 追加した, 会議一覧 (/orgs/:orgId/meetings) の本文
 function OrganizationMeetingsSection({
   meetings,
+  scopedToOrganization,
 }: OrganizationMeetingsSectionProps) {
   const [searchText, setSearchText] = useState("");
   const [sortField, setSortField] = useState<MeetingSortField>(
@@ -59,7 +65,7 @@ function OrganizationMeetingsSection({
 
   // 検索欄の文字列がサイドバーのいずれかのフィルターと完全一致する場合だけ,
   // その見出しを表示する (フィルター自体はまだ実装しないため, 一覧は絞り込まれない)
-  const matchedFilter = MEETING_FILTERS.find(
+  const matchedFilter = getMeetingFilters(Boolean(scopedToOrganization)).find(
     (filter) => filter.query === searchText,
   );
   const heading = matchedFilter ? matchedFilter.label : "全て";
@@ -92,13 +98,19 @@ function OrganizationMeetingsSection({
   const showPagination = viewMode === ViewMode.List && pageCount > 1;
 
   return (
-    <div className={styles.root}>
+    <div
+      className={clsx(
+        styles.root,
+        viewMode === ViewMode.Calendar && styles.rootCalendarMode,
+      )}
+    >
       <MeetingFilterSidebar
         searchText={searchText}
         onSelect={handleSearchChange}
         calendarWeekStart={calendarWeekStart}
         viewMode={viewMode}
         onWeekSelect={handleCalendarWeekSelect}
+        scopedToOrganization={scopedToOrganization}
       />
 
       <Divider orientation="vertical" />

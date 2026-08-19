@@ -87,7 +87,9 @@ function MeetingCalendarCard({
         )}
       >
         <div className={styles.popoverTitleRow}>
-          <span className={styles.popoverTitle}>{meeting.title}</span>
+          <span className={styles.popoverTitle} title={meeting.title}>
+            {meeting.title}
+          </span>
           {statusLabel}
         </div>
         <p className={styles.popoverAgenda}>

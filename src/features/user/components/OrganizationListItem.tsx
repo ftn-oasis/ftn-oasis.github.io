@@ -20,8 +20,12 @@ function OrganizationListItem({ organization }: OrganizationListItemProps) {
     >
       <Avater size="medium" shape="square" />
       <div className={styles.text}>
-        <div className={styles.name}>{organization.name}</div>
-        <div className={styles.role}>{organization.role}</div>
+        <div className={styles.name} title={organization.name}>
+          {organization.name}
+        </div>
+        <div className={styles.role} title={organization.role}>
+          {organization.role}
+        </div>
       </div>
     </Link>
   );

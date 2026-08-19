@@ -1,7 +1,9 @@
 import { Icon } from "@src/components/ui/Icon";
+import { UserNameLink } from "@src/components/ui/UserNameLink";
 import { IconTriangle, IconUser, IconX } from "@tabler/icons-react";
 import { Link } from "react-router";
 
+import { resolveMemberId } from "../resolveMemberId";
 import {
   AgendaItemVoteResult,
   type MeetingAgendaItem,
@@ -85,7 +87,11 @@ function MeetingAgendaList({
 
             <span className={styles.submitter}>
               <Icon icon={IconUser} size={14} aria-hidden="true" />
-              {item.submitterName} ({item.submitterRole})
+              <UserNameLink
+                userId={resolveMemberId(item.submitterName)}
+                name={item.submitterName}
+              />{" "}
+              ({item.submitterRole})
             </span>
           </div>
         );

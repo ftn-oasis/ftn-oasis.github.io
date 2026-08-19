@@ -30,6 +30,7 @@ function DocumentCard({ document }: DocumentCardProps) {
         />
         <Link
           to={`/orgs/${document.organizationId}/documents/${document.id}`}
+          title={document.title}
           className={styles.title}
         >
           {document.title}
@@ -37,7 +38,9 @@ function DocumentCard({ document }: DocumentCardProps) {
         <Label>{VISIBILITY_LABEL[document.visibility]}</Label>
       </div>
 
-      <p className={styles.description}>{document.description}</p>
+      <p className={styles.description} title={document.description}>
+        {document.description}
+      </p>
 
       <div className={styles.meta}>
         <div className={styles.metaGroup}>

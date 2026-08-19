@@ -3,7 +3,10 @@ import { MOCK_ORGANIZATION_DOCUMENTS } from "@src/features/organization/mockData
 
 function OrganizationDocumentsPage() {
   return (
-    <OrganizationDocumentsSection documents={MOCK_ORGANIZATION_DOCUMENTS} />
+    <OrganizationDocumentsSection
+      documents={MOCK_ORGANIZATION_DOCUMENTS}
+      scopedToOrganization
+    />
   );
 }
 

@@ -1,10 +1,13 @@
 import {
   IconBuildingPlus,
   IconCalendarPlus,
+  IconDoor,
   IconFileAlert,
   IconFilePlus,
   IconFileUpload,
+  IconPackage,
   IconPlus,
+  IconPrinter,
   IconReceiptYen,
 } from "@tabler/icons-react";
 
@@ -33,20 +36,22 @@ function CreateButton() {
 
       {open && (
         <div className={styles.menu}>
-          <button type="button" className={menuItemBase.root} onClick={close}>
-            <Icon icon={IconReceiptYen} aria-hidden="true" />
-            <span>新たに会計申請を作成</span>
-          </button>
+          <MenuLink
+            to="/book/new"
+            icon={IconReceiptYen}
+            label="会計申請を作成"
+            onClick={close}
+          />
           <MenuLink
             to="/issues/new"
             icon={IconFileAlert}
-            label="新たに改善点を指摘"
+            label="改善点を指摘"
             onClick={close}
           />
           <MenuLink
             to="/documents/new"
             icon={IconFilePlus}
-            label="新たに文書を作成"
+            label="文書を作成"
             onClick={close}
           />
           <MenuLink
@@ -58,16 +63,33 @@ function CreateButton() {
           <MenuLink
             to="/meetings/new"
             icon={IconCalendarPlus}
-            label="新たに会議を予定"
+            label="会議を作成"
             onClick={close}
           />
+
+          <Divider />
+
+          {/* 動作はのちほど実装するため, 対応するルートがまだ無い他のボタンと
+              同じく MenuLink ではなく素の button にしている */}
+          <button type="button" className={menuItemBase.root} onClick={close}>
+            <Icon icon={IconPrinter} aria-hidden="true" />
+            <span>印刷を依頼</span>
+          </button>
+          <button type="button" className={menuItemBase.root} onClick={close}>
+            <Icon icon={IconPackage} aria-hidden="true" />
+            <span>備品貸出を申請</span>
+          </button>
+          <button type="button" className={menuItemBase.root} onClick={close}>
+            <Icon icon={IconDoor} aria-hidden="true" />
+            <span>新館の使用を申請</span>
+          </button>
 
           <Divider />
 
           <MenuLink
             to="/organizations/new"
             icon={IconBuildingPlus}
-            label="新たな組織を作成"
+            label="組織を作成"
             onClick={close}
           />
         </div>

@@ -1,6 +1,7 @@
 import { Avater } from "@src/components/ui/Avatar";
 import { Icon } from "@src/components/ui/Icon";
 import { Label } from "@src/components/ui/Label";
+import { OrgNameLink } from "@src/components/ui/OrgNameLink";
 import {
   IconCalendarWeek,
   IconChevronRight,
@@ -8,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { Fragment } from "react";
 
+import { resolveOrganizationId } from "../resolveOrganizationId";
 import { type OrganizationDetail, OrganizationType } from "../types";
 
 import styles from "./OrganizationHeaderBox.module.css";
@@ -39,20 +41,29 @@ function OrganizationHeaderBox({ organization }: OrganizationHeaderBoxProps) {
           <div className={styles.breadcrumb}>
             {organization.ancestorNames.map((name) => (
               <Fragment key={name}>
-                <span>{name}</span>
+                <OrgNameLink organizationId={resolveOrganizationId(name)} name={name} />
                 <Icon icon={IconChevronRight} size={14} aria-hidden="true" />
               </Fragment>
             ))}
-            <span>{organization.name}</span>
+            <OrgNameLink
+              organizationId={resolveOrganizationId(organization.name)}
+              name={organization.name}
+            />
           </div>
         )}
 
         <div className={styles.nameRow}>
-          <span className={styles.name}>{organization.name}</span>
+          <OrgNameLink
+            organizationId={resolveOrganizationId(organization.name)}
+            name={organization.name}
+            className={styles.name}
+          />
           <Label>{ORGANIZATION_TYPE_LABEL[organization.type]}</Label>
         </div>
 
-        <p className={styles.description}>{organization.description}</p>
+        <p className={styles.description} title={organization.description}>
+          {organization.description}
+        </p>
 
         <div className={styles.meta}>
           <span className={styles.metaItem}>

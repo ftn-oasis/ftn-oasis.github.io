@@ -22,8 +22,12 @@ function MemberListRow({ member }: MemberListRowProps) {
     <Link to={`/users/${member.id}`} className={styles.root}>
       <Avater size="medium" />
       <div className={styles.info}>
-        <span className={styles.title}>{member.name}</span>
-        <span className={styles.description}>{member.role}</span>
+        <span className={styles.title} title={member.name}>
+          {member.name}
+        </span>
+        <span className={styles.description} title={member.role}>
+          {member.role}
+        </span>
       </div>
       <div className={styles.meta}>
         <span className={styles.metaItem}>

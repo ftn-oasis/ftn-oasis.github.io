@@ -2,12 +2,13 @@ import { Divider } from "@src/components/ui/Divider";
 import { Pagination } from "@src/components/ui/Pagination";
 import { useMemo, useState } from "react";
 
+import { getDocumentFilters } from "../documentFilters";
 import {
   DocumentSortDirection,
   DocumentSortField,
   type OrganizationDocument,
 } from "../types";
-import { DOCUMENT_FILTERS, DocumentFilterSidebar } from "./DocumentFilterSidebar";
+import { DocumentFilterSidebar } from "./DocumentFilterSidebar";
 import { DocumentListBox } from "./DocumentListBox";
 import { DocumentSearchBar } from "./DocumentSearchBar";
 
@@ -31,10 +32,14 @@ function sortDocuments(
 
 type OrganizationDocumentsSectionProps = {
   documents: OrganizationDocument[];
+  // 組織プロフィールページ配下 (/orgs/:orgId/documents) から使う場合は true.
+  // DocumentFilterSidebar にそのまま渡す (getDocumentFilters を参照)
+  scopedToOrganization?: boolean;
 };
 
 function OrganizationDocumentsSection({
   documents,
+  scopedToOrganization,
 }: OrganizationDocumentsSectionProps) {
   const [searchText, setSearchText] = useState("");
   const [sortField, setSortField] = useState<DocumentSortField>(
@@ -47,7 +52,7 @@ function OrganizationDocumentsSection({
 
   // 検索欄の文字列がサイドバーのいずれかのフィルターと完全一致する場合だけ,
   // その見出しを表示する (フィルター自体はまだ実装しないため, 一覧は絞り込まれない)
-  const matchedFilter = DOCUMENT_FILTERS.find(
+  const matchedFilter = getDocumentFilters(Boolean(scopedToOrganization)).find(
     (filter) => filter.query === searchText,
   );
   const heading = matchedFilter ? matchedFilter.label : "全て";
@@ -71,6 +76,7 @@ function OrganizationDocumentsSection({
       <DocumentFilterSidebar
         searchText={searchText}
         onSelect={handleSearchChange}
+        scopedToOrganization={scopedToOrganization}
       />
 
       <Divider orientation="vertical" />

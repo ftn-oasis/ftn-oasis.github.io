@@ -1,5 +1,6 @@
 import { Avater } from "@src/components/ui/Avatar";
 import { Divider } from "@src/components/ui/Divider";
+import { UserNameLink } from "@src/components/ui/UserNameLink";
 import { currentUser } from "@src/lib/currentUser";
 
 import { MOCK_ORGANIZATIONS } from "../mockData";
@@ -13,8 +14,14 @@ function ProfileSidebar() {
       <div className={styles.identity}>
         <Avater size="large" />
         <div className={styles.identityText}>
-          <div className={styles.userName}>{currentUser.name}</div>
-          <div className={styles.userEmail}>{currentUser.email}</div>
+          <UserNameLink
+            userId={currentUser.id}
+            name={currentUser.name}
+            className={styles.userName}
+          />
+          <div className={styles.userEmail} title={currentUser.email}>
+            {currentUser.email}
+          </div>
         </div>
       </div>
 

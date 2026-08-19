@@ -25,7 +25,9 @@ function UserMenuButton() {
         onClick={toggle}
         className={styles.trigger}
       >
-        <Avater size="medium" />
+        {/* ヘッダーの他のアイコンボタン (controlBase の --control-size) と
+            大きさを揃える依頼のため, プリセットではなく直接 35px を指定 */}
+        <Avater size={35} />
       </button>
 
       {open && (

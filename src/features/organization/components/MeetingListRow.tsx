@@ -25,7 +25,9 @@ function MeetingListRow({ meeting }: MeetingListRowProps) {
     >
       <div className={styles.info}>
         <span className={styles.titleRow}>
-          <span className={styles.title}>{meeting.title}</span>
+          <span className={styles.title} title={meeting.title}>
+            {meeting.title}
+          </span>
           {meeting.status === MeetingStatus.Postponed && (
             <Label color="mauve">延会</Label>
           )}
@@ -33,7 +35,10 @@ function MeetingListRow({ meeting }: MeetingListRowProps) {
             <Label color="sky">流会</Label>
           )}
         </span>
-        <span className={styles.description}>
+        <span
+          className={styles.description}
+          title={meeting.agenda.map((item) => item.label).join(", ")}
+        >
           {meeting.agenda.map((item) => item.label).join(", ")}
         </span>
       </div>

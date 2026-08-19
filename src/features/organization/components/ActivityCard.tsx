@@ -1,5 +1,6 @@
 import { Avater } from "@src/components/ui/Avatar";
 import { Icon } from "@src/components/ui/Icon";
+import { UserNameLink } from "@src/components/ui/UserNameLink";
 import {
   IconCalendar,
   IconCalendarWeek,
@@ -11,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "react-router";
 
+import { resolveMemberId } from "../resolveMemberId";
 import {
   type Activity,
   ActivityType,
@@ -155,7 +157,11 @@ function ActivityCard({ activity }: ActivityCardProps) {
       <div className={styles.header}>
         <Avater size={40} />
         <div className={styles.headerText}>
-          <span className={styles.actorName}>{activity.actorName}</span>
+          <UserNameLink
+            userId={resolveMemberId(activity.actorName)}
+            name={activity.actorName}
+            className={styles.actorName}
+          />
           <span className={styles.timestamp}>{activity.occurredAt}</span>
         </div>
       </div>

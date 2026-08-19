@@ -2,7 +2,12 @@ import { OrganizationMeetingsSection } from "@src/features/organization/componen
 import { MOCK_ORGANIZATION_MEETINGS } from "@src/features/organization/mockData";
 
 function OrganizationMeetingsPage() {
-  return <OrganizationMeetingsSection meetings={MOCK_ORGANIZATION_MEETINGS} />;
+  return (
+    <OrganizationMeetingsSection
+      meetings={MOCK_ORGANIZATION_MEETINGS}
+      scopedToOrganization
+    />
+  );
 }
 
 export { OrganizationMeetingsPage };
