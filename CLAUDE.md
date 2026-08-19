@@ -38,36 +38,35 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   (`src/pages/`, 詳細は「404 ページ (`NotFoundPage`)」を参照) も実装済みで,
   `/users/:userId`/`/orgs/:orgId` 以外のどのパスにもマッチしない URL は 404 ページに
   なります (以前はここが完全な白紙になっていました).
+  `/orgs/:orgId/documents/:documentId` (概要/版/指摘事項/修正提案/編集者の5タブ,
+  詳細は「文書詳細ページ」を参照)/`/orgs/:orgId/book/:transactionId`
+  (詳細は「会計処理詳細ページ」を参照)/`/orgs/:orgId/meetings/:meetingId`
+  (詳細は「会議詳細ページ」を参照) の3つの個別詳細ページと, 組織/文書に紐付かない
+  グローバルな `/notifications` (詳細は「通知ページ (`NotificationsPage`)」を参照)
+  も実装済みです. さらに `/documents`/`/books`/`/meetings`/`/issues`/`/pulls`
+  (それぞれ対応する `/orgs/:orgId/...` ページと同じ構造で, 内容だけ組織を
+  横断した全件にしたもの. 詳細は「組織を横断した一覧ページ」を参照)/`/orgs`
+  (組織一覧, 詳細は「組織一覧ページ (`OrgsPage`)」を参照)/`/materials`・
+  `/materials/:documentKey` (規則・資料, 詳細は「規則・資料ページ
+  (`MaterialsPage`/`MaterialDetailPage`)」を参照)/`~` (ホーム, 詳細は
+  「ホーム画面 (`HomePage`)」を参照)/`~/documents/new` (文書作成フォーム,
+  詳細は「文書作成ページ (`NewDocumentPage`)」を参照)/`~/book/new`
+  (会計申請作成フォーム — 支出/予算執行/寄付の3種類, 詳細は「会計申請作成ページ
+  (`NewTransactionSection`)」を参照) も実装済みです.
 
 現状できていないこと (着手する際は要確認):
 
-- **文書の個別詳細ページ**
-  (`/orgs/:orgId/documents/:documentId`, 文書の変更 (版) 詳細は
-  `/orgs/:orgId/documents/:documentId/versions/:versionId`) — 入出金の詳細
-  ページ (`/orgs/:orgId/book/:transactionId`, 詳細は「会計処理詳細ページ」
-  を参照)/会議の詳細ページ (`/orgs/:orgId/meetings/:meetingId`, 詳細は
-  「会議詳細ページ」を参照) は実装済みのため, 次に着手予定の作業はこの1つ
-  だけです. 一覧の各行 (`DocumentListRow`)・`DocumentCard`
-  (概要タブ)・`ActivityCard` (組織の「直近の動向」のうち文書の変更) は既に
-  この URL へリンクを貼っていますが, 実ページが無いため `NotFoundPage`
-  (404) になります (正確なリンク先は各コンポーネントの項を参照).
-  `type Activity` 系 (「組織プロフィールページ」の「データモデリング」を参照) の
-  `documentId`/`versionId` は組織 ID から独立したフラットな ID のため,
-  詳細ページの実装時もこの設計をそのまま踏襲してください — 入出金/会議の
-  詳細ページ実装時も, 一覧側の ID (`OrganizationTransaction.id` =
-  `test-org-transaction-N`/`OrganizationMeeting.id` = `test-org-meeting-N`)
-  と「直近の動向」側の ID (`MoneyTransactionActivity.transactionId` =
-  `transaction-N`/`MeetingCreatedActivity.meetingId`) をあえて別の ID
-  空間のままにしています (この2つが同じ実体を指す設計にはしていません) —
-  そのため `ActivityCard` の金銭の出納/会議作成カードから「詳しく見る」等で
-  これらの詳細ページへ遷移しようとしても, 一致する `id` が無く 404 のまま
-  です. 文書の詳細ページ実装時, 同様に概要タブ側の `MOCK_DOCUMENTS`/
-  `ActivityCard` の ID と一覧側の `MOCK_ORGANIZATION_DOCUMENTS` の ID
-  が一致しない場合も, 同じ理由で意図した挙動 (別の ID 空間) です.
-- **`/users/:userId`/`/orgs/:orgId`/`/orgs/:orgId/documents`/`/orgs/:orgId/book`/
-  `/orgs/:orgId/members`/`/orgs/:orgId/meetings` (と上記の詳細ページ) 以外の
-  実ページ**は依然として存在しません — Header/Drawer 内のリンク先の大半,
-  および組織プロフィールページの
+- **指摘事項/修正提案の個別詳細ページ**
+  (`/orgs/:orgId/documents/:documentId/issues/:issueId`/
+  `/orgs/:orgId/documents/:documentId/pulls/:pullRequestId`) — 文書詳細ページの
+  実装時に「詳細な指摘事項を表すものは後で実装します」という依頼だったため,
+  一覧 (`IssueListRow`/`PullRequestListRow`) は既にこれらの URL へリンクを
+  貼っていますが, 実ページが無いため `NotFoundPage` (404) になります.
+- **`/`/`/users/:userId`/`/orgs/:orgId`/`/orgs/:orgId/documents`/`/orgs/:orgId/book`/
+  `/orgs/:orgId/members`/`/orgs/:orgId/meetings` (と上記の各詳細ページ)/
+  `/notifications`/`/documents`/`/documents/new`/`/books`/`/book/new`/`/meetings`/
+  `/issues`/`/pulls`/`/orgs`/`/materials`・`/materials/:documentKey` 以外の実ページ**は依然として
+  存在しません — Header/Drawer 内のリンク先の一部, および組織プロフィールページの
   「設定」タブは実際には `NotFoundPage` (404) が表示されるだけの状態です.
   新しいページを
   作る際, URL の命名は既存のリンク (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` など)
@@ -84,8 +83,6 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   (`src/features/user/mockData.ts`), 組織プロフィールページの組織詳細/構成員/直近の動向
   (`src/features/organization/mockData.ts`, `id: "test-org"` の1件のみ) も同様にダミーです.
 - テストスイート — 設定されていません.
-- `src/` 内の一部ファイルは空のスタブです (例: `SearchBar.tsx`). import
-  されているからといって中身があるとは限らないので, 必ず内容を確認してください.
 
 ## コマンド
 
@@ -197,19 +194,48 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   合わせて `components/` を1段挟む配置 — `features/navigation/` とは階層が異なる点に注意),
   `features/organization/components/` (`OrganizationTabs`/`OrganizationOverviewSection`/
   `OrganizationDocumentsSection`/`OrganizationBookSection`/
-  `OrganizationMembersSection`/`OrganizationMeetingsSection` など, 同じく
+  `OrganizationMembersSection`/`OrganizationMeetingsSection`/`Document*`
+  (文書詳細ページ)/`Issue*`/`PullRequest*` など, 同じく
   `components/` を挟む配置. 詳細は「組織プロフィールページ」「組織の文書一覧
   (`OrganizationDocumentsSection`)」「組織の入出金一覧
   (`OrganizationBookSection`)」「会計処理詳細ページ」「組織の構成員一覧
   (`OrganizationMembersSection`)」「組織の会議一覧
-  (`OrganizationMeetingsSection`)」「会議詳細ページ」を参照) が存在.
-- `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
-  (`/users/:userId`), `OrganizationLayout` (`/orgs/:orgId` の親ルート, 「組織が見つかりません」
+  (`OrganizationMeetingsSection`)」「会議詳細ページ」「文書詳細ページ」を参照),
+  `features/notifications/components/` (`NotificationsSection`/`NotificationListRow`
+  など, 組織/文書に紐付かないグローバルな機能のため独立させています.
+  詳細は「通知ページ (`NotificationsPage`)」を参照), `features/materials/components/`
+  (`MaterialsHomeSection`/`MaterialsExplorer`/`MaterialBreadcrumb` など, 通知と
+  同じ理由で独立させています. 詳細は「規則・資料ページ (`MaterialsPage`/
+  `MaterialDetailPage`)」を参照), `features/home/components/`
+  (`HomeSection`/`HomeSidebar`/`HomeFeed`/`HomeFeedCard`/`HomeEditedDocumentItem`/
+  `HomeInProgressTransactionItem` など, 同じ理由で独立させています. 詳細は
+  「ホーム画面 (`HomePage`)」を参照) が存在.
+- `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `HomePage` (`/`,
+  詳細は「ホーム画面 (`HomePage`)」を参照), `NewDocumentPage` (`/documents/new`,
+  詳細は「文書作成ページ (`NewDocumentPage`)」を参照), `NewTransactionPage`
+  (`/book/new`, 詳細は「会計申請作成ページ (`NewTransactionSection`)」を参照),
+  `UserProfilePage`
+  (`/users/:userId`), `NotificationsPage` (`/notifications`, 詳細は「通知ページ
+  (`NotificationsPage`)」を参照), `DocumentsPage`/`BooksPage`/`MeetingsPage`/
+  `IssuesPage`/`PullsPage` (`/documents`/`/books`/`/meetings`/`/issues`/`/pulls`,
+  組織を横断した一覧. 詳細は「組織を横断した一覧ページ」を参照), `OrgsPage`
+  (`/orgs`, 組織一覧. 詳細は「組織一覧ページ (`OrgsPage`)」を参照),
+  `MaterialsPage`/`MaterialDetailPage` (`/materials`/`/materials/:documentKey`,
+  詳細は「規則・資料ページ (`MaterialsPage`/`MaterialDetailPage`)」を参照),
+  `OrganizationLayout` (`/orgs/:orgId` の親ルート,
+  「組織が見つかりません」
   判定と `OrganizationTabs` の表示を担う) とその子ルート `OrganizationOverviewPage`
   (`/orgs/:orgId`, index route)/`OrganizationDocumentsPage`
   (`/orgs/:orgId/documents`)/`OrganizationBookPage` (`/orgs/:orgId/book`)/
   `OrganizationMembersPage` (`/orgs/:orgId/members`)/`OrganizationMeetingsPage`
-  (`/orgs/:orgId/meetings`), さらにその子として `OrganizationTransactionLayout`
+  (`/orgs/:orgId/meetings`), さらにその子として `OrganizationDocumentLayout`
+  (`/orgs/:orgId/documents/:documentId` の親ルート, 「文書が見つかりません」
+  判定と上部の要約+タブの表示を担う, 詳細は「文書詳細ページ」を参照)
+  とその子ルート `OrganizationDocumentOverviewPage` (index route)/
+  `OrganizationDocumentVersionsPage` (`/versions`)/
+  `OrganizationDocumentIssuesPage` (`/issues`)/
+  `OrganizationDocumentPullsPage` (`/pulls`)/
+  `OrganizationDocumentEditorsPage` (`/editors`), `OrganizationTransactionLayout`
   (`/orgs/:orgId/book/:transactionId` の親ルート, 「会計処理が見つかりません」
   判定と上部の状態表示+タブの表示を担う, 詳細は「会計処理詳細ページ」を参照)
   とその子ルート `OrganizationTransactionBreakdownPage` (index route)/
@@ -382,18 +408,52 @@ text色にしてほしい」という依頼で追加しました. `DocumentFilte
 プロフィール行) は `MenuLink` を使わず `menuItemBase.root` を直接 `<button>`/`<Link>` に適用して
 個別実装しています.
 
-`NavDrawer` 内の「規則･資料」(`/materials`)/「組織」(`/orgs`) は, 以前は実際のドメインが
-未確定のため `https://<subdomain>.io/{documents,organizations}` という外部URLの
-プレースホルダーでしたが, 内部ルーティングへ差し替え済みです. どちらも実ページは
-まだ無いため (前者は未着手, 後者は `/orgs/:orgId` はあっても一覧page `/orgs` 自体は
-無い), 現状はリンク先が `NotFoundPage` (404) になります.
-「規則･資料」は「文書」(`/documents`, `PrimaryNavLinks`/`CreateButton` の
-「全ての文書」「新たに文書を作成」が指す, 組織が作成する文書の機能) とは別物である
+`NavDrawer` 内の「規則･資料」(`/materials`)/「組織一覧」(`/orgs`, 元は「組織」— 「メニュー
+ドロワーの文言について」の依頼で NavDrawer 内のラベルだけ「〜一覧」を付ける形に
+統一した際に変更. 詳細は「組織一覧ページ (`OrgsPage`)」を参照) は, 以前は実際の
+ドメインが未確定のため `https://<subdomain>.io/{documents,organizations}` という
+外部URLのプレースホルダーでしたが, 内部ルーティングへ差し替え済みです.
+どちらも実装済みです (「規則･資料」の詳細は「規則・資料ページ
+(`MaterialsPage`/`MaterialDetailPage`)」を参照).
+「規則･資料」は「文書」(`/documents`, `PrimaryNavLinks` の「全ての文書」/
+`CreateButton` の「文書を作成」が指す, 組織が作成する文書の機能) とは別物である
 点に注意してください — 当初 `getBreadcrumb.ts` の `documents` に「規則・資料」を
 割り当てていましたが, これは「規則･資料」がまだ外部URLだった頃の名残りで,
 実際には「文書」の方を指すべき値だったための誤りでした. 現在は `documents: "文書"`/
 `materials: "規則・資料"`/`orgs: "組織"` (`/orgs/:orgId` の判定より後に評価されるため,
 `/orgs` 単体のときだけ使われます) とそれぞれ独立させています.
+
+「"印刷状況"/"新館予約状況"/"備品貸出状況" の項目をメニュードロワーの "会議一覧" と
+"規則･資料" の間に, 分割線で上下を区切って挿入してほしい」という依頼により,
+`NavDrawer` の「会議一覧」と (既存の) 区切り線+「規則･資料」の間に, もう1本
+区切り線を追加してこの3項目を挟んでいます. リンク先の URL は, 印刷/備品貸出の2つは
+「適切な名前」という依頼から `/print-queue`/`/equipment-loans` と推測しましたが,
+新館予約だけは後から「`~/room-reservations` にしてほしい」と明示的な指定を受けています
+(当初は同様に推測して `/new-building-reservations` としていましたが変更).
+それぞれ `CreateButton` の「印刷を依頼」/「新館の使用を申請」/「備品貸出を申請」
+(動作はのちほど実装, 詳細は上記) の状況確認ページに相当する想定で, アイコンも
+対応する `CreateButton` の項目と同じもの (`IconPrinter`/`IconBuildingEstate`/
+`IconPackage`) を再利用しています. **いずれも対応する実ページはまだ無いため
+`NotFoundPage` (404) になります** — `getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS`
+には他の未実装スタブ (`settings` など) と同様に追加済みのため, 404 表示中も
+パンくずには「印刷状況」等の日本語名がそのまま表示されます.
+
+**「メニュードロワーの最下部に分割線を入れ, その下に "組織名/文書名" として
+直近で編集した文書を画面に収まる限り入れてほしい」という依頼**により,
+「組織一覧」の下に `Divider` を挟んで, `getDocumentsEditedByCurrentUser`
+(「ホーム画面」の `MY_EDITED_DOCUMENTS` と同じ関数, `features/organization/
+mockData.ts` で共有) の結果を並べています. `.recentDocuments`
+(`flex: 1 1 auto; min-height: 0; overflow: hidden;`) が `.drawer` 自体の
+スクロール (`overflow: hidden auto`) とは別に, この一覧だけを画面に入りきる
+分だけ表示してクリップします (「問題を報告」ボタンを最下部に押し出す役割も
+兼ねます). 各行は `MenuLink` ではなく `menuItemBase.root` を直接 `<Link>`
+に適用した独自実装で, 先頭のアイコンは文書の組織アバター (`Avater
+shape="square" size={20}`, 当初は `IconFileText` でしたが「アイコン部分を
+組織のアバターに変更してほしい」という依頼で差し替え), ラベルは「組織名/
+文書名」を `overflow: hidden; white-space: nowrap; text-overflow:
+ellipsis; min-width: 0;` (「折り返しを無効化してはみ出した部分は3点リーダで
+見切れていることを示してほしい」という依頼のため) で1行に収め, `title`
+属性 (前述「見切れた文言をホバーで全体表示」を参照) で全体を見せます.
 
 ### タブバー系: `tabBase.module.css`
 
@@ -440,7 +500,11 @@ text色にしてほしい」という依頼で追加しました. `DocumentFilte
   (`CreateButton`, 画面中央寄り) か `right: 0` (`UserMenuButton`, 画面右端寄り) を使い分けています —
   画面端でのはみ出し検知は (`useTooltipAlign` のような) 未実装です.
 - 中身の各行は `menuItemBase.module.css` (`MenuLink`, または独自の `<button>`) を使い,
-  区切りが要る場合は `Divider` を挟みます.
+  区切りが要る場合は `Divider` を挟みます. `CreateButton` の「会計申請を作成」の
+  ように, まだ対応するルートが無い項目は `MenuLink` ではなく素の `<button
+  onClick={close}>` にしています — 「印刷を依頼」/「備品貸出を申請」/「新館の
+  使用を申請」(依頼により「会議を作成」と「組織を作成」の間に追加, 動作は
+  のちほど実装) も同じ理由でこの形にしています.
 - トリガーが `IconButton` の場合は `hideTooltip={open}` を渡してください (「正方形アイコン系」参照).
 - `UserMenuButton` のプロフィール行 (`.userName`/`.userEmail`) は `white-space: nowrap`
   にしています — `.menu` は `min-width: 240px` (最小値のみで `width`/`max-width`
@@ -505,8 +569,11 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
   `issues`/`pulls`/`notifications` も同様に追加済みで, それぞれ「指摘事項」「修正提案」「通知」
   です — `issues`/`pulls` は他の特殊パスと違い, パンくずだけでなく `PrimaryNavLinks`/`NavDrawer`
   のラベル (ヘッダーのツールチップ/ドロワーの表示文言) もこの表記に揃えるようユーザーから
-  指定されたため, そちらも変更済みです (`CreateButton` の「新たに改善点を指摘」は動詞句のため
-  対象外としています). `logout` はユーザー確認の結果, 専用画面になる想定のため
+  指定されたため, そちらも変更済みです (`CreateButton` の「改善点を指摘」は動詞句のため
+  対象外としています — NavDrawer/PrimaryNavLinks が「〜一覧」のような名詞句なのに対し,
+  `CreateButton` は「これから新しく作る操作」を表す動詞句のまま, という区別は
+  「メニュードロワーの文言について」の依頼で NavDrawer 側だけ「一覧」を付けた際も
+  そのまま踏襲しています). `logout` はユーザー確認の結果, 専用画面になる想定のため
   意図的に `SPECIAL_ROOT_LABELS` へ追加していません — 抜けているわけではないので,
   新たに追加しないよう注意してください.
 - **レスポンシブな折り畳み** (`useHeaderResponsiveLayout.ts`) — `breadcrumbRef`/
@@ -657,10 +724,16 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
     説明文, 3行目一式) はすべて `--color-body-subtext` (Catppuccin `subtext1`,
     `theme.css` に今回追加したトークン) で統一しています — 「これは実際にリンクである」
     という視覚的な合図を `--color-link` の青に一本化するためです.
-  - リンク先はまだ実装していない文書ページ想定で `/orgs/${organizationId}/documents/${documentId}`
-    の形にしています (`/${userId}/...` ではなく組織に紐付く点に注意. こちらも組織プロフィール
-    ページ実装時に `/orgs/` 配下へ差し替えています). カード自体の `border`/`border-radius`
-    は指定が無かったため `--borderWidth-thin`/`--borderRadius-medium` を流用しています.
+  - リンク先は文書詳細ページ (`/orgs/${organizationId}/documents/${documentId}`,
+    実装済み. 詳細は「文書詳細ページ」を参照) の形にしています (`/${userId}/...`
+    ではなく組織に紐付く点に注意. こちらも組織プロフィールページ実装時に
+    `/orgs/` 配下へ差し替えています). ただし `MOCK_DOCUMENTS`
+    (`features/user/mockData.ts`) の `documentId` は組織側の
+    `MOCK_ORGANIZATION_DOCUMENTS` とは別の ID 空間のため (「組織プロフィール
+    ページ」の「データモデリング」を参照), `bunkasai-plan` など大半の ID は
+    一致する文書が無く実際には 404 のままです. カード自体の `border`/
+    `border-radius` は指定が無かったため `--borderWidth-thin`/
+    `--borderRadius-medium` を流用しています.
 
 **`~` 表記について**: ユーザーからの指示文中の `~` はホスト名 (サイトのルート, 例:
 `https://fth-oasis.example`) を指します. `~/組織名` は「ホスト名直下の, その組織のパス」
@@ -699,9 +772,9 @@ React Router のネストしたルートでは, 親ルート (`/orgs/:orgId`) �
   は各タブが実際の `<NavLink>` (概要 `/orgs/:orgId` (`end` 必須 — 無いと他の全タブでも
   概要が選択中に見えてしまいます)/文書 `/orgs/:orgId/documents`/会計
   `/orgs/:orgId/book`/会議 `/orgs/:orgId/meetings`/構成員 `/orgs/:orgId/members`/
-  設定 `/orgs/:orgId/settings`) です — 概要/文書以外はいずれもまだ実ページが無いため,
-  選択すると `NotFoundPage` (404) が表示されます (ヘッダーの下部スロットも失われます.
-  「プロジェクトについて」の「現状できていないこと」を参照). **「設定」のリンク先は
+  設定 `/orgs/:orgId/settings`) です — 概要/文書/会計/会議/構成員は実装済みですが,
+  設定タブだけはまだ実ページが無いため, 選択すると `NotFoundPage` (404) が表示されます
+  (ヘッダーの下部スロットも失われます). **「設定」のリンク先は
   依頼文に明記が無かったため, 他のタブと同じ `/orgs/:orgId/設定パス` の形で
   `/orgs/:orgId/settings` と推測しています** — 別のパスにしたい場合は
   `OrganizationTabs.tsx` の `tabs` 配列を修正してください. 各タブはラベルの左に
@@ -710,7 +783,7 @@ React Router のネストしたルートでは, 親ルート (`/orgs/:orgId`) �
   設定 `IconSettings` (`ProfileTabs` の項も参照. 依頼文の `IconRecipientYen`/
   `IconSetting` は `@tabler/icons-react` に存在しない名称だったため, それぞれ
   実在する `IconReceiptYen`/`IconSettings` に読み替えています — 前者は
-  `CreateButton` の「新たに会計申請を作成」, 後者は `DocumentFilterSidebar`
+  `CreateButton` の「会計申請を作成」, 後者は `DocumentFilterSidebar`
   の「管理下」フィルターで既に使われているアイコンと同じです).
 - **ヘッダーの Box (`OrganizationHeaderBox`)** は `height: 116px; margin: 24px 0;`
   の横並びで, 左に組織アバター (`size={100} shape="square"`), 右にパンくず/組織名+
@@ -770,8 +843,11 @@ React Router のネストしたルートでは, 親ルート (`/orgs/:orgId`) �
     `READ_MORE_THRESHOLD` (= 5) 件以上のとき, 表示自体は先頭5件で打ち切り,
     代わりに太字下線の「詳しく見る」(`ReadMoreLink`, 非 export のローカル関数)
     を末尾に出します — 依頼文の会議/出納/文書それぞれのリンク先
-    (`/orgs/:orgId/meetings/:meetingId` など) に対応するページはまだ無いため,
-    実際にクリックすると 404 になります.
+    (`/orgs/:orgId/meetings/:meetingId` など) に対応するページ自体は
+    実装済みですが, `Activity` 側の `meetingId`/`transactionId`/
+    `documentId` は下記「データモデリング」のとおり一覧側とはあえて別の
+    ID 空間のままにしているため, 実際にクリックすると (一致する `id`
+    が無く) 404 になります.
 - **データモデリング**: 依頼文に「上記にある ID などは組織とは分離して考え, データベースで
   見た際には木構造ではなくなっている可能性があることに注意」という指示があったため,
   `types.ts` の `Activity` (会議作成/金銭の出納/文書の変更) は組織の子要素として
@@ -911,9 +987,13 @@ grid-template-columns: 1fr auto 3fr;` として左をサイドバー, 中央を�
   (`background: var(--color-secondary1)`) に「n本の文書」(検索にマッチする件数.
   太字) と `DocumentSortDropdown` を並べます. 各行は `DocumentListRow` —
   文書名 (太字)/概要/`IconFile` + ファイル種別を横並びにした, 行全体が1つの
-  `<Link to={`/${document.organizationId}/${document.id}`}>` になっている
-  ボタンです. リンク先はまだ実装していない文書ページ想定で, `OverviewSection`
-  の `DocumentCard` と同じ形式です. **`Pagination` はこの Box の内部ではなく,
+  `<Link to={`/orgs/${document.organizationId}/documents/${document.id}`}>`
+  になっているボタンです. リンク先の文書詳細ページは実装済み (詳細は
+  「文書詳細ページ」を参照) で, `MOCK_ORGANIZATION_DOCUMENTS`
+  の `id` (`test-org-doc-N`) をそのまま使っているため実際に遷移できます —
+  `OverviewSection` の `DocumentCard` (別の ID 空間の `MOCK_DOCUMENTS`
+  を参照するため大半が 404 のまま) とはこの点が異なります.
+  **`Pagination` はこの Box の内部ではなく,
   呼び出し元 (`OrganizationDocumentsSection`) が Box の外側 (上下) に配置します**
   — 当初は Box 内部の `.toolbar` 直下/一覧末尾に組み込んでいましたが,
   「Box の外に出してほしい」という依頼を受け, `DocumentListBox` からは
@@ -1184,8 +1264,8 @@ GitHub の Pull Request ページを参考にした, 入出金一覧の1件の�
   既存の `description` (一覧側で「概要」として使っている, 元々
   "装飾用の布地" のような短い名詞句だったフィールド) をそのまま流用しています.
   なお `MoneyTransactionActivity.transactionId` (組織の「直近の動向」側,
-  `transaction-N`) とはあえて別の ID 空間のままです (「プロジェクトについて」の
-  「現状できていないこと」を参照) — `ActivityCard` の金銭の出納カードからは
+  `transaction-N`) とはあえて別の ID 空間のままです (「組織プロフィールページ」の
+  「データモデリング」を参照) — `ActivityCard` の金銭の出納カードからは
   このページへは (一致する `id` が無いため) まだ遷移できません.
 - **ルーティング**: `/orgs/:orgId` (`OrganizationLayout`) の子ルートとして
   `book` (一覧, `OrganizationBookPage`) とは別に `book/:transactionId`
@@ -1974,9 +2054,816 @@ GitHubのようにレンダリングして表示してほしい, レンダリン
   (`MeetingMinutes` 自体に実ファイル名の概念が無いため).
 - **利用箇所**: `MeetingMaterialsExplorer` (資料タブ, Markdown 種別のみ.
   PDF/動画/テキストは対象外) と `MeetingMinutesExplorer` (議事録タブ,
-  全件) の2箇所です — 依頼の「他にmdファイルを表示する場所でも」を
-  満たすため, 特定の画面に結合させず `source`/`title` を受け取るだけの
-  汎用コンポーネントにしています.
+  全件), `DocumentContentViewer` (文書詳細ページの概要/版タブ, 詳細は
+  「文書詳細ページ」を参照) の3箇所です — 依頼の「他にmdファイルを表示する
+  場所でも」を満たすため, 特定の画面に結合させず `source`/`title`
+  を受け取るだけの汎用コンポーネントにしています.
+- **`bordered`/`onEdit`**: `bordered?: boolean` (既定 `true`) は false のとき
+  外枠のボーダー/角丸/背景を描画しない — `MeetingMaterialsExplorer`/
+  `MeetingMinutesExplorer` のように呼び出し側が既に外枠を持っていて二重に
+  囲われてしまう場合 (`MeetingMinutesExplorer` の複数開催回ケースで実際に
+  踏んだ「議事録が2重に囲われてしまっている」不具合の修正で追加) に使います
+  — ツールバーと本文の分割自体はこの場合も維持されます. `onEdit?: () =>
+  void` は指定するとトグルスイッチの左横に `IconButton` (`icon={IconPencil}
+  label="編集する"`) を表示します — 「トグルスイッチの左横に編集する
+  ボタンを追加してほしい, 動作はのちほど実装する」という依頼のため, 現状は
+  `DocumentContentViewer`/`DocumentOverviewSection` から渡すハンドラーは
+  何もしないスタブです (`MeetingMaterialsExplorer`/`MeetingMinutesExplorer`
+  からは渡していないため, それらのツールバーには表示されません).
+
+## 文書詳細ページ (`/orgs/:orgId/documents/:documentId`)
+
+会計処理詳細ページ/会議詳細ページと基本的に同じ構成 (存在チェック+上部要約を
+担う親レイアウト, ページ本文側のタブバー, `<Outlet context={document} />` +
+`useOutletContext` で子ページへ受け渡す薄いラッパーページ) です —
+「../../meetings/会議ID を参考とし」という依頼のため, `OrganizationMeetingLayout`
+とほぼ同じ形で `OrganizationDocumentLayout`
+(`src/pages/`, 「文書が見つかりません」判定+`DocumentHeaderBox`+
+`DocumentDetailTabs`+`Outlet` を担う) を実装しています. `DocumentListRow`
+(一覧の各行) は既にこの URL (`/orgs/${organizationId}/documents/${id}`)
+へリンクしていたため, 実装対象は詳細ページ側のみでした.
+
+- **上部要約 (`DocumentHeaderBox`)**: 1段目は文書名 (太字)+公開/非公開バッジ
+  (`DocumentCard` と同じ `Label`, 色指定は無し), 2段目は `IconUser`+作成者名です.
+- **タブ (`DocumentDetailTabs`)**: 概要 (`IconHome`)/版 (`IconTag`)/指摘事項
+  (`IconFileAlert`)/修正提案 (`IconFileTextSpark`)/編集者 (`IconUsers`)
+  の5タブです. 他の詳細ページと同じくヘッダー下部のスロットではなく本文側に
+  描画します (`OrganizationTabs` が既にそのスロットを使っているため).
+  URL のパス部分は既存の `getBreadcrumb.ts`/`SPECIAL_ROOT_LABELS`
+  で「指摘事項」「修正提案」に対応付け済みの `issues`/`pulls`
+  をそのまま使っています (`/orgs/:orgId/documents/:documentId/issues`/`/pulls`).
+- **データモデリング**: 会計処理詳細ページ/会議詳細ページと同じ考え方
+  (「一覧の1件」と「その詳細」は同一の実体を指す) で, `OrganizationDocument`
+  (`features/organization/types.ts`) に `authorName`/`visibility`/`versions`/
+  `editors`/`resolution` を追加する形で拡張しています — 別の型は新設していません.
+  - `visibility: DocumentVisibility` — 公開/非公開バッジ用に新設した型です.
+    `features/user/types.ts` の `DocumentVisibility` (`DocumentSummary` 用)
+    とは別の実体 (「組織の文書一覧」の1件 vs 「ユーザーの概要タブ」の1件)
+    のため, 「各機能が自分の型を持つ」という既存の方針
+    (`DocumentSortField`/`TransactionSortField` が同じ形でも別々なのと
+    同じ考え方) に揃えて独立して定義しています.
+  - `type DocumentVersion` (`id`/`editedAt`/`editor: OrganizationMember`/
+    `content?: string`) — 版タブ用. `editor` は概要タブの「編集者(管理者は)」
+    の判定にも `role` を使うため, 名前の文字列ではなく `OrganizationMember`
+    をそのまま持たせています. `content` は Markdown/Text のときだけ持ち,
+    PDF/MP4 のときは無い (会議の資料タブと同じ考え方) ため任意にしています.
+  - `type DocumentResolution` (`meetingId`/`meetingTitle`/`agendaLabel`/
+    `voteResult`) — 「議決されていればその会議と可決･否決の情報」用.
+    `voteResult` は `AgendaItemVoteResult` (会議の議題の議決結果) を再利用
+    しますが, `Approved`/`Rejected` の2値だけに絞っています (「可決･否決」と
+    明示されていたため `Postponed` は使いません). `meetingId` は実在する
+    `MOCK_ORGANIZATION_MEETINGS` の会議を指す実際に機能するリンクにしています
+    (`EmbeddedTransactionView` が実在する会計処理を参照するのと同じ考え方
+    — `MoneyTransactionActivity.transactionId` 等とは異なり, こちらは
+    あえて別の ID 空間にする理由が無いため実在の ID をそのまま使っています).
+  - `type DocumentIssue`/`type DocumentPullRequest` (指摘事項/修正提案タブ用)
+    — `id`/`documentId`/`title`/`posterName`/`postedAt` の同じ形ですが,
+    「指摘事項と修正提案は別の実体」という判断で型は分けています (`Activity`
+    系と同じ「組織/文書とは分離して考える」設計 — 組織の直下ではなく,
+    `documentId` を外部キーとして持つフラットな配列です). ソート用の型
+    (`DocumentIssueSortField`/`DocumentPullRequestSortField` など) も
+    同じ形ですが独立して定義しています.
+- **概要タブ (`DocumentOverviewSection`)**: 「GitHubのリポジトリのページを
+  参考に」という依頼のため, `OrganizationOverviewSection` と同じ 3fr/1fr
+  (メイン:サイドバー) の列比率にしています (依頼文の「左側にメインの資料
+  右側に資料の情報」に対応). メインは `DocumentContentViewer`
+  (概要/版タブ共通, 後述). サイドバー (「資料の情報」見出し+`<dl>`) は
+  作成日時/版 (`第${versions.length}版`)/編集者/議決 (あれば) の4項目です.
+  - **「編集者(管理者は)」**: 依頼文の意図をユーザーに確認したところ「編集者名
+    + 管理者なら付記」とのことだったため, 最新版 (`versions` の末尾) の
+    `editor.name` を表示し, その `role` が `"委員"` (既定の役職) 以外
+    (`isAdminRole`, 委員長/副委員長などの特別な役職) であれば末尾に
+    「(管理者)」を付記します — 新しいフィールドは増やさず, 既存の
+    `OrganizationMember.role` の値で判定しています.
+  - **議決情報**: `document.resolution` があれば,
+    `` `${meetingTitle}にて「${agendaLabel}」が${可決/否決}されました` ``
+    を表示し, 会議名部分は実在する `/orgs/:orgId/meetings/:meetingId`
+    へのリンクにしています.
+  - **`DocumentContentViewer`** (概要タブ/版タブ共通の切り出し) は
+    `fileType`/`title`/`content`/`onEdit?` を受け取り, `fileType` に応じて
+    Markdown → `MarkdownFileViewer` (`onEdit` があれば「編集する」ボタンを
+    表示)/Text → 等幅プレビュー/それ以外 (PDF/MP4) → プレースホルダー,
+    を出し分けます (`MeetingMaterialsExplorer` と同じ分岐ロジック) —
+    概要タブ/版タブの両方から同じコンポーネントとして呼び出すため
+    (「タイムラインの左横に概要画面と同じビューワを配置し」という依頼を
+    素直に満たすため), 依頼されていませんが重複を避けてこの1コンポーネントに
+    切り出しています. 「編集する」ボタン (`IconPencil`, 動作はのちほど実装)
+    は概要タブから呼ぶときだけ `onEdit` を渡し, 版タブ (過去の版を見ている
+    ときに「編集する」は意味が通らないため) では渡していません.
+- **版タブ (`DocumentVersionsSection`/`DocumentVersionTimeline`)**: 左に
+  `DocumentContentViewer` (選択中の版の内容, 既定は最新版), 右にタイムライン
+  (概要タブと同じ 3fr/1fr 比率) という構成です. タイムラインは
+  「../../book/会計処理ID/procedureのタイムラインを逆転させ, アイコンを
+  塗り潰しの丸にしてほしい」という依頼のため, `TransactionProcedureTimeline`
+  と同じ土台 (rail+円+矢印+stepBody の縦タイムライン) を踏襲した新規
+  コンポーネント `DocumentVersionTimeline` として実装しています (「機能ごとに
+  似た構成でも別コンポーネントとして持つ」という既存の方針を踏襲 —
+  完了/否認/未完了の区別が無い分ロジックも簡略化されるため, 直接
+  `TransactionProcedureTimeline` を拡張するより新規のほうが素直でした).
+  - **逆転**: `versions` (`OrganizationDocument` 側は古い順で保持) を表示直前に
+    `.reverse()` して新しい順 (最新版が上) にしています — データ自体は
+    古い順のまま保つ設計です.
+  - **塗り潰しの丸**: 完了済 (チェック)/未完了 (枠線のみ)/否認 (バツ)
+    の3種類だった `TransactionProcedureTimeline` と異なり, 版は全て
+    確定済みの事実 (未来/未完了の概念が無い) なので `IconCircleFilled`
+    1種類だけを使います.
+  - **タイトル/選択状態**: タイトルは手順名ではなく版の編集日時, 下に
+    `IconUser`+編集者名です. 各行は `<button>` にして版を選択できるように
+    しており (`onSelect`), 選択中の版だけ `TransactionProcedureTimeline`
+    の「直近 (lastCompletedIndex)」と同じ強調 (30px, 通常色) にし,
+    それ以外は同じ控えめな表現 (24px, `--color-body-subtext0`) にしています
+    — 選択すると左側の `DocumentContentViewer` の表示内容がその版の
+    `content` に切り替わり, 「その版の状態を再現する」という依頼を
+    満たします (`MeetingMinutesExplorer` のサイドバー選択と同じ考え方).
+- **指摘事項/修正提案タブ (`DocumentIssuesSection`/`DocumentPullRequestsSection`)**:
+  「../../meetingsのリスト形式で」という依頼のため,
+  `OrganizationMeetingsSection` のリスト表示部分 (検索バー+フィルター
+  サイドバー+ソート+ページネーション付き一覧 Box, カレンダー表示関連は
+  対象外) と同じ構造です. `IssueListRow`/`IssueListBox`/
+  `IssueFilterSidebar`/`IssueSearchBar`/`IssueSortDropdown` を実装した後,
+  「指摘事項と同じ形式にしてほしい」という依頼どおり `PullRequest*`
+  として並行複製しています (`Document*`/`Transaction*`/`Meeting*`
+  系で確立した「機能ごとに似た構成でも別コンポーネントとして持つ」方針の
+  踏襲). 一覧の各行はタイトル (太字)+投稿者/投稿日 (右詰め2段,
+  `MeetingListRow` と同じ考え方) です. サイドバーのフィルターは
+  他のフィルター同様まだ実装しない (選択すると検索欄に文字列を入れるだけ)
+  ため, 具体的な選択肢は依頼に無い箇所を判断で補っています — 指摘事項は
+  全て/自分の投稿/未解決/解決済み, 修正提案は全て/自分の投稿/マージ待ち/
+  マージ済みです. 詳細な指摘事項/修正提案自体 (`/issues/:issueId`/
+  `/pulls/:pullRequestId`) はまだ実装していないため, 一覧の各行から
+  遷移すると 404 になります (「プロジェクトについて」の
+  「現状できていないこと」を参照). **`IssueListRow`/`PullRequestListRow`
+  は `issue`/`pullRequest` だけを受け取り, リンク先の組織 ID は
+  `issue.documentId`/`pullRequest.documentId` から `MOCK_ORGANIZATION_DOCUMENTS`
+  を検索して自分で解決します** (`organizationId`/`documentId` を props で
+  受け取る設計だと, ある文書に紐付いた指摘事項という前提を崩せないため) —
+  `DocumentIssuesSection`/`DocumentPullRequestsSection`/`IssueListBox`/
+  `PullRequestListBox` も同じ理由で `issues`/`pullRequests` の配列だけを
+  受け取ります. この設計のおかげで, 特定の文書の指摘事項だけに絞り込んだ
+  配列を渡す (このタブ) のと, 全件をそのまま渡す (`~/issues`, 詳細は
+  「組織を横断した一覧ページ」を参照) のを, 同じコンポーネントの
+  そのままの再利用で両立できています.
+- **編集者タブ (`DocumentEditorListBox`)**: 「../../meetings/会議ID/membersの
+  リストと同じものを配置してほしい」という依頼のため, `MeetingAttendeeListBox`
+  と全く同じ構造 (構成員一覧の行 `MemberListRow` をそのまま再利用する,
+  ソート/ページネーションは持たない簡潔な Box) です.
+- **モックデータ**: `MOCK_ORGANIZATION_DOCUMENTS` (300件) の各文書に
+  `authorName`/`visibility` (4件に1件を非公開)/`versions` (2〜4件, 版ごとに
+  `MOCK_MEMBERS` から機械的に選んだ編集者)/`editors` (3〜5人) を生成時に
+  追加しています. `resolution` だけは `MOCK_ORGANIZATION_MEETINGS`
+  (このファイルの後方で定義) を参照する必要があり, 文書生成の `Array.from`
+  内では組み立てられないため, `MOCK_ORGANIZATION_MEETINGS` の定義後に
+  可決/否決の議題を持つ会議を集めて (`RESOLVABLE_AGENDA_ENTRIES`) 4件に1件の
+  文書へ後付けで代入しています. `MOCK_DOCUMENT_ISSUES`/
+  `MOCK_DOCUMENT_PULL_REQUESTS` はそれぞれ5件に1件/7件に1件の文書にだけ
+  1〜3件/1〜2件を割り当てる `flatMap` で生成しています (全件に持たせると
+  件数が膨らみすぎるため).
+
+## 通知ページ (`NotificationsPage`)
+
+`~/notifications` — Header/`NavDrawer` の「全ての通知」/「通知」ボタンが
+指す, 組織/文書のいずれにも紐付かないグローバルな一覧ページです.
+「これ (指摘事項/修正提案のリスト形式) と同じ形式で実装してほしい」という
+依頼のため, `OrganizationDocumentsSection` と同じ構造 (検索バー+フィルター
+サイドバー+ソート+ページネーション付き一覧 Box) を土台にしていますが,
+「既読/未読の区別も追加してほしい」という確認への回答を受けて未読の視覚的な
+区別を追加しています.
+
+- **配置**: 組織/文書に紐付かないため, 既存の `features/organization/`
+  ではなく新しい `features/notifications/` (`types.ts`/`mockData.ts`/
+  `components/`, `features/user/` と同じ構成) として独立させています.
+  ルーティングも `/orgs/:orgId` 配下のネストしたルートではなく, `App.tsx`
+  の `<Route path="/notifications" element={<NotificationsPage />} />`
+  として `/users/:userId`/`/orgs/:orgId` と同じ階層のトップレベルルートに
+  しています (`OrganizationLayout` のような親レイアウト+存在チェックは
+  不要 — 「組織が見つかりません」に相当する概念が無いため).
+- **`type Notification`** (`id`/`title`/`senderName`/`occurredAt`/`read`/
+  `targetUrl`) — `DocumentIssue`/`DocumentPullRequest` と近い形ですが,
+  組織/文書に紐付かない別の実体のため独立した型にしています. `targetUrl`
+  は通知の対象ページへの絶対パスをそのまま持たせており (`documentId`
+  のような ID 参照+ リンク先を都度組み立てる形にはしていません — 通知の
+  対象が文書/会議/入出金など複数の種類にまたがるため, 種類ごとの分岐を
+  `NotificationListRow` 側に持たせるより単純です), `Link to={notification.targetUrl}`
+  でそのまま遷移します.
+- **`NotificationListRow`**: `IssueListRow`/`PullRequestListRow` と同じ
+  構成 (タイトル+送信元/日時を右詰め2段) に加え, 未読のときだけ左に
+  ドット (`--color-link`) を置きタイトルを太字にします (既読は通常の太さ.
+  ドット自体は既読でも同じ幅を確保したままにし, タイトルの開始位置が
+  既読/未読で揃うようにしています).
+- **`NotificationFilterSidebar`**: 「既読/未読の区別も追加してほしい」
+  という回答のため, 全て/未読のみの2件だけです. 他の一覧サイドバー
+  (`DocumentFilterSidebar`/`MeetingFilterSidebar` など) と違い
+  `useFixedSidebarPosition` (スクロール追従) は使っていません —
+  依頼されておらず, 汎用フックとはいえ `features/organization/` 配下に
+  あるものを機能をまたいで再利用するかどうかは判断が分かれるため,
+  ひとまず素朴な通常フローの配置にしています. スクロール追従が必要になれば
+  `useFixedSidebarPosition.ts` を `src/lib/` 等の共有場所へ移してから
+  使うことを検討してください.
+- **モックデータ**: `MOCK_NOTIFICATIONS` は文書/会議/入出金それぞれ実在する
+  `MOCK_ORGANIZATION_DOCUMENTS`/`MOCK_ORGANIZATION_MEETINGS`/
+  `MOCK_ORGANIZATION_TRANSACTIONS` (`features/organization/mockData.ts`)
+  の先頭15件ずつを参照し, 対象ページへの実際に機能するリンクとして生成して
+  います (`EmbeddedTransactionView`/文書詳細ページの議決情報と同じ,
+  「実在するデータを参照できる場合はそうする」という考え方). 日時は会議一覧
+  の `MEETING_ANCHOR` と同じ考え方で実行時の実際の日付を起点にしており
+  (固定の過去日付ではない — 「最近の通知」として常に新しく見えるようにする
+  ため), 3件に1件を未読にしています.
+
+## 組織を横断した一覧ページ (`/documents`/`/books`/`/meetings`/`/issues`/`/pulls`)
+
+「`~/orgs/組織ID/{issues, pulls, documents, books, meetings}` のページと
+同じ構造とし, 内容は組織を横断したものとしてほしい」という依頼による,
+5つのグローバル (`/orgs/:orgId` に属さないトップレベル) な一覧ページです.
+Header/`NavDrawer` の「全ての文書」/「全ての会計申請」/「予定されている会議」/
+「指摘事項」/「修正提案」ボタン (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS`
+にも `documents: "文書"`/`books: "帳簿"`/`meetings: "会議"`/`issues: "指摘事項"`/
+`pulls: "修正提案"` として以前から用意されていた) が指す, 従来は 404 だった
+5つのルートです.
+
+- **「同じ構造」の実現方法**: 新しいコンポーネントは1つも作らず, 既存の
+  `OrganizationDocumentsSection`/`OrganizationBookSection`/
+  `OrganizationMeetingsSection`/`DocumentIssuesSection`/
+  `DocumentPullRequestsSection` をそれぞれ単に別の配列 (組織で絞り込まない
+  全件) で呼び出すだけで実現しています. これが成立するのは, 各一覧行
+  (`DocumentListRow`/`TransactionListRow`/`MeetingListRow`/`IssueListRow`/
+  `PullRequestListRow`) がリンク先の組織 ID を props ではなく**項目自身から
+  (`document.organizationId` など) 解決する設計**に元々なっていたためです
+  — `OrganizationDocumentsSection`/`OrganizationBookSection`/
+  `OrganizationMeetingsSection` は元々 `documents`/`transactions`/`meetings`
+  の配列だけを受け取る設計だったため無改修でそのまま使えましたが,
+  `IssueListRow`/`PullRequestListRow` は元々 `organizationId`/`documentId`
+  を呼び出し元 (特定の文書のページ) から props で受け取る設計だったため,
+  このページを作るタイミングで「`issue.documentId` から
+  `MOCK_ORGANIZATION_DOCUMENTS` を検索して組織 ID を自己解決する」形に
+  リファクタリングしています (詳細は「文書詳細ページ」の「指摘事項/
+  修正提案タブ」を参照) — `documentId` prop 自体も `issue.documentId`
+  と重複していたため, この整理で不要になり削除しています.
+- **`DocumentsPage`/`BooksPage`/`MeetingsPage`**: それぞれ
+  `OrganizationDocumentsSection`/`OrganizationBookSection`/
+  `OrganizationMeetingsSection` (すでに自身で `max-width: 1280px;
+  margin: 0 auto;` を持つ, トップレベルページとして単独で使える設計) に
+  `MOCK_ORGANIZATION_DOCUMENTS`/`MOCK_ORGANIZATION_TRANSACTIONS`/
+  `MOCK_ORGANIZATION_MEETINGS` の全件をそのまま渡すだけの薄いラッパーです.
+  `OrganizationBookSection` の `TransactionSummaryBox` (残高/収入/支出) も
+  全件から算出されるため, 組織を横断した合計になります.
+- **`IssuesPage`/`PullsPage`**: `DocumentIssuesSection`/
+  `DocumentPullRequestsSection` に `MOCK_DOCUMENT_ISSUES`/
+  `MOCK_DOCUMENT_PULL_REQUESTS` の全件を渡すだけの薄いラッパーですが,
+  この2つのセクションは (`/orgs/:orgId/documents/:documentId` 配下に
+  ネストされる前提のため) 自身では `max-width` を持たないので,
+  `IssuesPage.module.css`/`PullsPage.module.css`
+  (`max-width: 1280px; padding: 24px 16px; margin: 0 auto;`,
+  `OrganizationDocumentsSection.module.css` の `.root` と同じ値) で
+  ページ側から中央寄せしています.
+- **`MOCK_ORGANIZATIONS` (組織一覧ページ用, 詳細は「組織一覧ページ
+  (`OrgsPage`)」を参照) は複数件ありますが, 詳細データ (文書/入出金/会議など)
+  を実際に持つ組織は `MOCK_ORGANIZATION` (`test-org`) の1件のみ**のため,
+  「組織を横断」の実際の効果 (複数組織の文書/入出金/会議が実データとして
+  混ざって表示される) はまだ確認できません — 上記の設計 (各項目が自分の
+  `organizationId` を持ち, 一覧側がそれを使ってリンクを組み立てる) により,
+  他の組織にも実データが増えたときも一覧側の実装を変更せずに自然に横断
+  できる想定です.
+
+## 組織一覧ページ (`OrgsPage`)
+
+`~/orgs` — NavDrawer の「組織一覧」が指すページ. 「`./組織ID/documents`
+(= `OrganizationDocumentsSection`) を参考にして, 組織のアイコン, 種類などを
+要素として持つリストを作成してほしい」という依頼のため, 新規コンポーネント
+(`OrgListRow`/`OrgListBox`/`OrgFilterSidebar`/`OrgSearchBar`/
+`OrgSortDropdown`/`OrgsSection`) を `OrganizationDocumentsSection` 一式と
+同じ構造 (検索バー+フィルターサイドバー+ソート+ページネーション付き一覧 Box,
+グリッド比率 `1fr auto 3fr`, `.root` 自身が `max-width: 1280px;
+margin: 0 auto;` を持つ独立ページ) で実装しています — 「組織を横断した
+一覧ページ」の5つとは異なり, 既存コンポーネントの再利用ではなく新規実装です
+(文書/入出金/会議/指摘事項/修正提案とは違い, 組織一覧はどの組織にも属さない
+別階層の一覧のため, 既存の `Organization*` 系コンポーネントを流用できる
+形にはなっていません).
+
+- **`OrgListRow`**: `MemberListRow` と同じ構成 (先頭にアバター, 中央に
+  名前 (太字)+種別ラベル/概要, 右詰めで所属人数) — 「アイコン」は
+  `Avater` (`size="medium" shape="square"`, `OrganizationHeaderBox`
+  と同じ形状. 実体は無く常に同じプレースホルダー画像) で表現し, 「種類」は
+  `OrganizationHeaderBox` と同じ `Label`+`ORGANIZATION_TYPE_LABEL`
+  (学級/執行機関/議決機関/独立委員会/クラブ/有志) です. リンク先は
+  `/orgs/${organization.id}` (組織プロフィールページ, 実装済み).
+- **`OrgFilterSidebar`**: 全て+`OrganizationType` の6種別, 計7件のフィルターです
+  (他のフィルターと同じく実装はまだ無く, 選択すると検索欄に文字列を入れる
+  だけ). `DocumentFilterSidebar` と同じ `useFixedSidebarPosition` を使います.
+- **`OrgSortDropdown`**: 組織には文書/入出金のような一貫した日付フィールドが
+  無いため, 名前/所属人数の2種類です. 「1年→3年」のような強い既定が無いため,
+  `MemberSortDropdown` と同じく別フィールドを選び直した際の既定方向は昇順
+  にしています (`OrgSortField.Name`/`OrgSortDirection.Asc` が初期値).
+- **`type OrgSortField`/`OrgSortDirection`** (`features/organization/types.ts`)
+  — 名前/所属人数の2種類. 既存の `DocumentSortField` 等と同じ形ですが,
+  フィールド構成が異なる (組織固有) ため独立して定義しています.
+- **モックデータ (`MOCK_ORGANIZATIONS`)**: 実データを持つのは
+  `MOCK_ORGANIZATION` (`test-org`) の1件だけで, それ以外
+  (1〜3年A〜D組の12クラス, 生徒会執行部, 代表委員会, 委員会4件, クラブ6件,
+  有志3件の計27件, あわせて28件) は一覧の見た目 (絞り込み/並び替え/
+  ページネーション) を確認するためのダミーです — `MOCK_DOCUMENTS`
+  (features/user/mockData.ts) と同じく, 一覧側とプロフィールページ側で
+  あえて別の ID 空間にする設計のため, `test-org` 以外の行をクリックすると
+  「組織が見つかりません」になります.
+
+## 規則・資料ページ (`MaterialsPage`/`MaterialDetailPage`)
+
+`~/materials` (ホーム, `MaterialsPage`) / `~/materials/:documentKey`
+(文書詳細, `MaterialDetailPage`) — NavDrawer の「規則･資料」が指すページです.
+当初「~/documents のページを, GitHub Docs を参考に規則/資料セクション+
+お知らせで作成してほしい」という依頼でしたが, 内容 (会則・規則・協定, 新入生の
+方々へ等の立場別案内) が「文書」(`/documents`, 組織が作成する文書の一覧) では
+なく「規則･資料」を指すと判断し, ユーザーに確認のうえ `/materials` 側に
+実装しています (詳細は「NavDrawer 内の「規則･資料」...」を参照 — 「文書」と
+「規則･資料」は元々別物として扱われています). 組織にもドキュメント一覧にも
+依存しないため, 新しい feature `features/materials/` (`types.ts`/
+`mockData.ts`/`components/`, `features/notifications/` と同じ構成) として
+独立させています.
+
+- **`MaterialsHomeSection` (ホーム)**: 「レイアウトはGitHub Docsを参考とし」
+  という依頼のため, GitHub Docs のカテゴリ一覧を参考に, 「規則」「資料」の
+  2セクションが並ぶ Box (`.sectionsBox`, 縦の `Divider` で区切った2列) の
+  下に「お知らせ」を配置する構成にしています.
+  - **セクションの中身**: 「規則」は会則/規則/協定の3件, 「資料」は新入生の
+    方々へ/会計担当者の方々へ/部長の方々へ/執行部役員に立候補する方々へ/
+    常設委員会に入りたい方々へ/行事を行う方々へ/有志の方々へ の7件, 依頼で
+    列挙された名称のままリンクにしています (`MenuLink` を再利用, アイコンは
+    規則側 `IconGavel`/資料側 `IconUsers` で統一). リンク先は
+    `/materials/${document.key}`.
+  - **お知らせ**: 「変更点など過去10個分表示する部分を設けてほしい」という
+    依頼のため, `MOCK_MATERIAL_CHANGES` (`MaterialChangeLogEntry[]`, 各文書に
+    対する変更点を模したダミー) の先頭10件を, 日付の新しい順に並べた状態で
+    (モックデータ自体を新しい順に定義することで実現. 実装を簡潔にするための
+    割り切りで, 実際のソート処理は行っていません) 一覧表示します. 各行は
+    変更点の要約+対象の文書名+日付で, クリックすると対象の文書詳細ページへ
+    遷移します.
+- **`MaterialBreadcrumb` (文書詳細ページ上部)**: 「上部に "ホーム/セクション名/
+  文書名" のパンくずを表示してほしい」という依頼のため, グローバルヘッダーの
+  パンくず (`Breadcrumb.tsx` — `/materials` 配下はどの深さでも
+  `SPECIAL_ROOT_LABELS` により「規則・資料」の1階層表示のまま) とは別に,
+  ページ本文側にこの機能専用の3階層パンくずを実装しています
+  (`OrganizationHeaderBox` の祖先組織名パンくずと同じ考え方) — 「ホーム」は
+  `/materials` (このページ自身) へのリンク, 「セクション名」はプレーンテキスト
+  (対応する一覧ページが無いため), 「文書名」は太字の現在地です.
+- **`MaterialsExplorer` (文書詳細ページ下部)**: 「下部に
+  `~/orgs/組織ID/meetings/会議ID/materials` の文書閲覧及び選択画面が出る
+  ようにしてほしい」という依頼のため, `MeetingMaterialsExplorer` と同じ構造
+  (開閉できるディレクトリツリーのサイドバー+選択中の文書のプレビュー) にして
+  います. 「ディレクトリを模した部分にはホームでの各リンク名を入れてほしい」
+  という依頼のため, サイドバーは「規則」「資料」の2フォルダ (ホームの
+  2セクションと対応) の下に, 各セクションの文書 (ホームでの各リンク名と同じ)
+  をファイルとして並べています. `MeetingMaterialsExplorer` のファイル行は
+  内部 state を切り替えるボタンでしたが, ここでは選択状態が URL の
+  `:documentKey` 由来のため実際の `<Link>` にしています — 文書をクリックする
+  たびに `MaterialDetailPage` ごと (パンくず含め) 再描画され, サイドバーの
+  展開状態は選択中の文書が属するセクションだけを初期状態で開く形にしています
+  (以後の開閉は通常どおり手動).
+  - 資料は全件 Markdown 相当のため, PDF/動画/テキストのような種別分岐は無く,
+    常に `MarkdownFileViewer` (`bordered={false}` + `.markdownContent` の
+    負の margin で外枠を二重にしない, `MeetingMaterialsExplorer` と同じ手法)
+    で表示しています. `MarkdownFileViewer`/`MarkdownDocument` は
+    `features/organization/components/` に置かれたままですが, ドメインに
+    依存しない汎用コンポーネントのためこの機能からもそのまま import して
+    再利用しています (`features/notifications/` が `features/organization/`
+    のモックデータを参照するのと同じ, 既存の踏襲済みの割り切りです).
+- **`type MaterialDocument`/`MaterialSectionKey`/`MaterialChangeLogEntry`**
+  (`features/materials/types.ts`) — 独立した新規の型です. `MaterialDocument.key`
+  はそのまま URL の `:documentKey` として使う英語スラッグ (`bylaws`/
+  `new-students` など). モックデータ (`MOCK_MATERIAL_DOCUMENTS`, 10件/
+  `MOCK_MATERIAL_CHANGES`, 10件) は `features/materials/mockData.ts` に
+  それぞれの文書用の短い Markdown 本文とあわせて用意しています.
+
+## ユーザー名のプロフィールへのリンク化 (`UserNameLink`/`resolveMemberId`)
+
+「ユーザー名が表示されているところは全て, そのユーザーのprofileへのリンクになるように
+してほしい. 表示は変化させず, ホバーすると下線が現れるようにしてほしい」という依頼のため,
+`ActivityCard`/`DocumentHeaderBox`/`DocumentOverviewSection`/`DocumentVersionTimeline`/
+`TransactionHeaderBox`/`TransactionReceiptBox`/`TransactionProcedureTimeline`/
+`MeetingAgendaList`/`IssueListRow`/`PullRequestListRow`/`MarkdownDocument`
+(議事録の議長/記録/出席者/欠席者/発言者/`@mention`)/`ProfileSidebar` (自分自身の
+名前) にある名前の表示箇所をプロフィールページ (`/users/:userId`) へのリンクに
+変更しています.
+
+- **`UserNameLink`** (`src/components/ui/`) — ユーザー名表示を共通で扱う部品です.
+  `userId`/`name`/`className`/`onClick`/`nested` を受け取り, `userId` が無ければ
+  (下記 `resolveMemberId` が逆引きできなかった場合) リンクにせずそのまま `name`
+  を表示します. **「表示は変化させず」を実現するため, `UserNameLink.module.css`
+  の `.root` は `:where()` で包んで詳細度を 0 にしています** — `<a>` は既定で
+  ブラウザ固有の色/下線を持つため, 呼び出し側の見た目を変えないようにするには
+  それらを打ち消して親から色/フォントを継承する必要がありますが, 単純にクラス
+  として定義すると, `ActivityCard` の `.actorName` や `MarkdownDocument` の
+  `.mention` (青文字) のような呼び出し側が独自に持つ色指定と詳細度が同じになり,
+  バンドル後の CSS の読み込み順によって勝敗が変わってしまいます. `:where()`
+  で詳細度を 0 にすることで, 呼び出し側の指定が (className を渡していても
+  渡していなくても) 常に優先されます. `color: inherit; font: inherit;
+  text-decoration: none; cursor: pointer;` を基本とし, hover 時だけ
+  `text-decoration: underline;` を追加しています.
+- **`resolveMemberId`** (`src/features/organization/`) — `actorName`/
+  `proposerName`/`authorName`/`uploaderName`/`submitterName`/`posterName` など,
+  id を持たない名前の文字列表示箇所から `userId` を逆引きするヘルパーです.
+  `currentUser.name` との完全一致, または `MOCK_MEMBERS` の名前との完全一致
+  でのみ解決でき, どちらにも一致しない場合 (`NotificationListRow` の
+  `senderName` = 組織名など, そもそも個人を指さない文字列) は `undefined`
+  を返し, `UserNameLink` はリンクにせずそのまま表示します — このため
+  `NotificationListRow` は意図的に変更対象から外しています (組織名を
+  ユーザーとして解決しようとしても常に `undefined` になるだけで無意味なため).
+  `OrganizationMember` を直接持っているフィールド (`DocumentVersion.editor`
+  など) は `resolveMemberId` を経由せず, `editor.id` をそのまま使っています.
+- **`nested` prop と `<a>` の入れ子問題**: `IssueListRow`/`PullRequestListRow`
+  は行全体が既に1つの `<Link>` (`<a>`) のため, `posterName` をそのまま
+  `<Link>` にすると `<a>` の中に `<a>` を入れ子にすることになります. これは
+  無効な DOM で, 実際に React が開発コンソールへ
+  `In HTML, <a> cannot be a descendant of <a>. This will cause a hydration
+  error.` という警告を出すことを Playwright で確認しました (`stopPropagation`
+  だけでは解決しません — 詳細は後述). `UserNameLink` の `nested: boolean`
+  prop はこれを避けるため, `<a>` の代わりに `role="link"` + `tabIndex={0}`
+  の `<span>` と `useNavigate()` (react-router) による命令的な遷移で同等の
+  挙動を実現します (biome の `lint/a11y/useSemanticElements` は
+  `biome-ignore` コメントで抑制 — 親が `<a>` のため `<a>` を使えない事情を
+  コメントに明記). クリックハンドラでは **`event.preventDefault()` と
+  `event.stopPropagation()` の両方を呼ぶ必要があります** —
+  `stopPropagation()` だけでは親の `<a>` 自身のクリック時デフォルト動作
+  (`href` への遷移) を止められないためです (デフォルト動作の抑制には
+  `preventDefault` が必要で, これは `stopPropagation` とは独立した仕組み
+  ―― `<span>` (それ自身は既定の動作を持たない) 上でクリックが発生しても,
+  そのクリックイベントが `preventDefault` されないまま伝播し終えると, 親の
+  最も近い `<a>` 祖先の既定動作 (遷移) が実行されてしまいます. 実装当初
+  `stopPropagation` だけを呼んでいたところ, 名前をクリックしても行全体の
+  リンク先に遷移してしまう不具合を Playwright で実際に踏んで修正した経緯です).
+  一方, **`DocumentVersionTimeline` (`<button>` の中に版の編集者名の
+  `<Link>` を置く) では, この入れ子は React の DOM 検証エラーにはならない
+  ことを確認済みです** (`<button>` は `<a>` と異なり React の
+  `validateDOMNesting` の特別扱い対象ではなく, また `<button>` 自身の
+  `onClick` はブラウザの既定動作ではなく単なる JS のイベントリスナーのため,
+  `event.stopPropagation()` だけで版の選択操作への伝播を止められます) —
+  そのため `DocumentVersionTimeline` は `nested` を使わず, 通常の `<a>`
+  (`UserNameLink` の既定) + `onClick={(event) => event.stopPropagation()}`
+  のままにしています. 同様の「既にリンク/ボタンの中にユーザー名を置く」
+  ケースが増えたら, 親要素が `<a>` かどうかで `nested` の要否を判断してください.
+- **`OrgNameLink`** (`src/components/ui/`) — 組織名版. `UserNameLink`
+  と全く同じ構造 (`:where()` による詳細度0, `nested` prop, `resolveOrganizationId`
+  @`features/organization/` による名前→id逆引き) です.
+- **見切れた文言をホバーで全体表示 (`title` 属性)**: 「全てのページにおいて,
+  3点リーダーが表示されている文言にカーソルを当てると全体が見えるように
+  してほしい」という依頼のため, `UserNameLink`/`OrgNameLink` はどちらも
+  `userId`/`organizationId` が無い (プレーンテキストのまま表示する)
+  場合も含め, 内部で常に `title={name}` をレンダリングします (「表示は
+  変化させず」の方針どおり見た目には影響しません — ブラウザ標準のホバー
+  ツールチップが増えるだけです). この2つ以外にも, `text-overflow: ellipsis`
+  を使っている箇所 (一覧行のタイトル/概要, `PurchaseItemsInput` の名称/
+  概要セル, `Breadcrumb`, `MarkdownFileViewer` の文書名など, サイト全体で
+  20箇所以上) には同様に呼び出し側で `title={表示している文字列そのもの}`
+  を付けています — 新しく `text-overflow: ellipsis` を使う要素を追加する
+  際は, 同じように `title` を付けるのが既定の方針です (例外は
+  `MeetingCalendarCard` の `.cardLabel` — 見切れた場合はホバーで
+  `.popover` という, 単なる `title` より詳しい情報 (ラベル/議題/日時/教室)
+  を表示する独自の仕組みが既にあるため, 二重にツールチップが出ないよう
+  意図的に `title` を付けていません).
+
+## ホーム画面 (`HomePage`)
+
+`~` — NavDrawer の「ホーム」(`to="/"`) が指す, ルート直下のページです. 「左の
+サイドバーには自身が編集に関わった文書を並べ, メインにはGitHubのダッシュボードの
+フィードのように組織の文書の発表情報であったり, 全体向けのメッセージであったりを
+表示するようにしてほしい. ヘッダー部分には「ホーム」と入れてほしい」という依頼
+どおりの構成です. 組織にもドキュメント一覧にも依存しないため, 新しい feature
+`features/home/` (`types.ts`/`mockData.ts`/`components/`, `features/notifications/`
+と同じ構成) として独立させています.
+
+- **`getBreadcrumb.ts`**: `segments.length === 0` (= `/`) のときのフォールバックを,
+  従来の `[]` (何も表示しない) から **`["ホーム"]`** に変更しています — 「ヘッダー
+  部分には「ホーム」と入れてほしい」という依頼を, 他の特殊パス
+  (`SPECIAL_ROOT_LABELS`) と同じくパンくず1階層の表示名として実現しています.
+- **`HomeSection`**: `OverviewSection` と同じ `1fr 3fr` (サイドバー:メイン) の
+  列比率で, 左に `HomeSidebar`, 右に `HomeFeed` を配置します.
+- **`HomeSidebar`**: 上から「進行中の会計処理」(下記)/`Divider`/「編集した文書」
+  の順です. **「編集した文書」**: `MY_EDITED_DOCUMENTS` (`mockData.ts`, 下記)
+  を編集日時の新しい順に並べ, 0件のときは一覧の代わりに「編集に関わった文書は
+  まだありません.」を表示します. 各行 (`HomeEditedDocumentItem`) は
+  `OrganizationListItem` と同じパターン (`menuItemBase.root` を直接
+  `<Link to={`/orgs/${organizationId}/documents/${id}`}>` に適用) で,
+  文書の組織アバター (`Avater shape="square" size={20}`, 当初は
+  `IconFileText` でしたが「組織のアバターに変更してほしい」という依頼で
+  差し替え) + 文書名 (太字) + 最終編集日時 (`editedAt` の `-` を `/`
+  に置換して表示) の2行構成です.
+- **「進行中の会計処理」(`HomeInProgressTransactionItem`)**: 「編集した文書」の
+  上に配置する, 自身が起案した会計処理のうち完了/却下していないものの一覧です.
+  0件のときはセクション自体 (見出し+`Divider` ごと) を表示しません.
+  `getInProgressTransactionsProposedByCurrentUser`
+  (`features/organization/mockData.ts`, `currentUser.name` を一部の
+  `MOCK_ORGANIZATION_TRANSACTIONS` の `proposerName` に後付けで割り当てる
+  `CURRENT_USER_TRANSACTION_OVERRIDES` を参照) が実データを返します. 各行は
+  名目 (`description`)/金額 (整形済みの `title`) + ラベルです. ラベルは
+  承認待 (`TransactionStatus.ApprovalPending`) ならいつもの
+  `TransactionStatusBadge` (青), 承認済 (支払待/清算待) なら
+  `getTransactionAvailabilityLabel` (`features/organization/
+  transactionAvailability.ts`) が返す「購入可」(立替)/「仮払可」(仮払)
+  という teal (`--color-status-teal`, Catppuccin teal を新規追加) の
+  ラベルに切り替わります. **この「可能」ラベルが付いた行が一覧の先頭に
+  来るよう, `getInProgressTransactionsProposedByCurrentUser`
+  側でソートしています** (承認待より優先度が高い, という判断).
+- **`MY_EDITED_DOCUMENTS` の生成 (データモデリング)**: 「自身が編集に関わった
+  文書」を表現するため, 実在する `MOCK_ORGANIZATION_DOCUMENTS`
+  (`features/organization/mockData.ts`) のうち `editors` に `currentUser` が
+  含まれる文書だけを抽出しています. **`currentUser` を一部の文書の `editors`
+  に加える割り当て自体は, `features/home/` 側ではなく
+  `features/organization/mockData.ts` 側で行っています** —
+  `RESOLVABLE_AGENDA_ENTRIES` (文書詳細ページの議決情報) と同じ「生成後に
+  一部だけ書き換える」手法で, `CURRENT_USER_AS_MEMBER` (`currentUser` の
+  `id`/`name`/`email` を使い, `role`/`grade`/`class` は他の `MOCK_MEMBERS`
+  と同様の値を仮に割り当てた `OrganizationMember`) を 30件に1件 (index % 30
+  === 0, 300件中10件) の文書の `editors` に追加しています. `features/home/`
+  側で独自にモックを作らずこの実在データを参照しているため, ホーム画面の
+  サイドバーから遷移した文書の「編集者」タブを開いても実際に「テストユーザー」
+  が表示され, 矛盾しません (Playwright で確認済み).
+- **`HomeFeed`/`HomeFeedCard`**: 「GitHubのダッシュボードのフィードのように」
+  という依頼のため, `IconActivity` + 「最新の情報」見出しの下に `HomeFeedCard`
+  (`ActivityCard`/`DocumentCard` と同じ外形 `border`/`border-radius`/
+  `padding: 16px` のボーダー付き Box) を並べます. `HomeFeedItem`
+  (`features/home/types.ts`) は `ActivityCard` と同じ考え方の discriminated
+  union (`HomeFeedItemType`) です:
+  - **`DocumentAnnouncementFeedItem`** (「組織の文書の発表情報」) — 実在する
+    `MOCK_ORGANIZATION_DOCUMENTS` のうち公開済みで編集日時が新しい6件を
+    「{組織名}が文書を公開しました」という体裁で参照します (`organizationId`/
+    `documentId` を持ち, 文書名は実在の文書詳細ページへ, 組織名は実在の組織
+    プロフィールページへ, それぞれ実際にリンクします). `occurredAt` は
+    文書の `editedAt` (`"YYYY-MM-DD"`) を `toDisplayDateTime` で
+    `"YYYY/MM/DD 09:00"` (時刻情報を持たないため固定の09:00を補う) に整形して
+    います.
+  - **`BroadcastMessageFeedItem`** (「全体向けのメッセージ」) — 特定の文書/
+    組織に紐付かない, 学校全体からのお知らせ (生徒会本部/図書委員会/保健委員会/
+    教務課/情報委員会などを送信元とする6件) です. こちらはリンクを持たず,
+    `senderName` (太字, ヘッダー) + `title` (太字, 本文見出し) + `body`
+    (説明文) をそのまま表示します.
+  - 両方をあわせて `occurredAt` の新しい順にソートして `MOCK_HOME_FEED_ITEMS`
+    としてエクスポートしています.
+  - **カードヘッダーのアバター+バッジ (`HomeFeedCardAvatar`)**: 「カードの
+    左上に組織のアバターを追加し, その右下に16x16px程の塗り潰し円を表示して
+    アイコンと色を表示してほしい」という依頼で追加しました. `Avater
+    shape="square" size={40}` (当初32pxでしたが「40x40にしてほしい」という
+    依頼で拡大) の右下に, box-sizing: border-box+`border: 2px solid
+    var(--color-background)` (カード自身は透過のため, ページ背景色) の
+    円形バッジ (「枠線を含まない大きさが16x16pxになるように」という依頼のため,
+    box-sizing は content-box, `width`/`height` を16pxに — 見た目の合計は
+    16+2*2=20px) を重ねます. お知らせ (`BroadcastMessageFeedItem`) は青+
+    `IconSpeakerphone`, 文書の発表 (`DocumentAnnouncementFeedItem`) は緑+
+    `IconFileTextFilled` です.
+  - **投稿者名 (`posterName`)**: 「カードのアバターの横に, 投稿者のユーザー名を
+    載せてほしい」という依頼で, ヘッダー行のアバターの直後に
+    `UserNameLink`+`resolveMemberId` (太字) を追加しました — 文書の発表
+    なら `item.authorName` (文書の作成者, `DocumentAnnouncementFeedItem`
+    に追加したフィールド), お知らせなら `item.senderName` (部署/委員会などの
+    集団名のため, `resolveMemberId` は解決できず結局リンクなしのプレーン
+    テキスト表示になります) です. 元々ヘッダー行にあった「{組織名}が文書を
+    公開しました」/`senderName` のテキストはそのまま残しているため,
+    文書の発表カードは「{投稿者名} {組織名}が文書を公開しました」という
+    見た目になります.
+
+## 文書作成ページ (`NewDocumentPage`)
+
+`~/documents/new` — `CreateButton` の「文書を作成」(`/documents/new`) が指す
+ページです. 「GitHubのNew repositoryのページを参考とし, 組織/文書名/文書概要/
+公開範囲を入力できるようにしてほしい」という依頼どおり, `NewDocumentSection`
+(`src/features/organization/components/`, 文書に関するデータを扱うため既存の
+`features/organization/` に配置) が単一カラムのフォームとして実装しています.
+バックエンドが無いため送信後の実際の作成処理自体は行いませんが (「動作は
+のちほど実装する」という既存のスタブと同じ扱い — `handleSubmit` 内にコメントで
+明記), **依頼された各項目のバリデーション自体は実際に機能します**:
+
+- **組織 (`<select>`)**: 「自身が所属している組織からドロップダウンで選択」
+  という依頼のため, `features/organization/` 側の全組織一覧
+  (`MOCK_ORGANIZATIONS`, 28件) ではなく, **`features/user/mockData.ts` の
+  `MOCK_ORGANIZATIONS`** (`Organization[]`, `id`/`name`/`role`. `ProfileSidebar`
+  の「所属する組織」で使っているのと同じ, currentUser が実際に所属する3件
+  ——生徒会/新聞部/文化祭実行委員会——のリスト) を使っています. 同名の別の
+  エクスポートが2つの feature に存在するため, import 時に
+  `MOCK_ORGANIZATIONS as MOCK_MY_ORGANIZATIONS` としてエイリアスしています.
+  - **「デフォルトで最近編集に参加した組織を入力」**: `useState` の初期値を
+    `getDocumentsEditedByCurrentUser()[0]?.organizationId` (無ければ
+    `MOCK_MY_ORGANIZATIONS[0].id` にフォールバック) にしています.
+    **`getDocumentsEditedByCurrentUser`** (`features/organization/mockData.ts`
+    で新規に export) は, ホーム画面の `MY_EDITED_DOCUMENTS`
+    (`features/home/mockData.ts`) が元々個別に実装していた「currentUser が
+    editors に含まれる文書を編集日時の新しい順に返す」ロジックを, この
+    ページでも同じ形で必要としたため, 重複を避けて共通関数として
+    `features/organization/mockData.ts` 側に切り出したものです — `features/home/`
+    はこの関数を呼ぶだけになり, 重複していたフィルタ/ソート処理は削除しています.
+- **文書名**: 「文書IDではないので重複しても構わないが, 組織内で重複すると
+  人間にとってややこしいのでここでチェックを行う, 重複する場合は弾く」という
+  依頼のため, 選択中の組織の `MOCK_ORGANIZATION_DOCUMENTS`
+  (`organizationId` で絞り込み) の中に完全一致する `title` が無いかを
+  `useMemo` でチェックしています (組織を跨いだ重複は許可 — 依頼どおり
+  チェック対象外). 空文字列/重複のいずれかならエラーとして送信を弾きます.
+  実際にデータを持つのは `test-org` (文化祭実行委員会) だけのため, 重複判定が
+  実際に機能する (弾かれる) のは組織に `test-org` を選んだ場合だけです —
+  他の2組織 (生徒会/新聞部) はまだ文書データが無いため, 常に重複無し判定に
+  なります.
+- **文書概要**: 「16文字以上・必須」のため, `description.length < 16`
+  をエラー条件にしています. **`X/16文字` のカウンターは16文字未満の間だけ
+  表示**します — 16文字を超えた後もそのまま表示し続けると (例: `37/16文字`)
+  上限を超過しているかのように誤解されるため, 条件を満たした時点でカウンター
+  自体を消し, ヒント文だけを残す形にしています (実装時に実際に見た目を確認して
+  気付いた点で, 依頼には無い改善です).
+- **公開範囲**: `DocumentVisibility.Public`/`Private` の2択をラジオボタンで
+  提供し (GitHub の Public/Private の選択 UI を参考に, それぞれ短い説明文を
+  添えています), 初期値は `Public` です.
+- **エラー表示のタイミング**: 各項目は「一度フォーカスを外す (`onBlur`)」か
+  「送信を試みる (`submitAttempted`)」までエラーを表示しません — 何も
+  入力していない初期状態からいきなり赤枠/エラー文が出ないようにするためです.
+  **送信ボタン (`Button`, 後述) はあえて `disabled` にしていません** —
+  無効化されたボタンはキーボード操作性/なぜ押せないかの説明という点で
+  劣るため, 常に押せる状態にしたうえで, 無効な状態で押された場合は
+  `submitAttempted` を立てて全項目のエラーを一斉に表示する (実際の送信処理は
+  スキップする) という, 一般的なフォームの実装方針を採っています.
+- **`Button`** (`src/components/ui/`) — 塗りつぶしの主要アクションボタンです.
+  README.md/CLAUDE.md の「UI コンポーネントの共通パターン」では以前から
+  `Button` の存在が前提として書かれていましたが実体が無かったため, この
+  フォームの送信ボタンの実装にあわせて新設しました. `type`/`disabled`/
+  `onClick`/`className` に加え, `color?: "blue" | "green"` (既定 `"blue"`,
+  `--color-link`/文字 `--color-background`. `Pagination` の選択中ページ番号と
+  同じ配色) と `variant?: "filled" | "ghost"` (既定 `"filled"`. `"ghost"`
+  は背景透過+`--color-border` の枠線のみ) を受け取ります — 会計申請作成
+  ページ (後述「会計申請作成ページ」) の確認/キャンセル系ボタンで
+  緑色/背景透過が必要になった際に追加した props です.
+
+## 会計申請作成ページ (`NewTransactionSection`)
+
+`~/book/new` — `CreateButton` の「会計申請を作成」が指すページです. 当初は
+「支出」(仮払/立替) 専用の単一フォームでしたが, 「申請の最上部に "支出の申請"
+"予算執行の申請" "寄付の申請" というラジオボタンを3つ横並びに配置し, それぞれ
+別の入力画面を表示してほしい」という依頼で, `NewTransactionSection.tsx`
+自体は3つのモードを切り替えるだけの薄いディスパッチャに変わり, 実際の入力画面は
+`ExpenseRequestForm`/`BudgetExecutionRequestForm`/`DonationRequestForm`
+(いずれも `src/features/organization/components/`) の3コンポーネントに
+分割されています. 3フォームとも「送信ボタン押下→確認画面→(送信 or
+キャンセルして破棄確認→破棄)」という同じ UX (「会計申請作成ページの送信/
+キャンセル UX」を参照) を踏むため, 重複を避けて以下の要素を共通化しています:
+
+- **`requestFormBase.module.css`** (`features/organization/components/`) —
+  3フォーム+モード選択 (`NewTransactionSection`) が共通で使うフィールドの
+  見た目 (`.root`/`.field`/`.label`/`.required`/`.input`/`.select`/
+  `.textarea`/`.error`/`.hints`/`.requestTypeOptions` (縦積みのラジオ選択肢)/
+  `.modeOptions` (横並び版, 後述)/`.radio`/`.formActions`/
+  `.amountFieldWrapper`+`.currencySuffix` (金額入力欄+右の「円」)/
+  `.paymentMethodOptions`+`.paymentMethodOption` (支払方法の横並びラジオ) など)
+  をまとめた CSS Module です. 元は支出の申請専用の
+  `NewTransactionSection.module.css` でしたが, 予算執行/寄付の申請が
+  追加されたタイミングでこの汎用名に切り出しました (中身は「フィールドの
+  見た目」であって「購入」固有ではなかったため, リネームだけで転用できました).
+- **`RequestConfirmDialog`** (`features/organization/components/`) — 送信
+  ボタン押下時の確認モーダルです. `items: { label: string; value: string
+  }[]` を受け取り, ラベル+値の並びをそのまま `<dl>` で表示するだけの汎用
+  コンポーネントにしています (元は支出専用の `TransactionConfirmDialog`
+  でしたが, 予算執行/寄付それぞれの要約内容 (対象組織/対象予算項目/支払方法/
+  支払先/購入品目, など) が異なるため, 固定 props ではなく `items`
+  配列に一般化しました). 送信する (緑)/修正する (背景透過)/キャンセル
+  (背景透過) を**縦に**並べます (「送信ボタン, 修正ボタン, キャンセル
+  ボタンを縦に配置してほしい」という依頼のため — キャンセル確認画面
+  `DiscardConfirmDialog` の2ボタンは逆に横並びのままなので混同しないよう
+  注意してください). 見た目の土台 (オーバーレイ+画面中央のパネル) は
+  `src/components/ui/Dialog.tsx` (`onClose`+`labelledBy`+`children` を
+  受け取るだけの汎用シェル. `RequestConfirmDialog`/`DiscardConfirmDialog`
+  の両方がここから切り出されています) を使っています.
+- **`DiscardConfirmDialog`** (`features/organization/components/`) —
+  「キャンセルボタンが押下された場合は, 確認モーダルでも入力画面でも
+  『入力内容が破棄されるが本当にキャンセルするか』を訊くモーダルを作成して
+  ほしい」という依頼で追加した, 破棄確認の第2段モーダルです. 「本当に
+  キャンセルしますか?」の下に, 右側に青で「入力画面に戻る」, 左側に背景透過で
+  「入力内容を破棄する」を配置しています (安全な側の操作を右+強調色, 破壊的な
+  操作を左+控えめな見た目にする, という判断. オーバーレイのクリック/Escape も
+  安全な側 = 「入力画面に戻る」に割り当てています). 3フォームいずれの
+  キャンセルボタンからも, いったんこのモーダルを必ず経由します.
+- **`useRequestSubmitFlow`** (`features/organization/`) — 送信/確認/
+  キャンセル/破棄の一連の状態遷移 (`confirmOpen`/`discardConfirmOpen`/
+  `submitAttempted` の3つの state と, それぞれの操作に対応するハンドラ) を
+  まとめたフックです. `isValid`/トースト文言 (`pendingMessage`/
+  `successMessage`, フォームごとに「会計申請」/「予算執行申請」/「寄付申請」
+  と変える) だけをフォーム側から渡します. 「キャンセルした場合, キャンセル
+  しましたとトーストに出してほしい」という依頼のため, 破棄確定時
+  (`handleDiscard`) は `showToast` (未完了/スピナー表示) を経由せず
+  `resolveToast` を直接呼んで完了状態のトーストを即座に表示しています
+  (破棄は待つ処理が無い即時完了の操作のため). 送信/破棄いずれの場合も
+  最終的に `navigate(-1)` で「入力画面の前に開いていた画面」へ戻ります.
+- **`SELECTABLE_ORGANIZATIONS`** (`features/organization/selectableOrganizations.ts`)
+  — 「組織から有志は選択できないようにしてほしい」という依頼のため,
+  `features/user/mockData.ts` の `MOCK_ORGANIZATIONS` (所属組織) から
+  `OrganizationType.Volunteer` を除いたものを3フォーム共通の組織
+  ドロップダウンの選択肢にしています. このフィルタのために
+  `features/user/types.ts` の `Organization` に `type?: OrganizationType`
+  (`features/organization/types.ts` からの再利用) と `hasBankAccount?:
+  boolean` (後述の寄付/予算執行フォームの銀行口座選択肢の出し分け用) を
+  追加しました — `MOCK_ORGANIZATIONS` (`features/user/mockData.ts`)
+  の3件のうち `test-org` (文化祭実行委員会) だけ `hasBankAccount: true`
+  にしています.
+- **`isValidNaturalNumberInput`** (`features/organization/purchaseItemDraft.ts`)
+  — 「金額と個数について, 自然数のみを受けつけるようにし, 0始まりの数字も
+  禁止してください」という依頼のため追加した検証関数です (`/^[1-9]\d*$/`
+  にマッチするか空文字列かのみ許可). 金額系の `<input>` は `type="number"`
+  ではなく `type="text" inputMode="numeric"` にした上で, `onChange`
+  でこの関数が false を返す入力はそもそも state に反映しない (=
+  不正な文字はそのまま弾かれ, 入力欄に現れない) ことでこの制約を実現して
+  います. `PurchaseItemsInput` の金額/個数と, 寄付/予算執行フォームの
+  金額入力欄すべてがこの関数を共有しています.
+
+以下, モードごとの差分です.
+
+- **支出の申請 (`ExpenseRequestForm`)** — 従来からある画面です. 組織/購入名目/
+  種類 (仮払/立替のみ. 「寄付」は後述のとおりこの種類の選択肢から削除し,
+  最上部のモード自体に格上げしました)/購入品目 (`PurchaseItemsInput`, 予算執行
+  申請とも共有)/証憑画像 (立替のときだけ) という, 元々の `NewTransactionSection`
+  とほぼ同じ構成です.
+  - **`PurchaseItemsInput`** (`features/organization/components/`) の主な
+    特徴: 名称/概要/金額/個数/計の5列の編集可能な表. 最下段に常に1件だけ
+    空白行を保ち, いずれかのフィールドに入力があった瞬間に新しい空白行を
+    追加します. 金額/個数は上記の自然数検証を使い, 金額の右には常に「円」
+    を表示します (`.amountInputWrapper`/`.currencySuffix`). 金額/個数の
+    どちらかが未入力の行の「計」は `0円` ではなく `"- 円"` と表示します
+    (「なにも入力されていない場合, 計はハイフン円となるようにしてほしい」
+    という依頼のため). 「金額」「個数」列は「計」列と同じ幅
+    (`<colgroup>` の `<col>` に `width` を指定) にして, 名称/概要をより
+    広く見せています. `isEstimate?: boolean` (仮払選択時に true) を渡すと
+    「金額」→「金額 (概算)」/「合計」→「合計 (概算)」に見出しが切り替わります
+    (仮払は支払前の見込み額であるため).
+  - **`OrganizationSelectField`** (`features/organization/components/`) —
+    組織ドロップダウン. 「ヘッダーの作成ボタンと同じ形式にし, 組織名の左に
+    アバターを表示してほしい」という依頼のため, ネイティブ `<select>`
+    ではなく `useDismissablePopover` + `menuItemBase` の構成 (`CreateButton`
+    と同じパターン) のカスタムドロップダウンです. トリガー/パネル内の各項目
+    どちらもアバター (`Avater shape="square" size={20}`) を組織名の左に
+    表示します.
+- **予算執行の申請 (`BudgetExecutionRequestForm`)** — 対象組織/対象予算項目/
+  支払方法/支払先/購入品目の5項目です.
+  - **対象予算項目**: `features/organization/budgetMockData.ts` の
+    `MOCK_BUDGET_LINE_ITEMS` (所管/組織/項の3階層を持つダミーデータ) を,
+    「所管 - 組織」を `<optgroup label>` に, 「項」を `<option>`
+    にした素のネイティブ `<select>` (`styles.select`, `requestFormBase`
+    の `.input` と同じ見た目) で表示しています. 3階層の分類をそのまま
+    表現しつつ, 実際の選択操作は (依頼の「どの項を使用するか選択する」の
+    とおり) 単一の select 1つに単純化しています — 所管→組織→項と3段の
+    ネイティブ select をカスケードさせる案もありましたが, 依頼文の
+    「分類されており, 選択する」という表現がこの (1つの select+階層的な
+    グループラベル) 実装で十分満たせると判断しました.
+  - **支払方法**: 「銀行口座･振り込み用紙･現金」の3択ラジオです. `振り込み
+    用紙」は実際の決済手段を表す `PaymentMethod` (現金/銀行振込/引き落し.
+    完了済み会計処理の一覧/詳細ページ側で使う型) の「引き落し」とは別概念
+    (用紙に記入して提出する方式) のため, 混同を避けてこのフォーム限定の
+    `BudgetPaymentMethod` (`bank-account`/`transfer-slip`/`cash`) を
+    `BudgetExecutionRequestForm.tsx` 内に独立して定義しています.
+  - **支払先**: 支払方法に応じて表示する入力欄を出し分けます — 銀行口座
+    なら口座番号+名義の2つの `<input>` (`.fieldRow` で横並び), 振り込み
+    用紙なら自由記述の `<textarea>`, 現金なら支払先を書く `<input>`
+    1つです. 共通で末尾に「参考となる画像 (任意)」として
+    `ReceiptUploadField` (証憑画像アップロード欄と同じコンポーネントを
+    再利用. 必須マーカーは付けません) を配置しています.
+  - **購入品目**: 「支出の申請のものと同じリスト」という依頼のとおり,
+    `ExpenseRequestForm` と全く同じ `PurchaseItemsInput` をそのまま
+    再利用しています (`isEstimate` は渡していないため常に「金額」「合計」
+    の通常表記のままです — 予算執行に「概算」の概念は無いため).
+- **寄付の申請 (`DonationRequestForm`)** — 対象組織/支払方法/金額の3項目
+  だけの, 他の2つよりずっと単純なフォームです. 支払方法は現金/銀行口座の
+  2択ラジオで, 銀行口座は対象組織が `hasBankAccount: true`
+  (`SELECTABLE_ORGANIZATIONS`) の場合だけ選択肢に現れます (対象組織を
+  切り替えて銀行口座を持たない組織を選ぶと, 選択中だった支払方法が銀行口座
+  でも自動的に現金へ差し戻します — `effectivePaymentMethod` を参照).
+  金額欄は自然数のみ入力可能で, 右に「円」を表示します (`ExpenseRequestForm`
+  の金額入力欄と同じ `.amountFieldWrapper`/`.currencySuffix`).
+  - 当初「寄付」は支出の申請の「種類」(仮払/立替と並ぶ3つ目の選択肢, 選択中
+    の枠線/ラジオボタンの色を緑にし, 仮払・立替との間隔を広く取って別
+    カテゴリだと分かるようにする) として実装されましたが, 後の依頼で
+    最上部のモード自体に格上げされ, 「種類」からは削除されています —
+    「種類」欄の緑色/間隔を広くする実装 (`requestTypeOptionSelectedGreen`/
+    `requestTypeOptionSeparated`, `requestFormBase.module.css`) 自体は,
+    現在は最上部の3モードのラジオ (`.modeOptions`, 横並びのため
+    `.requestTypeOptionSeparated` は使っていません) ではなく,
+    削除済みの旧実装の名残としてクラスだけ CSS に残っています —
+    寄付以外の用途で緑の強調色/間隔を広げる選択肢が必要になったら
+    再利用してください.
+
+## 会計申請作成ページの送信/キャンセル UX
+
+支出/予算執行/寄付の3フォームすべてが共有する, 送信ボタン押下からの一連の
+画面遷移です (`useRequestSubmitFlow` 前述を参照):
+
+1. 送信ボタン押下 → バリデーション NG ならエラー表示のみ (`submitAttempted`
+   を立てて全項目のエラーを一斉表示). OK なら `RequestConfirmDialog`
+   (確認画面) を表示.
+2. 確認画面の「送信する」→ 画面を入力画面の前に開いていた画面に戻し
+   (`navigate(-1)`), 右上にトーストで「送信しています…」を表示. 実際の
+   送信処理 (API 呼び出し) はまだ無いため, ダミーの遅延 (`setTimeout`,
+   1500ms) の後にトーストの表示を緑のチェックマーク+「送信が完了しました」
+   に切り替えます (4秒後に自動で消えます — トースト自体の仕組みは
+   `src/contexts/ToastContext.tsx` を参照).
+3. 確認画面の「修正する」→ 確認画面を閉じて入力画面に戻るだけ (入力内容は
+   そのまま). オーバーレイのクリック/Escape もこちらと同じ扱いです.
+4. 確認画面 or 入力画面いずれかの「キャンセル」→ `DiscardConfirmDialog`
+   (破棄確認) を表示. 確認画面は (もし開いていれば) 閉じておきます.
+5. 破棄確認の「入力画面に戻る」→ 破棄確認を閉じるだけ (常に入力画面へ
+   戻る — 確認画面を経由していた場合でも確認画面へは戻さず, 素の入力画面
+   まで戻します).
+6. 破棄確認の「入力内容を破棄する」→ 送信完了時と同じく `navigate(-1)`
+   で画面遷移しますが, 実際には何も送信していないためトーストは
+   (成功アイコンではなく) 「キャンセルしました」を即座に表示するだけです
+   (`showToast` を経由せず `resolveToast` を直接呼んでいます — 破棄は
+   待つ処理の無い即時完了の操作のため).
 
 ## 404 ページ (`NotFoundPage`)
 
