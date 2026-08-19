@@ -33,7 +33,9 @@ function MeetingListRow({ meeting }: MeetingListRowProps) {
             <Label color="sky">流会</Label>
           )}
         </span>
-        <span className={styles.description}>{meeting.agenda.join(", ")}</span>
+        <span className={styles.description}>
+          {meeting.agenda.map((item) => item.label).join(", ")}
+        </span>
       </div>
       <div className={styles.meta}>
         <span className={styles.metaItem}>

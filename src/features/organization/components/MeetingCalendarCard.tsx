@@ -57,7 +57,9 @@ function MeetingCalendarCard({
           </span>
         </div>
         {meeting.agenda.length > 0 && (
-          <p className={styles.expandedAgenda}>{meeting.agenda.join(", ")}</p>
+          <p className={styles.expandedAgenda}>
+            {meeting.agenda.map((item) => item.label).join(", ")}
+          </p>
         )}
         <div className={styles.expandedMeta}>
           <span className={styles.expandedMetaItem}>
@@ -88,7 +90,9 @@ function MeetingCalendarCard({
           <span className={styles.popoverTitle}>{meeting.title}</span>
           {statusLabel}
         </div>
-        <p className={styles.popoverAgenda}>{meeting.agenda.join(", ")}</p>
+        <p className={styles.popoverAgenda}>
+          {meeting.agenda.map((item) => item.label).join(", ")}
+        </p>
         <div className={styles.popoverMeta}>
           <span className={styles.popoverMetaItem}>
             <Icon icon={IconCalendarTime} size={14} aria-hidden="true" />

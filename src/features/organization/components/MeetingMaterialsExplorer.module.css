@@ -1,0 +1,85 @@
+.root {
+  display: flex;
+  min-height: 320px;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 280px;
+  overflow-y: auto;
+  padding: 8px;
+  border-right: var(--borderWidth-thin) solid var(--color-border);
+  background: var(--color-secondary1);
+}
+
+/* ファイルビューワのディレクトリのように, ファイル行 (.fileRow) だけ
+   フォルダ行より1段インデントする */
+.fileRow {
+  padding-left: 24px;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-overlay1);
+}
+
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 24px;
+  overflow: auto;
+}
+
+.empty {
+  color: var(--color-body-subtext);
+}
+
+/* Markdown 資料 (bordered={false} の MarkdownFileViewer) 用 — .main の
+   padding: 24px を負の margin で打ち消し, ツールバーが .root の外枠に
+   直接接するようにする (2重に囲われるのを避けるため) */
+.markdownContent {
+  margin: -24px;
+}
+
+.materialName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  color: var(--color-body-headline);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* PDF/動画は実ファイルの保存先が無いため, 証憑タブ (TransactionReceiptBox)
+   と同じ考え方でそれとわかるプレースホルダーにしている */
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 16px;
+  border: var(--borderWidth-thin) dashed var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  color: var(--color-overlay1);
+}
+
+.previewLabel {
+  font-size: 0.875rem;
+}
+
+.textPreview {
+  overflow-wrap: break-word;
+  padding: 16px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-secondary1);
+  color: var(--color-body-body);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}

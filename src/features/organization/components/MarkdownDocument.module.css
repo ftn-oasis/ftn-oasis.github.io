@@ -1,0 +1,191 @@
+/* GitHub の markdown-body 相当の基準値 (font-size: 16px 相当/line-height: 1.5).
+   色のみ本アプリのテーマトークンに置き換えている (ライト/ダーク両対応のため) */
+.root {
+  color: var(--color-body-body);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.frontmatter {
+  margin-bottom: 16px;
+}
+
+/* GitHub の h1 相当 (下線付き) をそのままタイトルに使う */
+.title {
+  margin: 0 0 16px;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-body-headline);
+  font-size: 2em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* 開催場所/出席者はバッジではなく箇条書きで示す — 公開範囲/文書の種別
+   (逐語録・要約録, 全て逐語録のため廃止) はここに含めていない (依頼により非表示) */
+.metaList {
+  margin: 0;
+  padding-left: 2em;
+  list-style: disc;
+}
+
+.metaList li {
+  margin: 0;
+}
+
+.body > :first-child {
+  margin-top: 0;
+}
+
+.body > :last-child {
+  margin-bottom: 0;
+}
+
+.heading {
+  margin: 24px 0 16px;
+  padding-bottom: 0.3em;
+  color: var(--color-body-headline);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.heading1,
+.heading2 {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.heading1 {
+  font-size: 2em;
+}
+
+.heading2 {
+  font-size: 1.5em;
+}
+
+.heading3 {
+  font-size: 1.25em;
+}
+
+.heading4 {
+  font-size: 1em;
+}
+
+.heading5 {
+  font-size: 0.875em;
+}
+
+.heading6 {
+  color: var(--color-body-subtext);
+  font-size: 0.85em;
+}
+
+.paragraph {
+  margin: 0 0 16px;
+}
+
+.blockquote {
+  margin: 0 0 16px;
+  padding: 0 1em;
+  color: var(--color-body-subtext);
+  border-left: 0.25em solid var(--color-border);
+}
+
+.list {
+  margin: 0 0 16px;
+  padding-left: 2em;
+  list-style: disc;
+}
+
+.listItem {
+  margin: 0;
+}
+
+/* 発言記録 ("@id: 発言内容" の表記法) — 発言者名 (1列目)/発言内容 (2列目)
+   の2列の CSS Grid にし, 発言者ごとに1行 (turn) を積む. 発言者に紐付かない
+   行 (plain, .transcriptPlain) は2列目だけに配置する */
+.transcript {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6em 1fr;
+  gap: 16px 12px;
+  margin: 0 0 16px;
+}
+
+/* 「名前と発言を区切る線を, 上から下まで1本にしてほしい」という依頼のため,
+   発言ごとに線を引くのではなく, .transcript 自身に敷いた1本の縦線を
+   発言者名/発言内容の間 (列の境界) に通している — 行間の gap をまたいでも
+   途切れない, 発言記録全体で共通の1本の線になる */
+.transcript::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(6em + 6px);
+  width: 2px;
+  background: var(--color-border);
+}
+
+.transcriptSpeaker {
+  color: var(--color-body-headline);
+  font-weight: 600;
+}
+
+/* 「線と内容の距離をもう10px離してほしい」という依頼のため, 列の境界
+   (縦線の位置) 自体は変えず, 内容側にだけ追加の padding-left を入れて
+   クリアランスを広げている */
+.transcriptContent {
+  min-width: 0;
+  padding-left: 10px;
+}
+
+.transcriptPlain {
+  grid-column: 2;
+  min-width: 0;
+  padding-left: 10px;
+}
+
+/* 発言内容内の段落/箇条書き (parseTranscriptContentBlocks が分解したもの) は
+   本文の見出し直下などと違い前後の余白を詰め, 改行もそのまま反映する
+   (「発言内容の部分には改行や箇条書き等通常のmarkdown記法が使えるように
+   してほしい」という依頼のため) */
+.transcriptContent p {
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+}
+
+.transcriptContent ul {
+  margin: 0 0 8px;
+}
+
+.transcriptContent > :last-child,
+.transcriptPlain > :last-child {
+  margin-bottom: 0;
+}
+
+/* GitHub 風の fenced code block (中身が発言記録ではない ```) */
+.codeBlock {
+  overflow-x: auto;
+  margin: 0 0 16px;
+  padding: 16px;
+  border-radius: 6px;
+  background: var(--color-secondary1);
+  color: var(--color-body-body);
+  font-family: var(--font-mono), monospace;
+  font-size: 85%;
+  line-height: 1.45;
+}
+
+/* @mention (発言者以外の, 本文中に登場する @id) */
+.mention {
+  color: var(--color-link);
+  font-weight: 600;
+}
+
+/* インラインコード (`` `text` ``) — GitHub と同じ padding/背景/角丸/85%サイズ */
+.code {
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  background: var(--color-secondary1);
+  font-family: var(--font-mono), monospace;
+  font-size: 85%;
+}

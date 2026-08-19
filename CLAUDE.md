@@ -41,18 +41,29 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 
 現状できていないこと (着手する際は要確認):
 
-- **文書/入出金/会議それぞれの個別詳細ページ**
-  (`/orgs/:orgId/documents/:documentId`/`/orgs/:orgId/book/:transactionId`/
-  `/orgs/:orgId/meetings/:meetingId`, 文書の変更 (版) 詳細は
-  `/orgs/:orgId/documents/:documentId/versions/:versionId`) — 次に着手予定の
-  作業です. 一覧の各行 (`DocumentListRow`/`TransactionListRow`/
-  `MeetingListRow`)・`DocumentCard` (概要タブ)・`ActivityCard`
-  (組織の「直近の動向」) は既にこれらの URL へリンクを貼っていますが,
-  実ページが無いためどれも `NotFoundPage` (404) になります (正確なリンク先
-  は各コンポーネントの項を参照). `type Activity` 系 (「組織プロフィールページ」
-  の「データモデリング」を参照) の `meetingId`/`transactionId`/`documentId`/
-  `versionId` は組織 ID から独立したフラットな ID のため, 詳細ページの
-  実装時もこの設計をそのまま踏襲してください.
+- **文書の個別詳細ページ**
+  (`/orgs/:orgId/documents/:documentId`, 文書の変更 (版) 詳細は
+  `/orgs/:orgId/documents/:documentId/versions/:versionId`) — 入出金の詳細
+  ページ (`/orgs/:orgId/book/:transactionId`, 詳細は「会計処理詳細ページ」
+  を参照)/会議の詳細ページ (`/orgs/:orgId/meetings/:meetingId`, 詳細は
+  「会議詳細ページ」を参照) は実装済みのため, 次に着手予定の作業はこの1つ
+  だけです. 一覧の各行 (`DocumentListRow`)・`DocumentCard`
+  (概要タブ)・`ActivityCard` (組織の「直近の動向」のうち文書の変更) は既に
+  この URL へリンクを貼っていますが, 実ページが無いため `NotFoundPage`
+  (404) になります (正確なリンク先は各コンポーネントの項を参照).
+  `type Activity` 系 (「組織プロフィールページ」の「データモデリング」を参照) の
+  `documentId`/`versionId` は組織 ID から独立したフラットな ID のため,
+  詳細ページの実装時もこの設計をそのまま踏襲してください — 入出金/会議の
+  詳細ページ実装時も, 一覧側の ID (`OrganizationTransaction.id` =
+  `test-org-transaction-N`/`OrganizationMeeting.id` = `test-org-meeting-N`)
+  と「直近の動向」側の ID (`MoneyTransactionActivity.transactionId` =
+  `transaction-N`/`MeetingCreatedActivity.meetingId`) をあえて別の ID
+  空間のままにしています (この2つが同じ実体を指す設計にはしていません) —
+  そのため `ActivityCard` の金銭の出納/会議作成カードから「詳しく見る」等で
+  これらの詳細ページへ遷移しようとしても, 一致する `id` が無く 404 のまま
+  です. 文書の詳細ページ実装時, 同様に概要タブ側の `MOCK_DOCUMENTS`/
+  `ActivityCard` の ID と一覧側の `MOCK_ORGANIZATION_DOCUMENTS` の ID
+  が一致しない場合も, 同じ理由で意図した挙動 (別の ID 空間) です.
 - **`/users/:userId`/`/orgs/:orgId`/`/orgs/:orgId/documents`/`/orgs/:orgId/book`/
   `/orgs/:orgId/members`/`/orgs/:orgId/meetings` (と上記の詳細ページ) 以外の
   実ページ**は依然として存在しません — Header/Drawer 内のリンク先の大半,
@@ -95,6 +106,15 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
 - **ボタンの見た目 (border-radius/border-width など) に関する新しい指定があった場合は,
   `--borderRadius-medium`/`--borderWidth-thin` (`globals.css` で定義, 詳細は
   「共通デザイントークン」を参照) など既存の共通変数を使うかどうかを実装前に質問してください.**
+- **リストの角 (一覧 Box/`<table>` など)・フォーカスの枠の角・ボタンの角は,
+  特に指示が無い限り既定で `--borderRadius-medium` を使って丸めてください**
+  (「今後特に指示が無い場合は, リストの角やフォーカスの枠の角, ボタンの角を
+  丸めるようにしてほしい」という依頼による標準方針です — 上記の「新しい指定が
+  あった場合は質問する」ルールとは別に, これ自体は既に確立した既定挙動として
+  扱ってください. `border-collapse: collapse` の `<table>` は border-radius
+  が効かない既知の挙動があるため, `border-collapse: separate; border-spacing: 0;`
+  + `overflow: hidden;` に置き換える必要があります — `TransactionItemsList`
+  で実際に踏んだ不具合です).
 - **依頼された変更の結果, 既存コードと重複が生まれてコンポーネント/フックとして切り出すべきと
   判断できる場合は, 指示されていなくても一緒に切り出してください**
   (設計判断に迷ったら上記と同様に質問する).
@@ -180,16 +200,28 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   `OrganizationMembersSection`/`OrganizationMeetingsSection` など, 同じく
   `components/` を挟む配置. 詳細は「組織プロフィールページ」「組織の文書一覧
   (`OrganizationDocumentsSection`)」「組織の入出金一覧
-  (`OrganizationBookSection`)」「組織の構成員一覧
+  (`OrganizationBookSection`)」「会計処理詳細ページ」「組織の構成員一覧
   (`OrganizationMembersSection`)」「組織の会議一覧
-  (`OrganizationMeetingsSection`)」を参照) が存在.
+  (`OrganizationMeetingsSection`)」「会議詳細ページ」を参照) が存在.
 - `src/pages/` — ルートと1対1で対応するコンポーネント. 現状 `UserProfilePage`
   (`/users/:userId`), `OrganizationLayout` (`/orgs/:orgId` の親ルート, 「組織が見つかりません」
   判定と `OrganizationTabs` の表示を担う) とその子ルート `OrganizationOverviewPage`
   (`/orgs/:orgId`, index route)/`OrganizationDocumentsPage`
   (`/orgs/:orgId/documents`)/`OrganizationBookPage` (`/orgs/:orgId/book`)/
   `OrganizationMembersPage` (`/orgs/:orgId/members`)/`OrganizationMeetingsPage`
-  (`/orgs/:orgId/meetings`), `NotFoundPage` (`path="*"`) が存在.
+  (`/orgs/:orgId/meetings`), さらにその子として `OrganizationTransactionLayout`
+  (`/orgs/:orgId/book/:transactionId` の親ルート, 「会計処理が見つかりません」
+  判定と上部の状態表示+タブの表示を担う, 詳細は「会計処理詳細ページ」を参照)
+  とその子ルート `OrganizationTransactionBreakdownPage` (index route)/
+  `OrganizationTransactionProcedurePage` (`/procedure`)/
+  `OrganizationTransactionReceiptPage` (`/receipt`), 同様に
+  `OrganizationMeetingLayout` (`/orgs/:orgId/meetings/:meetingId` の親ルート,
+  「会議が見つかりません」判定と上部の要約+タブの表示を担う, 詳細は
+  「会議詳細ページ」を参照) とその子ルート `OrganizationMeetingAgendaPage`
+  (index route)/`OrganizationMeetingMaterialsPage` (`/materials`)/
+  `OrganizationMeetingAttendeesPage` (`/attendees`)/
+  `OrganizationMeetingMinutesPage` (`/minutes`), `NotFoundPage`
+  (`path="*"`) が存在.
 - `src/lib/` — 機能にもコンポーネントにも依存しない道具置き場 (現状 `currentUser.ts` のみ).
 - コンポーネントのスタイルは CSS Modules をコンポーネントと同じ場所に配置する方式です (`Foo.tsx` +
   `Foo.module.css`), `clsx` で合成します.
@@ -1135,6 +1167,196 @@ gap: 16px; padding: 24px 0;`, サイドバー/`Divider`/メインは元の `.roo
   です). 収入は3000〜30000円, 支出は500〜8500円程度の範囲にそれぞれ収まるよう
   振れ幅を持たせています.
 
+## 会計処理詳細ページ (`/orgs/:orgId/book/:transactionId`)
+
+GitHub の Pull Request ページを参考にした, 入出金一覧の1件の詳細ページです.
+`TransactionListRow` (一覧の各行) は既にこの URL (`/orgs/${organizationId}/book/${id}`)
+へリンクしていたため, 実装対象は詳細ページ側のみでした.
+
+- **データモデリング**: 「一覧の1件」と「その詳細」は同一の実体を指すという
+  判断で (`OrganizationMember` が構成員一覧の実装時に別の型を新設せず
+  フィールド追加で拡張されたのと同じ考え方), `OrganizationTransaction`
+  (`features/organization/types.ts`) に `status`/`proposerName`/`items`/
+  `procedure`/`receipt` を追加する形で拡張しています — 別の型
+  (`TransactionDetail` 等) は新設していません. 一覧側 (`TransactionListRow`
+  など) は引き続き既存のフィールドしか参照しないため, この拡張によるコンパイル
+  上の影響はありません. 名称 (上部の `<名称>`) は新しいフィールドを追加せず,
+  既存の `description` (一覧側で「概要」として使っている, 元々
+  "装飾用の布地" のような短い名詞句だったフィールド) をそのまま流用しています.
+  なお `MoneyTransactionActivity.transactionId` (組織の「直近の動向」側,
+  `transaction-N`) とはあえて別の ID 空間のままです (「プロジェクトについて」の
+  「現状できていないこと」を参照) — `ActivityCard` の金銭の出納カードからは
+  このページへは (一致する `id` が無いため) まだ遷移できません.
+- **ルーティング**: `/orgs/:orgId` (`OrganizationLayout`) の子ルートとして
+  `book` (一覧, `OrganizationBookPage`) とは別に `book/:transactionId`
+  (`OrganizationTransactionLayout`) を並べ, その配下にさらに index
+  (`OrganizationTransactionBreakdownPage`, 金額内訳)/`procedure`
+  (`OrganizationTransactionProcedurePage`, 手続状況)/`receipt`
+  (`OrganizationTransactionReceiptPage`, 証憑) をネストしています.
+  `OrganizationTransactionLayout` が `transactionId`
+  (`organizationId` と合わせて) の存在チェックと, 上部の状態表示+タブの表示を
+  まとめて担い (`OrganizationLayout` と同じ役割分担), 見つかった
+  `OrganizationTransaction` を `<Outlet context={transaction} />`
+  (react-router) 経由で3つの子ページへ渡します — 子ページ側は
+  `useOutletContext<OrganizationTransaction>()` で受け取るだけの薄い
+  ラッパーで, 自分では検索/存在チェックを行いません. `OrganizationTabs`
+  (概要/文書/会計/…) は `end` 指定の無い `NavLink` (`/orgs/:orgId/book`)
+  のため, `/orgs/:orgId/book/:transactionId` 配下でも「会計」タブは
+  引き続きアクティブに見えます (前方一致).
+- **上部2段 (`TransactionHeaderBox`)**: 1段目は「支出/収入 (太字):
+  名称 (太字) 金額 (subtext1, regular)」, 2段目は状態ラベル
+  (`TransactionStatusBadge`, 後述) + `IconUser` + 「起案者: 名前 (太字)」です.
+  `margin: 24px 0` は `OrganizationHeaderBox`/`TransactionSummaryBox`
+  と同じ値を踏襲しています. **1段目 (`.titleRow`) の文字サイズは
+  `1.25rem`** — 「`~/orgs/組織ID/book` のメイン上部にある残金の表示
+  (`TransactionSummaryBox` の `.balance`) と同じ大きさにしてほしい」
+  という依頼のため, その値をそのまま踏襲しています.
+- **`TransactionStatusBadge`**: 承認待 (blue)/支払待 (green)/清算待 (peach)/
+  完了済 (mauve)/否認済 (red) を, 左右が半円 (`border-radius: 999px`) の
+  塗りつぶし背景+太字で表現する専用コンポーネントです. `Label`
+  (`components/ui/`, 背景透過+細ボーダー) とは視覚的に別物のため, variant
+  として統合せず独立したコンポーネントにしています. 文字色は塗りつぶし色に
+  依らず一律 `--color-status-text` (Catppuccin base) — Catppuccin は
+  Latte (light) のアクセントカラーが濃いめ, Mocha (dark) のアクセントカラーが
+  明るいパステル調という設計のため, base (light は明るい, dark は暗い)
+  との組み合わせでどちらのテーマでも十分なコントラストが出ます (`--color-status-*`/
+  `--color-status-text` は `theme.css` に追加. 新しいトークンのため
+  light/dark 両ブロックに追加済みです).
+- **タブ (`TransactionDetailTabs`)**: 金額内訳 (`IconListSearch`, 当初
+  `IconChartPie4` でしたが依頼により変更)/手続状況
+  (`IconArrowMoveRight`)/証憑 (`IconCertificate`) の3タブです. 見た目は
+  `OrganizationTabs`/`ProfileTabs` と同じ `tabBase.module.css`
+  を使っていますが, **ヘッダー下部のスロット (`HeaderBottomPortal`) には
+  差し込んでいません** — このページは `OrganizationLayout` の子ルートのため,
+  ヘッダー下部のスロットは既に `OrganizationTabs` (会計タブなど) が使っており,
+  1つのスロットに2段のタブを同時に差し込むことはできません. そのため
+  `TransactionDetailTabs` は `TransactionHeaderBox` の下, ページ本文側に
+  普通に描画し, `OrganizationTransactionLayout.module.css` の
+  `.tabsWrapper` に `border-bottom` を持たせることで, ヘッダー自身の
+  `border-bottom` を借りられない代わりの区切り線にしています. 金額内訳
+  (index route) のみ他タブの祖先パスに一致するため `end` 指定が必須です.
+- **金額内訳 (`TransactionItemsList`)**: 名称/概要/金額/個数/計 の5列の
+  `<table>` です (他の一覧が div+flex の「カード風の行」なのに対し, ここは
+  実際に列が揃った表形式のデータのため, 素直に `<table>` を使っています).
+  各列見出しは `<button>` + `IconCaretUpFilled`/`IconCaretDownFilled`
+  (選択中の列, 昇順/降順. 当初は塗りつぶし無しの `IconCaretUp`/`IconCaretDown`
+  でしたが依頼により変更) または `IconArrowsSort` (非選択の列, 「並び替え可能」であることを示す
+  中立アイコン) で, クリックすると並び替わります — 同じ列をもう一度押すと
+  昇順/降順がトグルし, 別の列を押すとその列の昇順から始まります (学年/学級/
+  名前と同じ理由で, 金額内訳の各列も「新しい順」のような強い既定が無いため
+  昇順を既定にしています. `MemberSortDropdown` の項を参照). 計は
+  `unitPrice × quantity` の場で算出し, `TransactionLineItem`
+  自体には持たせていません (`OrganizationTransaction.title`
+  が整形済み文字列を持つのとは対照的に, こちらは算出元の数値2つをそのまま
+  持つ方が自然なため). 最下部の合計行 (名称列を「合計」とし, 計列に全項目の
+  計の合計を表示) は `--color-secondary1` の背景で通常の行より暗くしています.
+  **`.table` は `border-collapse: separate; border-spacing: 0;` +
+  `overflow: hidden;`** — `border-collapse: collapse` だと `border-radius`
+  が効かない (角が丸まらない) ブラウザの既知の挙動があり,「金額内訳のリストの
+  角を丸めてほしい」という依頼を機にこの構成へ変更しました (「今後特に指示が
+  無い場合は, リストの角やフォーカスの枠の角, ボタンの角を丸めるようにして
+  ほしい」という標準方針も参照 — 「作業の進め方」参照). 各列見出しの
+  `<button>` (`.headerButton`) にも `border-radius: var(--borderRadius-medium)`
+  + `:focus-visible` の outline を追加しています — 追加前はフォーカス時の
+  見た目が無い状態でした.
+- **手続状況 (`TransactionProcedureTimeline`)**: 縦のタイムラインです.
+  `.root` に `padding: 0 24px;` (「手続き状況のboxについて, 左右のpaddingを
+  24pxとってほしい」という依頼のため) を持たせていますが, **border/
+  border-radius は付けていません** — 当初はボーダー付きの Box にしていま
+  したが「内容を囲う枠を消してほしい」という依頼により外し, padding
+  だけ残しています. **上下は 0** — 当初 `padding: 24px;` (四方) にして
+  いましたが, 親 (`OrganizationTransactionLayout.module.css` の `.content`,
+  上下 `padding: 24px 0;`) と縦方向の padding が二重にかかり内容が二重に
+  囲われて見える (48px の間隔になる) 不具合になっていたため, 上下は
+  `.content` 側に任せて 0 にしています (「内側のboxの内, 上下の24pxの
+  paddingは0にしてほしい」という依頼のため). その中に, 各手順「円+専用の矢印 (アイコンではなく
+  CSS で描いた線+矢頭) を並べた `.rail`」+「ラベル/日時+担当者
+  (`IconUser`) の `.stepBody`」を横並びで縦に積んでいます. 未完了の手順は
+  ただの円 (`--color-overlay1` の枠線のみ, 塗りつぶし無し, 16px), 完了済は
+  `IconCircleCheckFilled`, 否認 (`denied`) だけは別の円 `IconCircleXFilled`
+  です. 手順の並び (起案→承認→支払→清算→完了) と, 状態ごとにどこまで完了
+  しているかの対応は `mockData.ts` の
+  `generateTransactionProcedure`/`COMPLETED_STEP_COUNT_BY_STATUS`
+  を参照してください. **否認済の場合は起案の直後に否認ステップで打ち切り,
+  それ以降の手順 (承認/支払/清算/完了) 自体を生成していません** — 全手順を
+  表示した上で否認された手順だけ×にする案もありましたが, 依頼により起案の
+  直後で打ち切る形にしています.
+  - **「直近 (現在の状態)」だけを強調する表示**: 「最後の完了のチェックマーク
+    以外はsubtext0色に」「チェックマークは最近のもの以外大きさを24pxに」
+    「最近のものは30px x 30pxに」という一連の依頼により, 手順のうち時系列で
+    最後に完了した1件 (`denied` を含む — `TransactionProcedureTimeline.tsx`
+    の `lastCompletedIndex`) だけを通常の色+30pxで強調し, それより前の
+    完了済の手順は円 (色/24px)・ラベル・日時+担当者のすべてを
+    `--color-body-subtext0` (`theme.css` に新規追加 — 既存の
+    `--color-body-subtext` = subtext1 とは別のトークンです. これを直接
+    変更すると他の (既に subtext1 を使っている) 箇所すべてに影響が及んで
+    しまうため) に落として背景に退かせています. 未完了の手順の見た目
+    (ただの円, ラベルは通常色) はこの対象外です.
+  - **`.circle` は常に固定 30px のボックス**: 中のアイコンは16/24/30pxと
+    可変ですが, ボックス自体は固定サイズで, アイコンをその中で中央寄せ
+    しています — 可変にしていた当初, `.rail` (円+矢印の列) は行ごとに
+    独立したフレックスコンテナのため, 円のサイズがそのまま `.rail` の実効幅
+    を決めてしまい, 30px の行と24pxの行とで中心の横位置が3pxずれる不具合が
+    ありました (「最近のチェックマークの中心と他のチェックマーク・矢印の
+    中心がズレている」という指摘はこれです) — 固定サイズにすることで
+    `.rail` の実効幅が常に同じになり, `align-items: center` による中央寄せが
+    全行で同じ横位置になります.
+  - **円の縦方向の中心をラベル〜日時+担当者の中心に一致させる**: 「チェック
+    マークの縦方向の中心は, 手順の名称の上端から実行者の名前の下端までの
+    中心と同じにしてほしい」という依頼のため, `.rail` を
+    [前の円からの矢印 (無ければ透明なスペーサー `.connectorSpacer`) / 円 /
+    次の円への矢印 (無ければスペーサー)] の3つを縦に並べる構成にし,
+    `.rail` 自体を `.step` (行全体, `.stepBody` の高さで決まる) いっぱいに
+    伸ばしています. 前後の矢印/スペーサーはどちらも `flex: 1 1 0`
+    (basis を明示的に 0 にする — 後述) なので均等に伸び, 結果として円は
+    自動的に `.rail` の縦方向中央 = `.stepBody` の縦方向中央 (`padding: 8px
+    0;` が上下対称なため, パディング込みの中央とラベル〜日時+担当者だけの
+    中央は一致する) に来ます.
+  - **円を繋ぐ矢印 (`.connector`)**: 汎用の矢印アイコンではなく, 縦線
+    (`.connectorLine`, `background: currentcolor` の1px幅) + CSS の
+    border トリックで描いた矢頭 (`.connectorArrowhead`) で繋いでいます —
+    「専用の矢印で繋いでほしい, タイムライン表示を縦にしたような表示に
+    してほしい」という依頼のため. **1本の矢印を隣り合う2行に分けて描画**
+    しています — 前の行の `.rail` 後半 (次の円への矢印, 線のみ) と, 次の行の
+    `.rail` 前半 (前の円からの矢印, 線+矢頭) の2つの要素が, 行同士に隙間が
+    無いためつながって見た目には1本の連続した矢印になります (矢頭は
+    「これから到達する円」側にだけ付けています). これにより「矢印は
+    前段階の円の縁から次の円の縁まで隙間なく伸びる」が実現できます
+    (円を rail の中央に置きつつ, かつ矢印が両隣の円の縁ちょうどで途切れる,
+    という2つの要件を同時に満たすための構成です). **`.connector`/
+    `.connectorSpacer` の `flex-basis` は `auto` ではなく明示的に `0`
+    にしています** — 矢頭が付く側 (前の円からの矢印) は矢頭の高さ (5px)
+    の分だけ `auto` だと初期サイズが大きくなり, 矢頭の無い側 (次の円への
+    矢印) との間で最終的な高さが5pxずれ, 結果として円の中心が2.5px
+    ずれる不具合になっていました — `flex-basis: 0` で純粋に `flex-grow`
+    の比率 (どちらも1) だけで分配することで, 矢頭の有無に関わらず前後が
+    正確に半分ずつになります. **色は既定で `--color-overlay1`, 直近の
+    手順に繋がる矢印だけ `--color-body-subtext0`** (「最近のチェック
+    マークに伸びる矢印もsubtext0色にしてほしい」という依頼のため, 当初の
+    緑/赤から変更) にしています — それ以外 (まだ完了していない手順同士を
+    繋ぐ矢印など) は overlay1 のままです (否認ステップの後ろに矢印は
+    存在しません — 手順自体がそこで打ち切られるため).
+- **証憑 (`TransactionReceiptBox`)**: 「1項目だけのリストのような見た目の
+  Box」として, `DocumentListBox` の `.toolbar` と同じ考え方の行 (背景
+  `--color-secondary1`) に文書ID (太字)+アップロード者+アップロード日を表示し,
+  その下にプレビュー領域を配置しています. **実ファイルの保存先が無いため,
+  プレビューは本物らしく見せるダミー画像ではなく, それとわかる破線枠+
+  ファイル種別アイコン (`IconPhoto`/`IconFileTypePdf`) のプレースホルダーに
+  しています** — 実データのように誤解されるリスクを避けるための意図的な判断
+  です (ユーザーに確認済み).
+- **日付の扱い**: 手続状況の日時/証憑のアップロード日は, `createdAt`/
+  `editedAt` と同じ UTC 起点の日数 (`MOCK_TRANSACTION_LIST_BASE_DAY` からの
+  経過日数) を元に, `mockData.ts` 内の専用ヘルパー
+  `formatEpochDayTime` で組み立てています. `calendarUtils.formatDateTime`
+  (ローカルタイムゾーン基準, 会議のように `setHours` などローカルに構築した
+  `Date` 向け) は意図的に使っていません — 混在させると `calendarUtils.dateKey`
+  で以前踏んだのと同種のタイムゾーンずれの不具合になるためです.
+- **モックデータの整合性**: `generateTransactionItems` は, 金額内訳の各項目の
+  計の合計が, その会計処理自体の金額 (`amountAbs`) と必ず一致するように
+  生成しています (`splitAmount` で合計を保ったまま分割した上で, 割り切れる
+  場合だけ個数2-3を採用し, それ以外は1個 = 単価が壊れないようにしています) —
+  金額内訳タブの合計行と, 上部の金額表示が食い違わないようにするためです.
+
 ## 組織の構成員一覧 (`OrganizationMembersSection`)
 
 `src/features/organization/components/OrganizationMembersSection.tsx` は
@@ -1505,6 +1727,256 @@ gap: 16px; padding: 24px 0;`, サイドバー/`Divider`/メインは元の `.roo
   過去日付起点ではありません — カレンダーの「今日」との位置関係を常に
   確認できるようにするための意図的な設計です). 9件に1件を延会,
   11件に1件を流会 (両方に該当する場合は延会が優先されます) にしています.
+
+## 会議詳細ページ (`/orgs/:orgId/meetings/:meetingId`)
+
+会計処理詳細ページ (`/orgs/:orgId/book/:transactionId`) と基本的に同じ構成
+(存在チェック+上部要約を担う親レイアウト, ページ本文側のタブバー
+(`MeetingDetailTabs`, `TransactionDetailTabs` と同じくヘッダー下部の
+スロットではなく本文側に描画), `<Outlet context={meeting} />` +
+`useOutletContext` で子ページへ受け渡す薄いラッパーページ) です — 差分の
+みここに記載します. `MeetingListRow` (一覧の各行) は既にこの URL
+(`/orgs/${organizationId}/meetings/${id}`) へリンクしていたため, 実装対象は
+詳細ページ側のみでした.
+
+- **データモデリング**: 会計処理詳細ページと同じ考え方 (「一覧の1件」と
+  「その詳細」は同一の実体を指す) で, `OrganizationMeeting`
+  (`features/organization/types.ts`) に `attendees`/`materials`/`minutes`
+  を追加する形で拡張しています. **`attendees: OrganizationMember[]`
+  は ID 参照ではなく実体を直接埋め込んでいます** — 出席者タブの表示に
+  そのまま使う値のため, 構成員一覧の `MemberListRow` にそのまま渡せる形が
+  自然だと判断しました (`documentId`/`meetingId` 等, 「組織とは分離して
+  考える」ために意図的に ID 参照+フラットな別テーブル相当にしている
+  `Activity` 系のフィールドとは異なる設計判断です). `minutes:
+  MeetingMinutes[]` (議事録タブ用, 後述) も配列にしており, 「同じ会議が
+  複数回に分けて開催されることがある」という想定を表現しています.
+- **上部要約 (`MeetingHeaderBox`)**: `TransactionHeaderBox` と同じ構成
+  (1段目 太字1.25rem+2段目メタ情報) です. 1段目は会議名 (太字)+開催日時
+  (subtext, regular), 2段目は状態ラベル (延会/流会, `MeetingListRow`
+  と同じ `Label` — 新しいバッジ (`TransactionStatusBadge` のような塗り
+  つぶし) は作らず既存のものをそのまま再利用しました. 通常は何も表示しません)
+  +開催場所 (`IconDoor`)+出席者数 (`IconUsers`) です.
+- **タブ (`MeetingDetailTabs`)**: 議題 (`IconListDetails`)/資料
+  (`IconFolders`)/出席者 (`IconUsers`)/議事録 (`IconNotes`, 「出席者の隣に
+  議事録というタブを増やしてほしい」という依頼のため出席者の次, 末尾に
+  追加) の4タブです.
+- **議題タブ (`MeetingAgendaList`)**: 「リスト形式」という依頼のため,
+  `meeting.agenda` を採番付きのボーダー付き Box (角丸は「リストの角は
+  既定で丸めてほしい」という標準方針のため) で表示するだけの単純な
+  コンポーネントです. **「議題の各項目を, 資料タブの対応する議題の
+  一番上の資料を開くリンクにしてほしい」という依頼により**, その議題に
+  資料が1件以上あれば `/orgs/:orgId/meetings/:meetingId/materials?material=<資料ID>`
+  へのリンクにしています (資料が無い議題は従来通り plain text). クエリ
+  文字列 (`?material=`) で資料を指定しているのは, `MeetingMaterialsExplorer`
+  側の選択状態がページ内の `useState` (URL に紐付かない) だったため —
+  別ルートである議題タブから「資料タブの特定の資料を開いた状態」を
+  指定するには, 何らかの形で URL に載せる必要があったための対応です.
+  `MeetingMaterialsExplorer` は `useSearchParams` (react-router) でこの
+  クエリを読み, 指定があればその資料を初期選択+所属する議題グループを
+  展開した状態でマウントします (無ければ従来通り先頭の議題グループ+
+  その最初の資料). 議題タブ→資料タブは別ルート (別コンポーネント) の
+  ため, クエリが変わるたびに `MeetingMaterialsExplorer` は素直に
+  再マウントされ, `useState` の初期化関数がそのたびに正しく再評価されます.
+  - **議決結果アイコン/提出者**: 「議題の各項目に議決結果アイコンを, 右端に
+    提出者の名前と役職を表示してほしい」という依頼に伴い, `meeting.agenda`
+    の型を `string[]` から `MeetingAgendaItem[]`
+    (`{ label, voteResult?, submitterName, submitterRole }`) に変更して
+    います — 議題名だけでなく議決結果/提出者という付随情報を持つように
+    なったため, 単純な文字列配列では表現できなくなったことによる型変更
+    です. この変更に伴い `MeetingListRow`/`MeetingCalendarCard`
+    (`meeting.agenda.join(", ")` は `Array.prototype.join` が要素を
+    `String()` で暗黙変換してしまうため, 型エラーにはならず
+    `"[object Object]"` になる不具合を実際に踏みました — `.map((item) =>
+    item.label).join(", ")` に修正)/`MeetingMaterialsExplorer`
+    (`groupMaterialsByAgenda` の議題名比較を `item.label` に) /
+    `mockData.ts` の `generateMeetingMaterials` (`agenda[i % agenda.length]`
+    → `.label`) も合わせて修正しています. **議決結果 (`AgendaItemVoteResult`)**
+    は 否決 (`Rejected`)/延会 (`Postponed`)/可決 (`Approved`) の3種類ですが,
+    **アイコンを表示するのは否決 (赤い `IconX`, `--color-status-red`)/延会
+    (subtext1 色の `IconTriangle`, `--color-body-subtext` — 依頼で明示的に
+    「subtext1」と指定されたため, より控えめな `--color-body-subtext0`
+    ではなくこちらを使用) の2つだけです** — 可決および `voteResult` が
+    `undefined` (「そもそも議決の概念が無い」報告事項など) の場合はどちらも
+    アイコンを表示しません (依頼で明示的にアイコンが指定されたのは否決/延会
+    の2つだけだったため, 可決も無表示扱いにしています — 要望と異なる場合は
+    `VoteResultIcon`@`MeetingAgendaList.tsx` に緑のアイコン等を追加してください).
+    提出者は `IconUser` + `名前 (役職)` を各行の右端に表示します
+    (`.item` を `justify-content: space-between` にし, 番号+アイコン+議題名
+    を `.main` としてまとめて左に, 提出者を右に配置). 提出者の役職は
+    新しい役職名を作らず, 出席者/構成員一覧と同じ `OrganizationMember.role`
+    をそのまま使っています.
+- **出席者タブ (`MeetingAttendeeListBox`)**: 「`../../members` にあるものと
+  同じリスト形式」という依頼のため, 構成員一覧の行 (`MemberListRow`)
+  をそのまま再利用しています. `MemberListBox` 自体 (ソート状態やページ
+  切り替え時のフォーカス制御など, 一覧専用の複雑さを持つ) は使わず,
+  見出し (「n人の出席者」)+行の並びだけの簡潔な Box にしています —
+  会議1件あたりの出席者は数人程度で, 並び替え/ページネーションの必要が
+  薄いと判断したためです.
+- **資料タブ (`MeetingMaterialsExplorer`)**: GitHub のファイルビューワを
+  参考に, 左にサイドバー (議題ごとのディレクトリツリー, 開閉可能)/右に
+  メイン (選択中の資料のプレビュー) を配置しています.
+  - **サイドバーのツリー**: `meeting.materials` を `meeting.agenda`
+    の順序で議題ごとにグルーピングし (資料が無い議題はサイドバーに
+    出しません), フォルダ行 (`IconFolder`/`IconFolderOpen`+シェブロン)
+    をクリックすると配下のファイル行が開閉します. フォルダ/ファイル
+    行はどちらも `menuItemBase` (NavDrawer 等と同じ土台) を使い,
+    ファイル行だけ追加の `padding-left` でインデントすることで
+    ディレクトリの階層を表現しています. 初期状態は先頭の議題グループ
+    だけ展開し, その中の最初の資料を選択済みにしています.
+  - **資料の種別 (`MeetingMaterialFileType`)**: PDF/Markdown/テキスト/動画/
+    会計処理の5種類です. PDF/動画は実ファイルの保存先が無いため, 証憑タブ
+    (`TransactionReceiptBox`) と同じ考え方でそれとわかる破線枠+アイコンの
+    プレースホルダーにしています. **Markdown は `MarkdownFileViewer`
+    (GitHub 風プレビュー+ソース切り替え, 詳細は「Markdown ドキュメントの
+    プレビュー」を参照) で描画し, テキストのみ従来通り等幅フォントの
+    `<pre>` でそのまま表示します** (テキストは Markdown ではないため対象外).
+  - **会計処理を資料として埋め込む (`EmbeddedTransactionView`)**:
+    「`../../book/会計処理ID` のページをリンクではなく, メインの中に
+    同じ内容を表示してほしい」という依頼のため, 会計処理詳細ページの
+    「中身」(上部要約+タブ切り替え+3つの本文) を, ルーティングに依存しない
+    形で切り出した専用コンポーネントを新設しました. `OrganizationTransactionLayout`/
+    `TransactionDetailTabs` (実際の URL の子ルート + `NavLink` でタブを
+    切り替える) とは異なり, ここには対応する URL が無いため, `ProfileTabs`
+    と同じ考え方 (`tabBase` の見た目を `<button>` + `useState` の内部状態で
+    切り替える) にしています. 上部の `TransactionHeaderBox` と, 3つの本文
+    コンポーネント (`TransactionItemsList`/`TransactionProcedureTimeline`/
+    `TransactionReceiptBox`) はページ版とそのまま共有しているため, 見た目
+    や挙動の変更は自動的に両方に反映されます. 参照先の `OrganizationTransaction`
+    は `MeetingMaterial.transactionId` から `MOCK_ORGANIZATION_TRANSACTIONS`
+    を検索して解決しています (`OrganizationMeetingMaterialsPage` が全件を
+    `MeetingMaterialsExplorer` へ渡し, 選択中の資料が変わるたびに探索する形.
+    件数が少ないため配列探索のままにしています).
+- **議事録タブ (`MeetingMinutesExplorer`)**: 「資料と同じ形式で示してほしい」
+  という依頼のため `MeetingMaterialsExplorer` と同じ左サイドバー+右メインの
+  構成を土台にしていますが, ディレクトリツリー (議題ごとのグルーピング/
+  開閉) は無く, 開催回 (`MeetingMinutes`) をそのまま縦一列に並べるだけの
+  単純なリストです. **「会議が1度のときはサイドバーを表示せず, 2回以上
+  開催されたときにサイドバーが出現するようにしてほしい」という依頼**
+  のため, `meeting.minutes.length` に応じて構成そのものを (サイドバーを
+  CSS で隠すのではなく) 出し分けています — 1件のときは選ぶ必要が無いため,
+  サイドバー無しの単一 Box (`.singleRoot`) で本文をそのまま表示します.
+  各開催回の本文 (`content`) は「議事録のmdファイル」の書式 (frontmatter+
+  発言者形式, 詳細は「Markdown ドキュメントのプレビュー」を参照) のため
+  `MarkdownFileViewer` で描画します — frontmatter 自体がタイトル/日時/
+  場所/議長/記録などを表示するため, サイドバーの「第N回 日時」ラベル以外に
+  メイン側で改めて見出しを重ねて表示していません.
+- **モックデータ**: `generateMeetingAttendees`/`generateMeetingMaterials`
+  (`mockData.ts`) が各会議ごとに出席者3〜6人・資料2〜4件を機械的に
+  生成します. 資料の種別は5種類 (Markdown/PDF/テキスト/動画/会計処理)
+  を順番に割り当てており, 会計処理種別のときは `MOCK_ORGANIZATION_TRANSACTIONS`
+  から実在する取引を1件参照させています (資料名も参照先の
+  `description` から `会計処理: ○○` として生成). `generateMeetingMinutes`
+  は大半の会議を1回開催 (`minutes` 配列1件) にしつつ, 一部 (index が4の
+  倍数/8の倍数) を2〜3回開催として生成し, サイドバー有り/無しの両方の
+  見た目を実際に確認できるようにしています — 各回の日付はその会議自体の
+  `startsAt` (最終回) から1週間おきに遡って算出しています. `buildMinutesContent`
+  が出席者 (`OrganizationMember[]`) をそのまま発言者 (frontmatter の
+  `speakers`) として使い, 議題 (`MeetingAgendaItem[]`, 詳細は上記「議決結果
+  アイコン/提出者」を参照) の `voteResult` を議事録本文の `[決定]`/`[宿題]`
+  タグに反映しています (`Approved`/`Rejected`/`Postponed` → `[決定]`,
+  `undefined` → `[宿題]`) — 議題タブのアイコンと議事録の内容が矛盾しない
+  ようにするための対応です.
+
+## Markdown ドキュメントのプレビュー (`MarkdownDocument`/`MarkdownFileViewer`)
+
+会議詳細ページの資料タブ (Markdown 種別)/議事録タブの両方で共有している,
+Markdown ファイルの GitHub 風プレビュー機構です. 「議事録のmdファイルを
+GitHubのようにレンダリングして表示してほしい, レンダリングは他にmdファイルを
+表示する場所でも行ってほしい」という依頼のため, 特定のページに紐付けず
+`features/organization/` 直下の汎用ロジック (`minutesMarkdown.ts`) +
+2つのコンポーネントとして切り出しています.
+
+- **パーサーは自前実装 (`minutesMarkdown.ts`)**: `react-markdown`/`marked`
+  や `js-yaml` のような Markdown/YAML ライブラリは追加していません — 依頼で
+  共有された議事録の書式 (frontmatter の `speakers`/`attendees` などの
+  項目, 本文側の `@id [HH:MM]`/`@id: 発言`/`- [決定]`/`- [宿題]` といった
+  独自記法) は標準の Markdown/YAML の範囲を超えており, 汎用ライブラリを
+  導入してもこれらは結局自前でパースする必要があること, かつこのアプリの
+  Markdown コンテンツはすべて自分たちが生成するダミーデータ (任意の外部
+  入力を安全に扱う必要が無い) であることから, 依存を増やさず必要な範囲
+  だけを実装する方針にしています.
+  - **frontmatter**: `extractFrontmatter`/`parseFrontmatterYaml` が
+    `---` で挟まれたブロックを解析します. 汎用 YAML ではなく, このアプリの
+    議事録が実際に使う形 (トップレベルの `key: value`, `"..."` によるクォート
+    文字列, `true`/`false`, `[a, b]` のインライン配列, `speakers:` の
+    直後だけ2段インデントの `id: { name: ..., role: ... }` というインライン
+    マップ) に絞った簡易パーサーです. `# コメント` (行末の `" #"` 以降)
+    も取り除きます.
+  - **本文**: `parseBlocks`/`parseBlock` が空行区切りのチャンクごとに
+    見出し (`#`〜`######`)/箇条書き (`- ...`, `- [決定]`/`- [宿題]`
+    ならタグ付き)/引用 (`> ...`)/発言者の発言 (`@id [HH:MM]` 単独行+
+    続く段落 = `speakerTurn`, `@id: 発言` の1行 = `speakerInline`)/
+    それ以外は通常の段落, に分類します. **frontmatter/独自記法が無い
+    一般的な Markdown 資料 (資料タブの他のダミーコンテンツなど) も
+    同じパーサーを通ります** — 該当するパターンに一致しないだけで,
+    見出し/段落/箇条書き/引用としては自然に解釈されるため, 議事録専用
+    ロジックとは別にもう1つパーサーを用意する必要はありませんでした.
+- **描画 (`MarkdownDocument.tsx`)**: `frontmatter` があれば
+  `FrontmatterHeader` を描画し, 無ければスキップします.
+  **タイポグラフィ (行間/文字サイズ/余白) は GitHub の markdown-body 相当の
+  値に揃えています** — 「見た目を全てgithubのそれに合わせてほしい」という
+  依頼のため, 基準 `line-height: 1.5`, 見出しごとのサイズ (h1: 2em〜h6:
+  0.85em) + `font-weight: 600` + margin (24px 0 16px) + h1/h2 だけ
+  `border-bottom`, リストは (独自の "・" ではなく) 実際の `list-style: disc`,
+  blockquote は左ボーダー+灰色文字, インラインコードは背景+角丸+85%サイズ,
+  という具合に GitHub の実際の値に合わせています (色のみ本アプリの
+  テーマトークンに置き換え, 明暗両対応). `.body`/`.frontmatter`
+  は (以前の `flex + gap` ではなく) 各要素自身の margin で間隔を作る
+  素の block flow にしています — GitHub 自身がこの方式のため, 見出しと
+  段落の margin の相殺のされ方まで含めて忠実になります.
+  **`FrontmatterHeader` は「開催場所や出席者, 文書の種別についてもバッジ
+  ではなく箇条書きで示してほしい」という依頼により, `Label`/チップを
+  やめて1つの `<ul>` (`.metaList`) にまとめています** (日時/開催場所/
+  議長/記録/出席者/欠席者/種別 (逐語録・要約録) を箇条書きの各行として
+  列挙. 議長/記録は `speakers` から解決した名前のみ表示). **「公開範囲は
+  メタデータに記載しないでほしい」という依頼により, frontmatter の
+  `visibility` はパース自体はしますが `FrontmatterHeader` では描画して
+  いません.** 本文ブロックは見出し/段落/引用/箇条書き/発言者の発言として
+  描画します — **「本文内には"決定"のようなラベルを表示しないでほしい」
+  という依頼により, `[決定]`/`[宿題]` はもう `Label`
+  (バッジ) にせず, `[決定] 本文...` のように生の角括弧付きテキストとして
+  そのまま表示しています** (`Label` の green/peach バリアント自体は
+  `components/ui/Label.tsx`/`theme.css` に残していますが, 現状この用途
+  では使っていません — 他の用途で必要になれば再利用できます).
+  **「発言時刻･委員の立場については本文中に記載せず, 名前だけを記載して
+  ほしい」という依頼により, `speakerTurn`/`speakerInline` はどちらも
+  `block.time`/`speaker.role` を参照せず, 解決した名前だけを表示して
+  います** (パーサー自体は引き続き time/role を解析します — 描画側だけが
+  参照をやめています). **本文中の `@id` (発言者の発言以外の, 段落/リスト
+  項目内に登場するものも含む) は `renderInline` が正規表現でトークン化し,
+  frontmatter の `speakers` に一致すれば名前に置き換えます** (一致しなければ
+  `@id` のままフォールバック表示) — `[宿題] @sato ...` の `@sato`
+  もこの仕組みで解決されます. `renderInline` は `**太字**`/`` `コード` ``
+  も併せてサポートしています (依頼の例には無い記法ですが, 「GitHub の
+  ように」という要望に沿った一般的な Markdown 記法として追加しました).
+- **プレビュー/ソース切り替え+文書名 (`MarkdownFileViewer.tsx`)**: 「書類の
+  上部に `IconEye`/`IconCode` を『プレビューを表示』『ソースを表示』という
+  ツールチップ付きのトグルボタンとして表示し, プレビューを標準としてほしい」
+  という依頼どおり, 会議一覧の `ViewModeToggle` (リスト/カレンダー切り替え)
+  と同じ「選択中の側にボタン型のオーバーレイがスライドする」見た目+
+  `aria-label` を CSS でツールチップ表示する仕組みをそのまま踏襲しています
+  — ドメインも役割も異なる (会議一覧の表示モード切り替え vs. Markdown
+  プレビュー/ソース切り替え) ため, 共通コンポーネントとして切り出さず
+  並行コンポーネントとして複製しています (Document*/Transaction*/Meeting*
+  系で確立した「機能ごとに似た構成でも別コンポーネントとして持つ」方針を
+  踏襲). 既定は `MarkdownViewMode.Preview`, ソース表示は整形前の生の
+  Markdown 文字列を等幅フォントの `<pre>` でそのまま表示するだけです.
+  **「トグルスイッチの左横には左詰めで文書名を記載してほしい, トグル
+  スイッチがある部分は本文と分割線で隔ててほしい」という依頼により**,
+  `title: string` prop を追加し `.toolbar`
+  (`justify-content: space-between`) の左に文書名, 右にトグルを配置した上で
+  `.toolbar` に `border-bottom` を付けています — `MeetingMaterialsExplorer`
+  (資料タブ) では Markdown 種別のときだけ, 他の種別 (PDF/動画/テキスト) が
+  使う外側の見出し (`.materialName`) の代わりにこの `title` prop
+  (`selectedMaterial.name`) で文書名を示すようにしました (二重表示を避ける
+  ため). `MeetingMinutesExplorer` (議事録タブ) は
+  `` `議事録_${sessionLabel}.md` `` という組み立てたファイル名を渡しています
+  (`MeetingMinutes` 自体に実ファイル名の概念が無いため).
+- **利用箇所**: `MeetingMaterialsExplorer` (資料タブ, Markdown 種別のみ.
+  PDF/動画/テキストは対象外) と `MeetingMinutesExplorer` (議事録タブ,
+  全件) の2箇所です — 依頼の「他にmdファイルを表示する場所でも」を
+  満たすため, 特定の画面に結合させず `source`/`title` を受け取るだけの
+  汎用コンポーネントにしています.
 
 ## 404 ページ (`NotFoundPage`)
 

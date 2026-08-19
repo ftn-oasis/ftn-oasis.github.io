@@ -1,0 +1,125 @@
+/* DocumentListBox 等の一覧 Box と同じ, 外枠のボーダー付き Box */
+.root {
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+/* 呼び出し側が既に外枠を持っている場合 (bordered={false}) は, 二重に
+   囲われないよう自身の外枠だけを外す — ツールバーと本文の分割は維持する */
+.borderless {
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+}
+
+/* 「書類本文と文書名･トグルスイッチはリストのヘッダーと要素のように完全に
+   分割し, その高さをリストのそれと等しくしてほしい」という依頼のため,
+   DocumentListBox の .toolbar と同じ値 (padding: 8px 16px, 背景色付き,
+   下端にボーダー) にしている. 文書名 (左詰め) + トグル (右詰め) */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  background: var(--color-secondary1);
+}
+
+.content {
+  padding: 24px;
+}
+
+.title {
+  overflow: hidden;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ViewModeToggle (会議一覧のリスト/カレンダー切り替え) と同じ, 選択中の側に
+   ボタン型のオーバーレイ (indicator) がスライドする見た目 */
+.toggleRoot {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 0;
+  padding: 3px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-surface0);
+}
+
+.indicator {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: calc(var(--borderRadius-medium) - 2px);
+  background: var(--color-background);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
+  transition: transform 0.15s ease;
+}
+
+.indicatorSource {
+  transform: translateX(34px);
+}
+
+.toggleButton {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.toggleButton::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--color-hover-body);
+  background: var(--color-hover-background);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.05s ease;
+}
+
+.toggleButton:hover::after,
+.toggleButton:focus-visible::after {
+  opacity: 1;
+}
+
+.sourceView {
+  overflow-wrap: break-word;
+  padding: 16px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-secondary1);
+  color: var(--color-body-body);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}

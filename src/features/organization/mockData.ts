@@ -2,10 +2,15 @@
 
 import { currentUser } from "@src/lib/currentUser";
 
-import { addDays } from "./calendarUtils";
+import { addDays, formatDateTime, formatTime } from "./calendarUtils";
 import {
   ActivityType,
   type Activity,
+  AgendaItemVoteResult,
+  type MeetingAgendaItem,
+  type MeetingMaterial,
+  MeetingMaterialFileType,
+  type MeetingMinutes,
   MeetingStatus,
   type OrganizationDetail,
   type OrganizationDocument,
@@ -504,6 +509,302 @@ function toIsoDateTime(date: Date): string {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
 }
 
+// 会議詳細ページ (/orgs/:orgId/meetings/:meetingId) 用のダミーデータ生成
+
+// 出席者タブ用 — 学年学級の偏りが出ないよう index からの単純なずらしで
+// 3〜6人を重複無く選ぶ (MOCK_MEMBERS は12件, 差分2ずつなら6件まで重複しない)
+function generateMeetingAttendees(meetingIndex: number): OrganizationMember[] {
+  const count = 3 + (meetingIndex % 4);
+  return Array.from(
+    { length: count },
+    (_, i) => MOCK_MEMBERS[(meetingIndex + i * 2) % MOCK_MEMBERS.length],
+  );
+}
+
+// 議題タブ用 — 議決結果は「否認/延会/議決の概念が無い/可決」を巡回させ,
+// 赤い IconX (否決)/subtext1 の IconTriangle (延会) の両方の見た目を実際に
+// 確認できるようにしている (MeetingAgendaList を参照. 可決/概念無しは
+// どちらもアイコンを表示しない — 依頼で明示的にアイコンが指定されたのは
+// 否決/延会の2つだけだったため). 提出者は MOCK_MEMBERS から1件選び,
+// その name/role をそのまま使う (別の役職名を新設せず, 構成員一覧と同じ
+// 役職表記に揃えるため)
+const AGENDA_VOTE_RESULT_CYCLE = [
+  undefined,
+  undefined,
+  AgendaItemVoteResult.Approved,
+  AgendaItemVoteResult.Approved,
+  AgendaItemVoteResult.Rejected,
+  AgendaItemVoteResult.Postponed,
+];
+
+function generateAgendaItems(
+  meetingIndex: number,
+  agendaCount: number,
+): MeetingAgendaItem[] {
+  return Array.from({ length: agendaCount }, (_, i) => {
+    const label = MEETING_AGENDA_ITEMS[(meetingIndex + i) % MEETING_AGENDA_ITEMS.length];
+    const voteResult =
+      AGENDA_VOTE_RESULT_CYCLE[(meetingIndex + i) % AGENDA_VOTE_RESULT_CYCLE.length];
+    const submitter = MOCK_MEMBERS[(meetingIndex + i * 3) % MOCK_MEMBERS.length];
+
+    return {
+      label,
+      voteResult,
+      submitterName: submitter.name,
+      submitterRole: submitter.role,
+    };
+  });
+}
+
+const MATERIAL_TYPE_CYCLE = [
+  MeetingMaterialFileType.Markdown,
+  MeetingMaterialFileType.Pdf,
+  MeetingMaterialFileType.Text,
+  MeetingMaterialFileType.Video,
+  MeetingMaterialFileType.Transaction,
+];
+const MATERIAL_NAME_BY_TYPE: Record<string, string[]> = {
+  [MeetingMaterialFileType.Markdown]: ["議事録.md", "進捗メモ.md", "検討事項.md"],
+  [MeetingMaterialFileType.Pdf]: ["配布資料.pdf", "アンケート結果.pdf", "企画書.pdf"],
+  [MeetingMaterialFileType.Text]: ["連絡事項.txt", "メモ.txt"],
+  [MeetingMaterialFileType.Video]: ["説明動画.mp4", "記録映像.mp4"],
+};
+const MATERIAL_PREVIEW_TEXT: Record<string, string> = {
+  [MeetingMaterialFileType.Markdown]:
+    "## 概要\n\nこれはダミーの Markdown プレビューです. 実際のファイル内容はまだ保存されていません.\n\n- 検討事項A\n- 検討事項B",
+  [MeetingMaterialFileType.Text]:
+    "これはダミーのテキストプレビューです. 実際のファイル内容はまだ保存されていません.",
+};
+
+// 資料タブ用 — 議題ごとに1〜2件, 会議1件あたり2〜4件を機械的に生成する.
+// 種別を一定間隔で会計処理 (MeetingMaterialFileType.Transaction) にし,
+// 実在する MOCK_ORGANIZATION_TRANSACTIONS を参照させる (「../../book/会計処理ID
+// のページをリンクではなくメインの中に同じ内容を表示する」という依頼のため.
+// 実際の埋め込み表示は EmbeddedTransactionView が担う)
+function generateMeetingMaterials(
+  meetingIndex: number,
+  agenda: MeetingAgendaItem[],
+): MeetingMaterial[] {
+  const materialCount = 2 + (meetingIndex % 3);
+
+  return Array.from({ length: materialCount }, (_, i) => {
+    const agendaItem = agenda[i % agenda.length].label;
+    const fileType = MATERIAL_TYPE_CYCLE[(meetingIndex + i) % MATERIAL_TYPE_CYCLE.length];
+    const id = `test-org-meeting-${meetingIndex + 1}-material-${i + 1}`;
+
+    if (fileType === MeetingMaterialFileType.Transaction) {
+      const transaction =
+        MOCK_ORGANIZATION_TRANSACTIONS[
+          (meetingIndex * 3 + i) % MOCK_ORGANIZATION_TRANSACTIONS.length
+        ];
+      return {
+        id,
+        agendaItem,
+        name: `会計処理: ${transaction.description}`,
+        fileType,
+        transactionId: transaction.id,
+      };
+    }
+
+    const names = MATERIAL_NAME_BY_TYPE[fileType];
+    const name = names[(meetingIndex + i) % names.length];
+    const content = MATERIAL_PREVIEW_TEXT[fileType];
+
+    return { id, agendaItem, name, fileType, content };
+  });
+}
+
+// 議事録タブ用 — 依頼で共有された frontmatter+発言者形式の Markdown 書式
+// (minutesMarkdown.ts が解析する形式) でダミーの議事録本文を生成する.
+// 出席者 (attendees) を発言者 (speakers) としてそのまま使う — 短い ID
+// (frontmatter の "tanaka" のような形式) は member.id の末尾の番号から
+// 機械的に組み立てている (例: test-org-member-5 → m5)
+function minutesSpeakerId(member: OrganizationMember): string {
+  return `m${member.id.split("-").pop()}`;
+}
+
+// ローカルタイムゾーン基準で "YYYY-MM-DD" を組み立てる. calendarUtils.formatDate
+// は "YYYY/MM/DD" (スラッシュ) のため, frontmatter の date フィールド用に
+// ハイフン区切りで別途組み立てている (toIsoDate のような UTC 起点の日数では
+// なく, 会議自体の startsAt と同じくローカルに構築した Date が入る想定)
+function toDashedDate(date: Date): string {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+}
+
+// 議決結果は「[決定] は表示しなくて構いません」という依頼により別枠の
+// リスト項目にはせず, 発言記録の中で発言者自身が述べる形にしている
+// (逐語録である以上, 議決の結果も本来は誰かの発言として記録されるはずのため)
+const MINUTES_APPROVED_TEXTS = [
+  "それでは採決します。賛成多数により、原案どおり可決とします。",
+  "それでは採決します。賛成多数により、一部修正のうえ可決とします。",
+];
+const MINUTES_REJECTED_TEXTS = ["それでは採決します。反対多数により、否決とします。"];
+const MINUTES_POSTPONED_TEXTS = ["本日は結論が出ませんでしたので、継続審議とし、次回に持ち越します。"];
+const MINUTES_HOMEWORK_TEXTS = [
+  "業者見積もりの再取得",
+  "関係部署への確認",
+  "資料の追加準備",
+];
+const MINUTES_REMARK_TEXTS = [
+  "資料の配布が遅れたため5分間の閲覧時間を設けた",
+  "オンライン参加者の音声が一部聞き取りにくかった",
+];
+
+// 議題1件分の発言 (`@id: 発言内容` 形式のチャンク文字列の配列) を組み立てる.
+// 「議題ごとに見出しで分割せず, 発言を全て記録する逐語録のようにしてほしい」
+// という依頼のため, `## 議題N` の見出しは持たず, 議題をまたいでそのまま
+// 連続した発言記録の一部として繋げられる形にしている (呼び出し元
+// buildMinutesContent 側で全議題分をまとめて1つの発言記録にする).
+// 最初の発言 (議題の切り出し) は複数行 (改行を挟んだ続きの発言) にし,
+// 採決がある場合は同じ発言者の発言に賛否の内訳を箇条書きで続ける — どちらも
+// 「発言内容の部分には改行や箇条書きが使える」ことを示すための構成
+function buildMinutesAgendaTurns(
+  agendaIndex: number,
+  seed: number,
+  item: MeetingAgendaItem,
+  sessionAttendees: OrganizationMember[],
+  sessionDate: Date,
+): string[] {
+  const speakerAId = minutesSpeakerId(sessionAttendees[agendaIndex % sessionAttendees.length]);
+  const speakerB = sessionAttendees[(agendaIndex + 1) % sessionAttendees.length];
+  const speakerBId = minutesSpeakerId(speakerB);
+
+  const chunks: string[] = [
+    [
+      `@${speakerAId}: それでは議題${agendaIndex + 1}に入ります。${item.label}について説明します。`,
+      "資料を配布していますのでご確認ください。",
+    ].join("\n"),
+    `@${speakerBId}: 承知しました。よろしくお願いします。`,
+  ];
+
+  if (item.voteResult !== undefined) {
+    const forCount = 5 + (seed % 3);
+    const againstCount = item.voteResult === AgendaItemVoteResult.Approved ? 0 : forCount - 1;
+    const holdCount = seed % 2;
+    const voteText =
+      item.voteResult === AgendaItemVoteResult.Approved
+        ? MINUTES_APPROVED_TEXTS[seed % MINUTES_APPROVED_TEXTS.length]
+        : item.voteResult === AgendaItemVoteResult.Rejected
+          ? MINUTES_REJECTED_TEXTS[seed % MINUTES_REJECTED_TEXTS.length]
+          : MINUTES_POSTPONED_TEXTS[seed % MINUTES_POSTPONED_TEXTS.length];
+
+    chunks.push(
+      [
+        `@${speakerAId}: ${voteText}`,
+        `- 賛成: ${forCount}名 / 反対: ${againstCount}名 / 保留: ${holdCount}名`,
+      ].join("\n"),
+    );
+  }
+
+  if (seed % 2 === 0) {
+    chunks.push(`> (補足) ${MINUTES_REMARK_TEXTS[seed % MINUTES_REMARK_TEXTS.length]}`);
+  }
+
+  if (item.voteResult === undefined) {
+    const dueDate = toDashedDate(addDays(sessionDate, 14));
+    chunks.push(
+      `- [宿題] ${speakerB.name} ${MINUTES_HOMEWORK_TEXTS[seed % MINUTES_HOMEWORK_TEXTS.length]} 期限:${dueDate}`,
+    );
+  }
+
+  return chunks;
+}
+
+function buildMinutesContent(
+  meetingIndex: number,
+  sessionIndex: number,
+  title: string,
+  location: string,
+  sessionDate: Date,
+  sessionAttendees: OrganizationMember[],
+  agenda: MeetingAgendaItem[],
+): string {
+  const speakerIds = sessionAttendees.map(minutesSpeakerId);
+  const chairId = speakerIds[0];
+  const recorderId = speakerIds[1] ?? speakerIds[0];
+  const absentMember =
+    MOCK_MEMBERS[(meetingIndex + sessionIndex) % MOCK_MEMBERS.length];
+  const isAbsent = !sessionAttendees.some(
+    (member) => member.id === absentMember.id,
+  );
+
+  const speakersYaml = sessionAttendees
+    .map(
+      (member) =>
+        `  ${minutesSpeakerId(member)}:  { name: ${member.name}, role: ${member.role} }`,
+    )
+    .join("\n");
+  const startTime = formatTime(sessionDate);
+  // 会議時間は80分と仮定した終了時刻
+  const endTime = formatTime(new Date(sessionDate.getTime() + 80 * 60 * 1000));
+
+  const frontmatterLines = [
+    "---",
+    `meeting_id: ${meetingIndex + 1}-${sessionIndex + 1}`,
+    `title: ${title} (第${sessionIndex + 1}回)`,
+    `date: ${toDashedDate(sessionDate)}`,
+    `time: "${startTime}-${endTime}"`,
+    `place: ${location}`,
+    `chair: ${chairId}`,
+    `recorder: ${recorderId}`,
+    "visibility: internal   # internal / public",
+    "speakers:",
+    speakersYaml,
+    `attendees: [${speakerIds.join(", ")}]`,
+    `absentees: [${isAbsent ? minutesSpeakerId(absentMember) : ""}]`,
+    "---",
+  ];
+
+  // 全議題分の発言を, 議題の切れ目に関わらずそのまま1本につなげ (見出しで
+  // 分割しない逐語録), 最後に議長の閉会の発言を加える. 「議事録の部分を ``` で
+  // 囲うことで議事録の本文を表してほしい」という依頼のため, 発言記録全体を
+  // 1つのフェンス付きコードブロックとして囲む (minutesMarkdown.ts の
+  // isTranscriptFence が, 中身が `@id:` で始まっていることを見て発言記録として
+  // 解析する)
+  const agendaChunks = agenda.flatMap((item, i) =>
+    buildMinutesAgendaTurns(i, meetingIndex + sessionIndex + i, item, sessionAttendees, sessionDate),
+  );
+  agendaChunks.push(`@${chairId}: 本日の議題は以上です。これにて${title}を終了します。`);
+
+  const transcript = ["```", agendaChunks.join("\n\n"), "```"].join("\n");
+
+  return `${frontmatterLines.join("\n")}\n\n${transcript}\n`;
+}
+
+// ほとんどの会議は1回開催 (配列1件) だが, 一部は複数回に分けて開催された
+// 想定で2〜3件生成する (「会議が1度のときはサイドバーを表示せず, 2回以上
+// 開催されたときにサイドバーが出現する」という MeetingMinutesExplorer 側の
+// 分岐を両方確認できるようにするため). 各回の日付は最終回 (= その会議自体の
+// startsAt) から遡って1週間おきにしている
+function generateMeetingMinutes(
+  index: number,
+  startsAt: Date,
+  title: string,
+  location: string,
+  attendees: OrganizationMember[],
+  agenda: MeetingAgendaItem[],
+): MeetingMinutes[] {
+  const sessionCount = index % 8 === 0 ? 3 : index % 4 === 0 ? 2 : 1;
+
+  return Array.from({ length: sessionCount }, (_, i) => {
+    const sessionDate = addDays(startsAt, -(sessionCount - 1 - i) * 7);
+    return {
+      id: `test-org-meeting-${index + 1}-minutes-${i + 1}`,
+      sessionLabel: `第${i + 1}回`,
+      occurredAt: formatDateTime(sessionDate),
+      content: buildMinutesContent(
+        index,
+        i,
+        title,
+        location,
+        sessionDate,
+        attendees,
+        agenda,
+      ),
+    };
+  });
+}
+
 const MOCK_ORGANIZATION_MEETINGS: OrganizationMeeting[] = Array.from(
   { length: 40 },
   (_, index) => {
@@ -520,20 +821,30 @@ const MOCK_ORGANIZATION_MEETINGS: OrganizationMeeting[] = Array.from(
           ? MeetingStatus.Canceled
           : MeetingStatus.Normal;
     const agendaCount = 2 + (index % 3);
-    const agenda = Array.from(
-      { length: agendaCount },
-      (_, i) => MEETING_AGENDA_ITEMS[(index + i) % MEETING_AGENDA_ITEMS.length],
-    );
+    const agenda = generateAgendaItems(index, agendaCount);
+    const title = MEETING_TITLES[index % MEETING_TITLES.length];
+    const location = MEETING_LOCATIONS[index % MEETING_LOCATIONS.length];
+    const attendees = generateMeetingAttendees(index);
 
     return {
       id: `test-org-meeting-${index + 1}`,
       organizationId: "test-org",
-      title: MEETING_TITLES[index % MEETING_TITLES.length],
+      title,
       agenda,
-      location: MEETING_LOCATIONS[index % MEETING_LOCATIONS.length],
+      location,
       status,
       startsAt: toIsoDateTime(startsAt),
       scheduledAt: toIsoDateTime(scheduledAt),
+      attendees,
+      materials: generateMeetingMaterials(index, agenda),
+      minutes: generateMeetingMinutes(
+        index,
+        startsAt,
+        title,
+        location,
+        attendees,
+        agenda,
+      ),
     };
   },
 );

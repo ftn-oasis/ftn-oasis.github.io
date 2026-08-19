@@ -1,0 +1,73 @@
+.root {
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+/* 番号+議決結果アイコン+議題名をまとめる左側のグループ. 議題名が長い場合に
+   右端の提出者ブロックを押し出さないよう min-width: 0 で縮められるようにする */
+.main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.index {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  color: var(--color-body-body);
+}
+
+/* 対応する資料がある議題はリンクにする — DocumentCard のタイトルと同じ考え方で,
+   リンクであることを示すため他のテキスト (subtext) とは別に --color-link を使う */
+.link {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* 否決: 赤い IconX */
+.voteRejected {
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--color-status-red);
+}
+
+/* 延会: subtext1 色の IconTriangle (--color-body-subtext が subtext1) */
+.votePostponed {
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--color-body-subtext);
+}
+
+/* 右端の提出者 (名前+役職) */
+.submitter {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+

@@ -287,20 +287,97 @@ const MeetingStatus = {
 
 type MeetingStatus = (typeof MeetingStatus)[keyof typeof MeetingStatus];
 
+// 議題の議決結果. 無い (undefined) 場合はそもそも議決の対象ではない議題
+// (「前回議事録の確認」のような報告事項など) を表す — 議題タブのアイコン
+// 表示の分岐 (MeetingAgendaList) を参照
+const AgendaItemVoteResult = {
+  Approved: "approved",
+  Rejected: "rejected",
+  Postponed: "postponed",
+} as const;
+
+type AgendaItemVoteResult =
+  (typeof AgendaItemVoteResult)[keyof typeof AgendaItemVoteResult];
+
+// 会議1件の議題1項目. 以前は string[] (議題名のみ) でしたが, 議題タブ
+// (MeetingAgendaList) に議決結果アイコン/提出者を表示する依頼により,
+// 議題名だけでなくこれらの情報も持つオブジェクトに拡張しています
+type MeetingAgendaItem = {
+  label: string;
+  voteResult?: AgendaItemVoteResult;
+  submitterName: string;
+  submitterRole: string;
+};
+
 // 組織の会議一覧 (/orgs/:orgId/meetings) の1件. フィルター (子組織/参加者/開催日
 // 前後など) はまだ実装しないため, 対応するフィールドはまだ持たせていない.
-// MeetingCreatedActivity (「直近の動向」用) とは別の, 一覧表示専用のフラットな型
+// MeetingCreatedActivity (「直近の動向」用) とは別の, 一覧表示専用のフラットな型.
+//
+// 個別詳細ページ (/orgs/:orgId/meetings/:meetingId) の実装に伴い, attendees/
+// materials/minutes を追加している — OrganizationTransaction が会計処理詳細
+// ページの実装時にフィールド追加で拡張されたのと同じ考え方で, 別の型は
+// 新設していない
 type OrganizationMeeting = {
   id: string;
   organizationId: string;
   title: string;
-  agenda: string[];
+  agenda: MeetingAgendaItem[];
   location: string;
   status: MeetingStatus;
   // ソート/カレンダー表示用. 画面にはそのまま表示せず, 都度整形して使う
   // ISO 形式 ("YYYY-MM-DDTHH:mm") の文字列
   startsAt: string;
   scheduledAt: string;
+  // 出席者タブ (/orgs/:orgId/meetings/:meetingId/attendees) 用. 構成員一覧と
+  // 同じ表示 (MemberListRow) にそのまま使えるよう, ID 参照ではなく
+  // OrganizationMember を直接埋め込んでいる (documents/mockData.ts の
+  // 「組織とは分離して考える」設計とは別に, こちらは表示にそのまま使う値の
+  // ため denormalize している)
+  attendees: OrganizationMember[];
+  // 資料タブ (/orgs/:orgId/meetings/:meetingId/materials) 用
+  materials: MeetingMaterial[];
+  // 議事録タブ (/orgs/:orgId/meetings/:meetingId/minutes) 用. 同じ議題の
+  // 会議が複数回開催されることがある想定のため配列にしている (通常は1件)
+  minutes: MeetingMinutes[];
+};
+
+// 議事録タブの1回分. 会議が1度しか開催されていない場合は配列が1件だけになり,
+// そのときはサイドバー無しで本文をそのまま表示する (MeetingMinutesExplorer を参照)
+type MeetingMinutes = {
+  id: string;
+  // 開催回のラベル (例: "第1回")
+  sessionLabel: string;
+  // 表示用に整形済みの開催日時 ("YYYY/MM/DD HH:mm")
+  occurredAt: string;
+  content: string;
+};
+
+const MeetingMaterialFileType = {
+  Pdf: "pdf",
+  Markdown: "markdown",
+  Text: "text",
+  Video: "video",
+  // 会計処理詳細ページ (/orgs/:orgId/book/:transactionId) と同じ内容を,
+  // リンクではなく資料ビューワのメイン領域にそのまま表示する特殊な種別
+  Transaction: "transaction",
+} as const;
+
+type MeetingMaterialFileType =
+  (typeof MeetingMaterialFileType)[keyof typeof MeetingMaterialFileType];
+
+// 資料タブのサイドバー (ファイルビューワのディレクトリツリー) は議題ごとに
+// 資料をグルーピングするため, agendaItem (meeting.agenda の要素と一致する
+// 文字列) を持たせている
+type MeetingMaterial = {
+  id: string;
+  agendaItem: string;
+  name: string;
+  fileType: MeetingMaterialFileType;
+  // markdown/text のプレビュー用本文. pdf/video/transaction のときは無い
+  // (実ファイルの保存先が無いため, 証憑タブと同様プレースホルダー表示にする)
+  content?: string;
+  // fileType が Transaction のときだけ持つ, 参照先の OrganizationTransaction.id
+  transactionId?: string;
 };
 
 const MeetingSortField = {
@@ -322,12 +399,17 @@ type MeetingSortDirection =
 export {
   ActivityType,
   type Activity,
+  AgendaItemVoteResult,
   type DocumentChangeActivity,
   DocumentSortDirection,
   DocumentSortField,
   MemberSortDirection,
   MemberSortField,
+  type MeetingAgendaItem,
   type MeetingCreatedActivity,
+  type MeetingMaterial,
+  MeetingMaterialFileType,
+  type MeetingMinutes,
   MeetingSortDirection,
   MeetingSortField,
   MeetingStatus,

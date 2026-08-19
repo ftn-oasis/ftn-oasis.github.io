@@ -16,3 +16,13 @@
   border-color: var(--color-label-mauve);
   color: var(--color-label-mauve);
 }
+
+.green {
+  border-color: var(--color-label-green);
+  color: var(--color-label-green);
+}
+
+.peach {
+  border-color: var(--color-label-peach);
+  color: var(--color-label-peach);
+}

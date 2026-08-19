@@ -3,6 +3,11 @@ import { NotFoundPage } from "@src/pages/NotFoundPage";
 import { OrganizationBookPage } from "@src/pages/OrganizationBookPage";
 import { OrganizationDocumentsPage } from "@src/pages/OrganizationDocumentsPage";
 import { OrganizationLayout } from "@src/pages/OrganizationLayout";
+import { OrganizationMeetingAgendaPage } from "@src/pages/OrganizationMeetingAgendaPage";
+import { OrganizationMeetingAttendeesPage } from "@src/pages/OrganizationMeetingAttendeesPage";
+import { OrganizationMeetingLayout } from "@src/pages/OrganizationMeetingLayout";
+import { OrganizationMeetingMaterialsPage } from "@src/pages/OrganizationMeetingMaterialsPage";
+import { OrganizationMeetingMinutesPage } from "@src/pages/OrganizationMeetingMinutesPage";
 import { OrganizationMeetingsPage } from "@src/pages/OrganizationMeetingsPage";
 import { OrganizationMembersPage } from "@src/pages/OrganizationMembersPage";
 import { OrganizationOverviewPage } from "@src/pages/OrganizationOverviewPage";
@@ -35,6 +40,15 @@ function App() {
           </Route>
           <Route path="members" element={<OrganizationMembersPage />} />
           <Route path="meetings" element={<OrganizationMeetingsPage />} />
+          <Route
+            path="meetings/:meetingId"
+            element={<OrganizationMeetingLayout />}
+          >
+            <Route index element={<OrganizationMeetingAgendaPage />} />
+            <Route path="materials" element={<OrganizationMeetingMaterialsPage />} />
+            <Route path="attendees" element={<OrganizationMeetingAttendeesPage />} />
+            <Route path="minutes" element={<OrganizationMeetingMinutesPage />} />
+          </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
