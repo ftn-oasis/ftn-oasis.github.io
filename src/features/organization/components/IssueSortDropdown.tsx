@@ -8,56 +8,48 @@ import {
   IconSortDescendingLetters,
 } from "@tabler/icons-react";
 
-import { DocumentSortDirection, DocumentSortField } from "../types";
+import { DocumentIssueSortDirection, DocumentIssueSortField } from "../types";
 
-import styles from "./DocumentSortDropdown.module.css";
+import styles from "./IssueSortDropdown.module.css";
 
-const SORT_FIELD_LABEL: Record<DocumentSortField, string> = {
-  [DocumentSortField.EditedAt]: "最新編集日時",
-  [DocumentSortField.CreatedAt]: "作成日",
-  [DocumentSortField.Title]: "名称",
+const SORT_FIELD_LABEL: Record<DocumentIssueSortField, string> = {
+  [DocumentIssueSortField.PostedAt]: "投稿日",
+  [DocumentIssueSortField.Title]: "タイトル",
 };
 
-const SORT_FIELDS: DocumentSortField[] = [
-  DocumentSortField.EditedAt,
-  DocumentSortField.CreatedAt,
-  DocumentSortField.Title,
+const SORT_FIELDS: DocumentIssueSortField[] = [
+  DocumentIssueSortField.PostedAt,
+  DocumentIssueSortField.Title,
 ];
 
-type DocumentSortDropdownProps = {
-  field: DocumentSortField;
-  direction: DocumentSortDirection;
-  onChange: (field: DocumentSortField, direction: DocumentSortDirection) => void;
+type IssueSortDropdownProps = {
+  field: DocumentIssueSortField;
+  direction: DocumentIssueSortDirection;
+  onChange: (field: DocumentIssueSortField, direction: DocumentIssueSortDirection) => void;
 };
 
-// 枠線無しのドロップダウン. 開いている一覧で選択中のフィールドをもう一度選ぶと
-// 昇順/降順を切り替え, 別のフィールドを選ぶと降順で選び直す. 末尾には分割線を
+// MeetingSortDropdown と同じ構造の, 枠線無しドロップダウン. 末尾には分割線を
 // 挟み, フィールドに関わらず直接昇順/降順を選べる項目を追加している
-// (「ドロップダウンの一番下に分割線と昇順/降順のオプションも追加してほしい」
-// という依頼のため)
-function DocumentSortDropdown({
-  field,
-  direction,
-  onChange,
-}: DocumentSortDropdownProps) {
+// (DocumentSortDropdown と同じ依頼のため)
+function IssueSortDropdown({ field, direction, onChange }: IssueSortDropdownProps) {
   const { open, wrapperRef, toggle, close } =
     useDismissablePopover<HTMLDivElement>();
 
-  const handleSelect = (selectedField: DocumentSortField) => {
+  const handleSelect = (selectedField: DocumentIssueSortField) => {
     if (selectedField === field) {
       onChange(
         field,
-        direction === DocumentSortDirection.Asc
-          ? DocumentSortDirection.Desc
-          : DocumentSortDirection.Asc,
+        direction === DocumentIssueSortDirection.Asc
+          ? DocumentIssueSortDirection.Desc
+          : DocumentIssueSortDirection.Asc,
       );
     } else {
-      onChange(selectedField, DocumentSortDirection.Desc);
+      onChange(selectedField, DocumentIssueSortDirection.Desc);
     }
     close();
   };
 
-  const handleSelectDirection = (selectedDirection: DocumentSortDirection) => {
+  const handleSelectDirection = (selectedDirection: DocumentIssueSortDirection) => {
     onChange(field, selectedDirection);
     close();
   };
@@ -73,7 +65,7 @@ function DocumentSortDropdown({
       >
         <Icon
           icon={
-            direction === DocumentSortDirection.Asc
+            direction === DocumentIssueSortDirection.Asc
               ? IconSortAscendingLetters
               : IconSortDescendingLetters
           }
@@ -100,14 +92,14 @@ function DocumentSortDropdown({
           <SortMenuItem
             label="昇順"
             icon={IconSortDescendingLetters}
-            isActive={direction === DocumentSortDirection.Asc}
-            onClick={() => handleSelectDirection(DocumentSortDirection.Asc)}
+            isActive={direction === DocumentIssueSortDirection.Asc}
+            onClick={() => handleSelectDirection(DocumentIssueSortDirection.Asc)}
           />
           <SortMenuItem
             label="降順"
             icon={IconSortAscendingLetters}
-            isActive={direction === DocumentSortDirection.Desc}
-            onClick={() => handleSelectDirection(DocumentSortDirection.Desc)}
+            isActive={direction === DocumentIssueSortDirection.Desc}
+            onClick={() => handleSelectDirection(DocumentIssueSortDirection.Desc)}
           />
         </div>
       )}
@@ -115,4 +107,4 @@ function DocumentSortDropdown({
   );
 }
 
-export { DocumentSortDropdown };
+export { IssueSortDropdown };

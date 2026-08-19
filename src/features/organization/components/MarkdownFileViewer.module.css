@@ -39,6 +39,14 @@
   white-space: nowrap;
 }
 
+/* 「編集する」ボタン (任意) + トグルスイッチをまとめる右詰めのグループ */
+.controls {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ViewModeToggle (会議一覧のリスト/カレンダー切り替え) と同じ, 選択中の側に
    ボタン型のオーバーレイ (indicator) がスライドする見た目 */
 .toggleRoot {

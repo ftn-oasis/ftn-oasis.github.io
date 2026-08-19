@@ -1,5 +1,6 @@
+import { IconButton } from "@src/components/ui/IconButton";
 import { Icon } from "@src/components/ui/Icon";
-import { IconCode, IconEye } from "@tabler/icons-react";
+import { IconCode, IconEye, IconPencil } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useState } from "react";
 
@@ -23,6 +24,10 @@ type MarkdownFileViewerProps = {
   // ケースなど) が既に外枠を持っており, 二重に囲われてしまう場合に使う.
   // ツールバーと本文の分割 (border-bottom) 自体はこの場合も維持する
   bordered?: boolean;
+  // 指定するとトグルスイッチの左横に <IconPencil> の「編集する」ボタンを
+  // 表示する (文書詳細ページの概要タブで使用. 動作自体はのちほど実装する
+  // 想定のため, 現時点ではこのコールバックを呼ぶだけ)
+  onEdit?: () => void;
 };
 
 // Markdown ファイルの表示 (資料タブ/議事録タブで共通利用). 上部に文書名
@@ -36,39 +41,51 @@ type MarkdownFileViewerProps = {
 // 本文側の .content) にしている. ソース表示は整形前の生の Markdown を
 // そのまま等幅フォントで表示するだけ (資料タブの text 種別と同じ
 // .textPreview 相当の見た目)
-function MarkdownFileViewer({ source, title, bordered = true }: MarkdownFileViewerProps) {
+function MarkdownFileViewer({
+  source,
+  title,
+  bordered = true,
+  onEdit,
+}: MarkdownFileViewerProps) {
   const [mode, setMode] = useState<MarkdownViewMode>(MarkdownViewMode.Preview);
 
   return (
     <div className={clsx(styles.root, !bordered && styles.borderless)}>
       <div className={styles.toolbar}>
-        <span className={styles.title}>{title}</span>
-        <div className={styles.toggleRoot}>
-          <div
-            className={clsx(
-              styles.indicator,
-              mode === MarkdownViewMode.Source && styles.indicatorSource,
-            )}
-            aria-hidden="true"
-          />
-          <button
-            type="button"
-            aria-label="プレビューを表示"
-            aria-pressed={mode === MarkdownViewMode.Preview}
-            onClick={() => setMode(MarkdownViewMode.Preview)}
-            className={styles.toggleButton}
-          >
-            <Icon icon={IconEye} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="ソースを表示"
-            aria-pressed={mode === MarkdownViewMode.Source}
-            onClick={() => setMode(MarkdownViewMode.Source)}
-            className={styles.toggleButton}
-          >
-            <Icon icon={IconCode} aria-hidden="true" />
-          </button>
+        <span className={styles.title} title={title}>
+          {title}
+        </span>
+        <div className={styles.controls}>
+          {onEdit && (
+            <IconButton icon={IconPencil} label="編集する" onClick={onEdit} />
+          )}
+          <div className={styles.toggleRoot}>
+            <div
+              className={clsx(
+                styles.indicator,
+                mode === MarkdownViewMode.Source && styles.indicatorSource,
+              )}
+              aria-hidden="true"
+            />
+            <button
+              type="button"
+              aria-label="プレビューを表示"
+              aria-pressed={mode === MarkdownViewMode.Preview}
+              onClick={() => setMode(MarkdownViewMode.Preview)}
+              className={styles.toggleButton}
+            >
+              <Icon icon={IconEye} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="ソースを表示"
+              aria-pressed={mode === MarkdownViewMode.Source}
+              onClick={() => setMode(MarkdownViewMode.Source)}
+              className={styles.toggleButton}
+            >
+              <Icon icon={IconCode} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import { UserNameLink } from "@src/components/ui/UserNameLink";
 import clsx from "clsx";
 import { Fragment, type ReactNode, useMemo } from "react";
 
@@ -7,6 +8,7 @@ import {
   type MinutesSpeaker,
   parseMarkdownDocument,
 } from "../minutesMarkdown";
+import { resolveMemberId } from "../resolveMemberId";
 
 import styles from "./MarkdownDocument.module.css";
 
@@ -40,10 +42,14 @@ function renderInline(
     const [, mentionId, bold, code] = match;
     if (mentionId !== undefined) {
       const speaker = speakers[mentionId];
+      const name = speaker ? speaker.name : mentionId;
       nodes.push(
-        <span key={key++} className={styles.mention}>
-          @{speaker ? speaker.name : mentionId}
-        </span>,
+        <UserNameLink
+          key={key++}
+          userId={resolveMemberId(name)}
+          name={`@${name}`}
+          className={styles.mention}
+        />,
       );
     } else if (bold !== undefined) {
       nodes.push(<strong key={key++}>{bold}</strong>);
@@ -83,15 +89,34 @@ type FrontmatterHeaderProps = {
 // 逐語録か要約録かの別を取り払ってほしい」という依頼により, 文書の種別
 // (旧 verbatim) の行も無い — frontmatter 自体がこのフィールドを持たなく
 // なったため (minutesMarkdown.ts を参照)
+// 出席者/欠席者は複数名を「、」区切りで並べる. 文字列に join せず, 1人ずつ
+// UserNameLink に変換してから区切り文字を挟むことで, 各名前を個別のリンクに
+// できるようにしている
+function NameList({
+  ids,
+  speakers,
+}: {
+  ids: string[];
+  speakers: Record<string, MinutesSpeaker>;
+}) {
+  return (
+    <>
+      {ids.map((id, index) => {
+        const name = speakers[id]?.name ?? id;
+        return (
+          <Fragment key={id}>
+            {index > 0 && "、"}
+            <UserNameLink userId={resolveMemberId(name)} name={name} />
+          </Fragment>
+        );
+      })}
+    </>
+  );
+}
+
 function FrontmatterHeader({ frontmatter }: FrontmatterHeaderProps) {
   const chairName = resolveName(frontmatter.chair, frontmatter.speakers);
   const recorderName = resolveName(frontmatter.recorder, frontmatter.speakers);
-  const attendeeNames = frontmatter.attendees.map(
-    (id) => frontmatter.speakers[id]?.name ?? id,
-  );
-  const absenteeNames = frontmatter.absentees.map(
-    (id) => frontmatter.speakers[id]?.name ?? id,
-  );
 
   return (
     <div className={styles.frontmatter}>
@@ -105,10 +130,27 @@ function FrontmatterHeader({ frontmatter }: FrontmatterHeaderProps) {
           </li>
         )}
         {frontmatter.place && <li>開催場所: {frontmatter.place}</li>}
-        {chairName && <li>議長: {chairName}</li>}
-        {recorderName && <li>記録: {recorderName}</li>}
-        {attendeeNames.length > 0 && <li>出席者: {attendeeNames.join("、")}</li>}
-        {absenteeNames.length > 0 && <li>欠席者: {absenteeNames.join("、")}</li>}
+        {chairName && (
+          <li>
+            議長: <UserNameLink userId={resolveMemberId(chairName)} name={chairName} />
+          </li>
+        )}
+        {recorderName && (
+          <li>
+            記録:{" "}
+            <UserNameLink userId={resolveMemberId(recorderName)} name={recorderName} />
+          </li>
+        )}
+        {frontmatter.attendees.length > 0 && (
+          <li>
+            出席者: <NameList ids={frontmatter.attendees} speakers={frontmatter.speakers} />
+          </li>
+        )}
+        {frontmatter.absentees.length > 0 && (
+          <li>
+            欠席者: <NameList ids={frontmatter.absentees} speakers={frontmatter.speakers} />
+          </li>
+        )}
       </ul>
     </div>
   );
@@ -186,7 +228,12 @@ function BlockView({ block, speakers }: BlockViewProps) {
               // biome-ignore lint/suspicious/noArrayIndexKey: エントリ自体に安定した ID が無いテキストのみの発言記録のため
               <Fragment key={index}>
                 <span className={styles.transcriptSpeaker}>
-                  {speakers[entry.speaker]?.name ?? entry.speaker}
+                  <UserNameLink
+                    userId={resolveMemberId(
+                      speakers[entry.speaker]?.name ?? entry.speaker,
+                    )}
+                    name={speakers[entry.speaker]?.name ?? entry.speaker}
+                  />
                 </span>
                 <div className={styles.transcriptContent}>
                   {entry.blocks.map((nested, nestedIndex) => (

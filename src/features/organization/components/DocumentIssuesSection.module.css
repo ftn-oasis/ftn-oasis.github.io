@@ -1,0 +1,18 @@
+.root {
+  display: grid;
+  grid-template-columns: 1fr auto 3fr;
+  gap: 16px;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-body-headline);
+  font-size: 1.5rem;
+}

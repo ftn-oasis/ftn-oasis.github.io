@@ -17,8 +17,12 @@ function DocumentListRow({ document }: DocumentListRowProps) {
       to={`/orgs/${document.organizationId}/documents/${document.id}`}
       className={styles.root}
     >
-      <span className={styles.title}>{document.title}</span>
-      <span className={styles.description}>{document.description}</span>
+      <span className={styles.title} title={document.title}>
+        {document.title}
+      </span>
+      <span className={styles.description} title={document.description}>
+        {document.description}
+      </span>
       <span className={styles.fileType}>
         <Icon icon={IconFile} size={16} aria-hidden="true" />
         {document.fileType}

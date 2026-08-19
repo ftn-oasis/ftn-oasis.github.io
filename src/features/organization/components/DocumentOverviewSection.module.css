@@ -1,0 +1,49 @@
+.root {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 24px;
+}
+
+.main {
+  min-width: 0;
+}
+
+.sidebar {
+  min-width: 0;
+}
+
+.sidebarHeading {
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  color: var(--color-body-headline);
+  font-size: 1rem;
+}
+
+.metaList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+}
+
+.metaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metaLabel {
+  margin: 0;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.metaValue {
+  margin: 0;
+  color: var(--color-body-body);
+}
+
+.resolutionLink {
+  color: var(--color-link);
+}

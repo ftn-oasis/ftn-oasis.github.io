@@ -1,0 +1,39 @@
+.fileName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  color: var(--color-body-headline);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* PDF/MP4 は実ファイルの保存先が無いため, それとわかるプレースホルダーに
+   している (会議の資料タブと同じ考え方) */
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 16px;
+  border: var(--borderWidth-thin) dashed var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  color: var(--color-overlay1);
+}
+
+.previewLabel {
+  font-size: 0.875rem;
+}
+
+.textPreview {
+  overflow-wrap: break-word;
+  padding: 16px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-secondary1);
+  color: var(--color-body-body);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}
