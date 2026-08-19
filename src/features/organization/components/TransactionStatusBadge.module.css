@@ -1,0 +1,33 @@
+/* 左右が半円のピル型ラベル. Label (components/ui/) の背景透過スタイルとは別物
+   (塗りつぶし背景+Base色の太字テキストのため, variant として共存させず専用の
+   コンポーネントにしている) */
+.root {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 12px;
+  border-radius: 999px;
+  color: var(--color-status-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.approvalPending {
+  background: var(--color-status-blue);
+}
+
+.paymentPending {
+  background: var(--color-status-green);
+}
+
+.settlementPending {
+  background: var(--color-status-peach);
+}
+
+.completed {
+  background: var(--color-status-mauve);
+}
+
+.denied {
+  background: var(--color-status-red);
+}

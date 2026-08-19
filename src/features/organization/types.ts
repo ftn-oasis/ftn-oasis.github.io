@@ -149,7 +149,14 @@ type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 // (絶対値+円, 符号無し. 符号は一覧側で行頭の +/- アイコンとして表現する) を
 // 持たせ, OrganizationDocument.title と同じ扱いでソート/表示できるようにしている.
 // フィルター (子組織/種別/有効フラグなど) はまだ実装しないため, 対応するフィールドは
-// まだ持たせていない
+// まだ持たせていない.
+//
+// 個別詳細ページ (/orgs/:orgId/book/:transactionId) の実装に伴い, status/
+// proposerName/items/procedure/receipt を追加している — OrganizationMember が
+// 構成員一覧ページの実装時に (別の型を新設せず) フィールドを追加する形で拡張された
+// のと同じ考え方で, 「入出金一覧の1件」と「その会計処理の詳細」は同一の実体を指す
+// ため型を分けていない. 一覧側 (TransactionListRow など) は引き続き既存のフィールド
+// (title/description など) だけを使うため, この拡張によるコンパイル上の影響は無い
 type OrganizationTransaction = {
   id: string;
   organizationId: string;
@@ -160,6 +167,15 @@ type OrganizationTransaction = {
   // ソート用. 画面には表示しないため, 比較さえできれば良い ISO 形式の文字列
   createdAt: string;
   editedAt: string;
+  status: TransactionStatus;
+  // 起案者 (詳細ページ上部に表示)
+  proposerName: string;
+  // 金額内訳タブ (/orgs/:orgId/book/:transactionId) 用
+  items: TransactionLineItem[];
+  // 手続状況タブ (/orgs/:orgId/book/:transactionId/procedure) 用
+  procedure: TransactionProcedureStep[];
+  // 証憑タブ (/orgs/:orgId/book/:transactionId/receipt) 用
+  receipt: TransactionReceipt;
 };
 
 const TransactionSortField = {
@@ -178,6 +194,89 @@ const TransactionSortDirection = {
 
 type TransactionSortDirection =
   (typeof TransactionSortDirection)[keyof typeof TransactionSortDirection];
+
+// 承認待/支払待/清算待/完了済/否認済. 詳細ページ上部の状態ラベル
+// (TransactionStatusBadge) の色分け (blue/green/peach/mauve/red, この順) にも
+// 対応する
+const TransactionStatus = {
+  ApprovalPending: "approval-pending",
+  PaymentPending: "payment-pending",
+  SettlementPending: "settlement-pending",
+  Completed: "completed",
+  Denied: "denied",
+} as const;
+
+type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus];
+
+// 金額内訳タブの1項目. 計 (subtotal) は unitPrice × quantity で画面側が算出する
+// ため, ここには持たせていない (OrganizationTransaction.title が整形済み文字列を
+// 持つのとは違い, こちらは算出元の数値2つをそのまま持つ方が自然なため)
+type TransactionLineItem = {
+  id: string;
+  name: string;
+  description: string;
+  unitPrice: number;
+  quantity: number;
+};
+
+const TransactionItemSortField = {
+  Name: "name",
+  Description: "description",
+  UnitPrice: "unitPrice",
+  Quantity: "quantity",
+  Subtotal: "subtotal",
+} as const;
+
+type TransactionItemSortField =
+  (typeof TransactionItemSortField)[keyof typeof TransactionItemSortField];
+
+const TransactionItemSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type TransactionItemSortDirection =
+  (typeof TransactionItemSortDirection)[keyof typeof TransactionItemSortDirection];
+
+// 手続状況タブの手順. 起案の後は 通常なら 承認→支払→清算→完了 と進み,
+// 否認された場合は起案の直後に否認ステップで打ち切る (それ以降の手順は生成しない)
+const TransactionProcedureStepKey = {
+  Proposed: "proposed",
+  Approved: "approved",
+  Paid: "paid",
+  Settled: "settled",
+  Completed: "completed",
+  Denied: "denied",
+} as const;
+
+type TransactionProcedureStepKey =
+  (typeof TransactionProcedureStepKey)[keyof typeof TransactionProcedureStepKey];
+
+type TransactionProcedureStep = {
+  key: TransactionProcedureStepKey;
+  label: string;
+  completed: boolean;
+  // completed が true のときだけ持つ ("YYYY/MM/DD HH:mm")
+  occurredAt?: string;
+  actorName?: string;
+};
+
+const ReceiptFileType = {
+  Image: "image",
+  Pdf: "pdf",
+} as const;
+
+type ReceiptFileType = (typeof ReceiptFileType)[keyof typeof ReceiptFileType];
+
+// 証憑タブ. 実ファイルの保存先が無いため, 画面側はプレースホルダー (枠線+アイコン)
+// を表示するだけで, 実際の画像/PDF は持たない
+type TransactionReceipt = {
+  documentId: string;
+  fileType: ReceiptFileType;
+  uploaderName: string;
+  // "YYYY/MM/DD HH:mm"
+  uploadedAt: string;
+};
 
 // 通常/延会 (mauve のラベル)/流会 (sky のラベル). 一覧の項目タイトル横のラベルに使う
 const MeetingStatus = {
@@ -240,6 +339,14 @@ export {
   type OrganizationDetail,
   type OrganizationMember,
   PaymentMethod,
+  ReceiptFileType,
+  TransactionItemSortDirection,
+  TransactionItemSortField,
+  type TransactionLineItem,
+  type TransactionProcedureStep,
+  TransactionProcedureStepKey,
+  type TransactionReceipt,
   TransactionSortDirection,
   TransactionSortField,
+  TransactionStatus,
 };

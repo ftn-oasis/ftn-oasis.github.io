@@ -14,6 +14,12 @@ import {
   type OrganizationTransaction,
   OrganizationType,
   PaymentMethod,
+  ReceiptFileType,
+  type TransactionLineItem,
+  type TransactionProcedureStep,
+  TransactionProcedureStepKey,
+  type TransactionReceipt,
+  TransactionStatus,
 } from "./types";
 
 const MOCK_ORGANIZATION: OrganizationDetail = {
@@ -206,6 +212,220 @@ const TRANSACTION_METHODS = [
 // 2025/08/01 を起点に, index が進むほど新しい (作成/編集日時が後ろにずれる) ものとする
 const MOCK_TRANSACTION_LIST_BASE_DAY = Date.UTC(2025, 7, 1) / (24 * 60 * 60 * 1000);
 
+// 会計処理詳細ページ (/orgs/:orgId/book/:transactionId) 用のダミーデータ生成.
+// createdAt/editedAt (toIsoDate) と同じ UTC 起点の日数で日付を扱うため,
+// calendarUtils.formatDateTime (ローカルタイムゾーン基準, 会議のように
+// setHours などローカルに構築した Date 向け) は使わず, UTC の getter で
+// 独自に整形している — 混在させると calendarUtils.dateKey で踏んだのと同種の
+// タイムゾーンずれの不具合になる
+function formatEpochDayTime(dayNumber: number, hour: number, minute: number): string {
+  const date = new Date(dayNumber * 24 * 60 * 60 * 1000);
+  const year = date.getUTCFullYear();
+  const month = pad2(date.getUTCMonth() + 1);
+  const day = pad2(date.getUTCDate());
+  return `${year}/${month}/${day} ${pad2(hour)}:${pad2(minute)}`;
+}
+
+// 合計が total と一致する count 個の正の整数に分割する (最大剰余法の簡易版 —
+// 先頭から順に1ずつ多く割り当てて端数を吸収する)
+function splitAmount(total: number, count: number): number[] {
+  const base = Math.floor(total / count);
+  const remainder = total - base * count;
+  return Array.from({ length: count }, (_, i) => base + (i < remainder ? 1 : 0));
+}
+
+// 金額内訳の個数 (quantity) — 割り切れる場合だけ 3/2 を採用し, それ以外は 1 個
+// 扱いにする (unitPrice = subtotal / quantity が必ず整数になるようにするため)
+function pickItemQuantity(subtotal: number, seed: number): number {
+  const preferred = seed % 2 === 0 ? 3 : 2;
+  if (subtotal % preferred === 0) return preferred;
+  if (preferred === 3 && subtotal % 2 === 0) return 2;
+  return 1;
+}
+
+const LINE_ITEM_NAMES = [
+  "布地",
+  "接着剤",
+  "油性マーカー",
+  "印刷用紙",
+  "インクカートリッジ",
+  "ポスター用紙",
+  "菓子",
+  "工具",
+  "ガムテープ",
+  "使用料",
+  "景品",
+  "絵の具",
+  "画用紙",
+  "リボン",
+];
+const LINE_ITEM_PURPOSES = [
+  "看板の背景を塗るため",
+  "掲示物を貼るため",
+  "資料を配布するため",
+  "備品を補修するため",
+  "作業をスムーズに進めるため",
+  "当日の移動のため",
+  "会場を借りるため",
+  "参加者に配るため",
+  "記録を残すため",
+  "予備として",
+];
+
+// 会計処理1件分の金額内訳 (2〜3件) を, 合計が amountAbs (取引の総額) と
+// 一致するように生成する
+function generateTransactionItems(
+  amountAbs: number,
+  index: number,
+): TransactionLineItem[] {
+  const itemCount = index % 2 === 0 ? 2 : 3;
+  const subtotals = splitAmount(amountAbs, itemCount);
+
+  return subtotals.map((subtotal, i) => {
+    const quantity = pickItemQuantity(subtotal, index + i);
+    return {
+      id: `test-org-transaction-${index + 1}-item-${i + 1}`,
+      name: LINE_ITEM_NAMES[(index + i) % LINE_ITEM_NAMES.length],
+      description: LINE_ITEM_PURPOSES[(index + i * 3) % LINE_ITEM_PURPOSES.length],
+      unitPrice: subtotal / quantity,
+      quantity,
+    };
+  });
+}
+
+// 手続きの各手順の表示ラベル
+const PROCEDURE_STEP_LABEL: Record<TransactionProcedureStepKey, string> = {
+  [TransactionProcedureStepKey.Proposed]: "起案",
+  [TransactionProcedureStepKey.Approved]: "承認",
+  [TransactionProcedureStepKey.Paid]: "支払",
+  [TransactionProcedureStepKey.Settled]: "清算",
+  [TransactionProcedureStepKey.Completed]: "完了",
+  [TransactionProcedureStepKey.Denied]: "否認",
+};
+
+// status ごとに, 起案からどこまでの手順が完了しているかを示す (否認済は除く —
+// 起案の直後に否認ステップで打ち切るため, 通常の手順とは別扱いにしている)
+const PROCEDURE_STEP_ORDER = [
+  TransactionProcedureStepKey.Proposed,
+  TransactionProcedureStepKey.Approved,
+  TransactionProcedureStepKey.Paid,
+  TransactionProcedureStepKey.Settled,
+  TransactionProcedureStepKey.Completed,
+];
+const COMPLETED_STEP_COUNT_BY_STATUS: Record<TransactionStatus, number> = {
+  [TransactionStatus.ApprovalPending]: 1,
+  [TransactionStatus.PaymentPending]: 2,
+  [TransactionStatus.SettlementPending]: 3,
+  [TransactionStatus.Completed]: 5,
+  // 否認済は generateTransactionProcedure 側で別処理するため参照しない
+  [TransactionStatus.Denied]: 1,
+};
+
+// 各手順の担当者ごとに日数/時刻をずらして, 起案日 (createdDay) を起点に生成する
+const PROCEDURE_STEP_DAY_OFFSET: Record<string, number> = {
+  [TransactionProcedureStepKey.Approved]: 1,
+  [TransactionProcedureStepKey.Paid]: 3,
+  [TransactionProcedureStepKey.Settled]: 5,
+  [TransactionProcedureStepKey.Completed]: 6,
+  [TransactionProcedureStepKey.Denied]: 1,
+};
+const PROCEDURE_STEP_HOUR: Record<string, number> = {
+  [TransactionProcedureStepKey.Proposed]: 9,
+  [TransactionProcedureStepKey.Approved]: 10,
+  [TransactionProcedureStepKey.Paid]: 14,
+  [TransactionProcedureStepKey.Settled]: 11,
+  [TransactionProcedureStepKey.Completed]: 16,
+  [TransactionProcedureStepKey.Denied]: 10,
+};
+
+function generateTransactionProcedure(
+  status: TransactionStatus,
+  createdDay: number,
+  proposerName: string,
+  index: number,
+): TransactionProcedureStep[] {
+  const proposedStep: TransactionProcedureStep = {
+    key: TransactionProcedureStepKey.Proposed,
+    label: PROCEDURE_STEP_LABEL[TransactionProcedureStepKey.Proposed],
+    completed: true,
+    occurredAt: formatEpochDayTime(
+      createdDay,
+      PROCEDURE_STEP_HOUR[TransactionProcedureStepKey.Proposed],
+      0,
+    ),
+    actorName: proposerName,
+  };
+
+  if (status === TransactionStatus.Denied) {
+    const approverName =
+      MOCK_MEMBERS[(index + 1) % MOCK_MEMBERS.length]?.name ?? proposerName;
+    return [
+      proposedStep,
+      {
+        key: TransactionProcedureStepKey.Denied,
+        label: PROCEDURE_STEP_LABEL[TransactionProcedureStepKey.Denied],
+        completed: true,
+        occurredAt: formatEpochDayTime(
+          createdDay + PROCEDURE_STEP_DAY_OFFSET[TransactionProcedureStepKey.Denied],
+          PROCEDURE_STEP_HOUR[TransactionProcedureStepKey.Denied],
+          30,
+        ),
+        actorName: approverName,
+      },
+    ];
+  }
+
+  const completedCount = COMPLETED_STEP_COUNT_BY_STATUS[status];
+  return PROCEDURE_STEP_ORDER.map((key, stepIndex) => {
+    if (key === TransactionProcedureStepKey.Proposed) return proposedStep;
+    if (stepIndex >= completedCount) {
+      return { key, label: PROCEDURE_STEP_LABEL[key], completed: false };
+    }
+    const actorName =
+      MOCK_MEMBERS[(index + stepIndex) % MOCK_MEMBERS.length]?.name ?? proposerName;
+    return {
+      key,
+      label: PROCEDURE_STEP_LABEL[key],
+      completed: true,
+      occurredAt: formatEpochDayTime(
+        createdDay + PROCEDURE_STEP_DAY_OFFSET[key],
+        PROCEDURE_STEP_HOUR[key],
+        stepIndex % 2 === 0 ? 0 : 30,
+      ),
+      actorName,
+    };
+  });
+}
+
+function generateTransactionReceipt(
+  index: number,
+  proposerName: string,
+  createdDay: number,
+): TransactionReceipt {
+  return {
+    documentId: `REC-${String(index + 1).padStart(4, "0")}`,
+    fileType: index % 2 === 0 ? ReceiptFileType.Image : ReceiptFileType.Pdf,
+    uploaderName: proposerName,
+    uploadedAt: formatEpochDayTime(createdDay + 1, 18, 0),
+  };
+}
+
+// 承認待/支払待/清算待/完了済/否認済 を index から機械的に散らす —
+// 実際の部活動では大半の会計処理が最終的に完了するだろうという想定で,
+// 完了済の比重を高くしている
+const TRANSACTION_STATUS_CYCLE = [
+  TransactionStatus.Completed,
+  TransactionStatus.Completed,
+  TransactionStatus.ApprovalPending,
+  TransactionStatus.PaymentPending,
+  TransactionStatus.Completed,
+  TransactionStatus.SettlementPending,
+  TransactionStatus.Completed,
+  TransactionStatus.Denied,
+  TransactionStatus.ApprovalPending,
+  TransactionStatus.Completed,
+];
+
 const MOCK_ORGANIZATION_TRANSACTIONS: OrganizationTransaction[] = Array.from(
   { length: 50 },
   (_, index) => {
@@ -223,6 +443,8 @@ const MOCK_ORGANIZATION_TRANSACTIONS: OrganizationTransaction[] = Array.from(
     const createdDay = MOCK_TRANSACTION_LIST_BASE_DAY + index;
     // 編集日は作成日と同じか, 数日後
     const editedDay = createdDay + (index % 3);
+    const status = TRANSACTION_STATUS_CYCLE[index % TRANSACTION_STATUS_CYCLE.length];
+    const proposerName = MOCK_MEMBERS[index % MOCK_MEMBERS.length]?.name ?? "";
 
     return {
       id: `test-org-transaction-${index + 1}`,
@@ -233,6 +455,11 @@ const MOCK_ORGANIZATION_TRANSACTIONS: OrganizationTransaction[] = Array.from(
       method,
       createdAt: toIsoDate(createdDay),
       editedAt: toIsoDate(editedDay),
+      status,
+      proposerName,
+      items: generateTransactionItems(amountAbs, index),
+      procedure: generateTransactionProcedure(status, createdDay, proposerName, index),
+      receipt: generateTransactionReceipt(index, proposerName, createdDay),
     };
   },
 );

@@ -1,0 +1,50 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+/* TransactionSummaryBox (~/orgs/組織ID/book のメイン上部の残金表示) の
+   .balance と同じ大きさに揃えている */
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 1.25rem;
+}
+
+.sign {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.name {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.amount {
+  color: var(--color-body-subtext);
+  font-weight: 400;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.proposer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-body-subtext);
+}
+
+.proposerName {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}

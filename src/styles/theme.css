@@ -81,6 +81,18 @@
   --color-label-sky: var(--ctp-latte-sky);
   --color-label-mauve: var(--ctp-latte-mauve);
 
+  /* 会計処理詳細ページの状態ラベル (TransactionStatusBadge) の塗りつぶし色.
+     テキスト側は --color-status-text (Catppuccin base) を使う — latte/mocha
+     いずれもアクセントカラーと base の明暗差が大きく, 十分なコントラストが
+     取れるため (light: 濃いめのアクセント色+明るい base 文字, dark: 明るい
+     パステル調のアクセント色+暗い base 文字) */
+  --color-status-blue: var(--ctp-latte-blue);
+  --color-status-green: var(--ctp-latte-green);
+  --color-status-peach: var(--ctp-latte-peach);
+  --color-status-mauve: var(--ctp-latte-mauve);
+  --color-status-red: var(--ctp-latte-red);
+  --color-status-text: var(--ctp-latte-base);
+
   /* header */
   --color-header-body: var(--ctp-latte-overlay2);
   --color-header-body-em: var(--ctp-latte-text);
@@ -98,6 +110,13 @@
   --color-body-body-mono: var(--ctp-latte-text);
   --color-body-headline: var(--ctp-latte-text);
   --color-body-subtext: var(--ctp-latte-subtext1);
+
+  /* 手続状況タイムラインの完了済ステップ (TransactionProcedureTimeline) の
+     ラベル/日時+担当者を, 通常の subtext (subtext1) よりさらに控えめにする
+     ための色. subtext1 と別のトークンにしているのは, --color-body-subtext
+     を直接変更すると他の (既に subtext1 を使っている) 箇所すべてに影響が
+     及んでしまうため */
+  --color-body-subtext0: var(--ctp-latte-subtext0);
   --color-body-background: var(--ctp-latte-base);
   --color-body-button-body: var(--ctp-latte-overlay2);
   --color-body-button-background: var(--color-header-background);
@@ -137,6 +156,12 @@
   --color-current-content-bar: var(--ctp-mocha-blue);
   --color-label-sky: var(--ctp-mocha-sky);
   --color-label-mauve: var(--ctp-mocha-mauve);
+  --color-status-blue: var(--ctp-mocha-blue);
+  --color-status-green: var(--ctp-mocha-green);
+  --color-status-peach: var(--ctp-mocha-peach);
+  --color-status-mauve: var(--ctp-mocha-mauve);
+  --color-status-red: var(--ctp-mocha-red);
+  --color-status-text: var(--ctp-mocha-base);
 
   /* header */
   --color-header-body: var(--ctp-mocha-overlay2);
@@ -155,6 +180,7 @@
   --color-body-body-mono: var(--ctp-mocha-text);
   --color-body-headline: var(--ctp-mocha-text);
   --color-body-subtext: var(--ctp-mocha-subtext1);
+  --color-body-subtext0: var(--ctp-mocha-subtext0);
   --color-body-background: var(--ctp-mocha-base);
   --color-body-button-body: var(--ctp-mocha-overlay2);
   --color-body-button-background: var(--color-header-background);

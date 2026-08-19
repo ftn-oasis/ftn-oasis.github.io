@@ -6,6 +6,10 @@ import { OrganizationLayout } from "@src/pages/OrganizationLayout";
 import { OrganizationMeetingsPage } from "@src/pages/OrganizationMeetingsPage";
 import { OrganizationMembersPage } from "@src/pages/OrganizationMembersPage";
 import { OrganizationOverviewPage } from "@src/pages/OrganizationOverviewPage";
+import { OrganizationTransactionBreakdownPage } from "@src/pages/OrganizationTransactionBreakdownPage";
+import { OrganizationTransactionLayout } from "@src/pages/OrganizationTransactionLayout";
+import { OrganizationTransactionProcedurePage } from "@src/pages/OrganizationTransactionProcedurePage";
+import { OrganizationTransactionReceiptPage } from "@src/pages/OrganizationTransactionReceiptPage";
 import { UserProfilePage } from "@src/pages/UserProfilePage";
 import { Route, Routes } from "react-router";
 
@@ -18,6 +22,17 @@ function App() {
           <Route index element={<OrganizationOverviewPage />} />
           <Route path="documents" element={<OrganizationDocumentsPage />} />
           <Route path="book" element={<OrganizationBookPage />} />
+          <Route
+            path="book/:transactionId"
+            element={<OrganizationTransactionLayout />}
+          >
+            <Route index element={<OrganizationTransactionBreakdownPage />} />
+            <Route
+              path="procedure"
+              element={<OrganizationTransactionProcedurePage />}
+            />
+            <Route path="receipt" element={<OrganizationTransactionReceiptPage />} />
+          </Route>
           <Route path="members" element={<OrganizationMembersPage />} />
           <Route path="meetings" element={<OrganizationMeetingsPage />} />
         </Route>
