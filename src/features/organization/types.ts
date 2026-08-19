@@ -23,6 +23,23 @@ type OrganizationDetail = {
   ancestorNames: string[];
 };
 
+// 組織一覧 (/orgs) 用のソート条件. 名前/所属人数の2種類 (組織は文書/入出金の
+// ような一貫した日付フィールドを持たないため, DocumentSortField 等とは
+// フィールド構成が異なる)
+const OrgSortField = {
+  Name: "name",
+  MemberCount: "memberCount",
+} as const;
+
+type OrgSortField = (typeof OrgSortField)[keyof typeof OrgSortField];
+
+const OrgSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type OrgSortDirection = (typeof OrgSortDirection)[keyof typeof OrgSortDirection];
+
 // 構成員一覧 (/orgs/:orgId/members) の1件だが, OrganizationSidebar (概要タブの
 // アバター一覧) でも id/name だけを使う形で共用している. フィルター (子組織/参加
 // 状態など) はまだ実装しないため, 対応するフィールドはまだ持たせていない
@@ -106,8 +123,49 @@ type Activity =
   | MoneyTransactionActivity
   | DocumentChangeActivity;
 
+// 文書の1版. 個別詳細ページ (/orgs/:orgId/documents/:documentId) の版タブ用.
+// editor は概要タブの「編集者(管理者は)」の付記判定にも role を使うため,
+// 名前の文字列ではなく OrganizationMember をそのまま持たせている (編集者
+// タブと同じ実体を指すため — 会議の attendees と同じ考え方)
+type DocumentVersion = {
+  id: string;
+  // "YYYY/MM/DD HH:mm"
+  editedAt: string;
+  editor: OrganizationMember;
+  // Markdown/Text のプレビュー用本文. PDF/MP4 のときは無い (実ファイルの
+  // 保存先が無いため, 会議の資料タブと同様プレースホルダー表示にする)
+  content?: string;
+};
+
+// 議決されている場合の, 可決/否決の情報. AgendaItemVoteResult を再利用する
+// (Postponed は使わない — 「可決･否決の情報」という依頼のため, 概要タブでは
+// この2値のときだけ表示する)
+type DocumentResolution = {
+  meetingId: string;
+  meetingTitle: string;
+  agendaLabel: string;
+  voteResult:
+    | typeof AgendaItemVoteResult.Approved
+    | typeof AgendaItemVoteResult.Rejected;
+};
+
 // 組織の文書一覧 (/orgs/:orgId/documents) の1件. フィルター (子組織/関与/管理権限
-// など) はまだ実装しないため, 対応するフィールドはまだ持たせていない
+// など) はまだ実装しないため, 対応するフィールドはまだ持たせていない.
+//
+// 個別詳細ページ (/orgs/:orgId/documents/:documentId) の実装に伴い, authorName/
+// versions/editors/resolution を追加している — OrganizationTransaction/
+// OrganizationMeeting が各詳細ページの実装時にフィールド追加で拡張されたのと
+// 同じ考え方で, 別の型は新設していない
+// features/user/types.ts の DocumentVisibility (DocumentSummary 用) とは別に,
+// 各機能が自分の型を持つという既存の方針 (DocumentSortField/TransactionSortField
+// が同じ形でも別々なのと同じ) に揃えて独立して定義している
+const DocumentVisibility = {
+  Public: "public",
+  Private: "private",
+} as const;
+
+type DocumentVisibility = (typeof DocumentVisibility)[keyof typeof DocumentVisibility];
+
 type OrganizationDocument = {
   id: string;
   organizationId: string;
@@ -117,6 +175,14 @@ type OrganizationDocument = {
   // ソート用. 画面には表示しないため, 比較さえできれば良い ISO 形式の文字列
   createdAt: string;
   editedAt: string;
+  authorName: string;
+  visibility: DocumentVisibility;
+  // 版タブ用. 古い順 (versions[0] が初版, 最後が最新版)
+  versions: DocumentVersion[];
+  // 編集者タブ用
+  editors: OrganizationMember[];
+  // 議決されていない場合は undefined
+  resolution?: DocumentResolution;
 };
 
 const DocumentSortField = {
@@ -136,6 +202,62 @@ const DocumentSortDirection = {
 type DocumentSortDirection =
   (typeof DocumentSortDirection)[keyof typeof DocumentSortDirection];
 
+// 指摘事項タブ (/orgs/:orgId/documents/:documentId/issues) の1件. documentId で
+// 文書と紐付くフラットな型 (Activity 系と同じ「組織/文書とは分離して考える」設計)
+type DocumentIssue = {
+  id: string;
+  documentId: string;
+  title: string;
+  posterName: string;
+  // "YYYY/MM/DD HH:mm"
+  postedAt: string;
+};
+
+const DocumentIssueSortField = {
+  PostedAt: "postedAt",
+  Title: "title",
+} as const;
+
+type DocumentIssueSortField =
+  (typeof DocumentIssueSortField)[keyof typeof DocumentIssueSortField];
+
+const DocumentIssueSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type DocumentIssueSortDirection =
+  (typeof DocumentIssueSortDirection)[keyof typeof DocumentIssueSortDirection];
+
+// 修正提案タブ (/orgs/:orgId/documents/:documentId/pulls) の1件. 「指摘事項と
+// 同じ形式に」という依頼のため DocumentIssue と同じ形だが, 指摘事項とは別の
+// 実体を指すため型は分けている (DocumentIssue/DocumentPullRequest が同じ形の
+// まま将来分岐しても, 型を共有していないぶん個別に拡張できる)
+type DocumentPullRequest = {
+  id: string;
+  documentId: string;
+  title: string;
+  posterName: string;
+  // "YYYY/MM/DD HH:mm"
+  postedAt: string;
+};
+
+const DocumentPullRequestSortField = {
+  PostedAt: "postedAt",
+  Title: "title",
+} as const;
+
+type DocumentPullRequestSortField =
+  (typeof DocumentPullRequestSortField)[keyof typeof DocumentPullRequestSortField];
+
+const DocumentPullRequestSortDirection = {
+  Asc: "asc",
+  Desc: "desc",
+} as const;
+
+type DocumentPullRequestSortDirection =
+  (typeof DocumentPullRequestSortDirection)[keyof typeof DocumentPullRequestSortDirection];
+
 const PaymentMethod = {
   Cash: "cash",
   BankTransfer: "bank-transfer",
@@ -143,6 +265,17 @@ const PaymentMethod = {
 } as const;
 
 type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
+
+// 会計申請作成フォーム (/book/new) の「種類」— 立替 (自分で立て替えて後日精算)/
+// 仮払 (先に受け取ってから使う). PaymentMethod (決済手段: 現金/銀行振込/引き落し)
+// とは別の軸の値のため, 混同せず独立させている
+const TransactionRequestType = {
+  Reimbursement: "reimbursement",
+  AdvancePayment: "advance-payment",
+} as const;
+
+type TransactionRequestType =
+  (typeof TransactionRequestType)[keyof typeof TransactionRequestType];
 
 // 組織の入出金一覧 (/orgs/:orgId/book) の1件. amount は 収入: 正の数 / 支出: 負の数
 // (MoneyTransactionActivity と同じ約束). title は表示用に整形済みの金額文字列
@@ -168,6 +301,11 @@ type OrganizationTransaction = {
   createdAt: string;
   editedAt: string;
   status: TransactionStatus;
+  // 立替/仮払 (詳細ページ上部に表示). 会計申請作成フォーム (NewTransactionSection)
+  // の「種類」と同じ TransactionRequestType — 仮払の場合, 手続状況タブに
+  // 「承認」と「支払」の間に「仮払」の手順が1つ増える (generateTransactionProcedure
+  // @mockData.ts を参照)
+  requestType: TransactionRequestType;
   // 起案者 (詳細ページ上部に表示)
   proposerName: string;
   // 金額内訳タブ (/orgs/:orgId/book/:transactionId) 用
@@ -195,7 +333,7 @@ const TransactionSortDirection = {
 type TransactionSortDirection =
   (typeof TransactionSortDirection)[keyof typeof TransactionSortDirection];
 
-// 承認待/支払待/清算待/完了済/否認済. 詳細ページ上部の状態ラベル
+// 承認待/支払待/清算待/完了済/却下済. 詳細ページ上部の状態ラベル
 // (TransactionStatusBadge) の色分け (blue/green/peach/mauve/red, この順) にも
 // 対応する
 const TransactionStatus = {
@@ -239,10 +377,13 @@ type TransactionItemSortDirection =
   (typeof TransactionItemSortDirection)[keyof typeof TransactionItemSortDirection];
 
 // 手続状況タブの手順. 起案の後は 通常なら 承認→支払→清算→完了 と進み,
-// 否認された場合は起案の直後に否認ステップで打ち切る (それ以降の手順は生成しない)
+// 却下された場合は起案の直後に却下ステップで打ち切る (それ以降の手順は生成しない).
+// 仮払 (TransactionRequestType.AdvancePayment) の場合だけ, 承認と支払の間に
+// AdvancePaid (仮払) の手順が1つ増える
 const TransactionProcedureStepKey = {
   Proposed: "proposed",
   Approved: "approved",
+  AdvancePaid: "advance-paid",
   Paid: "paid",
   Settled: "settled",
   Completed: "completed",
@@ -401,8 +542,17 @@ export {
   type Activity,
   AgendaItemVoteResult,
   type DocumentChangeActivity,
+  type DocumentIssue,
+  DocumentIssueSortDirection,
+  DocumentIssueSortField,
+  type DocumentPullRequest,
+  DocumentPullRequestSortDirection,
+  DocumentPullRequestSortField,
+  type DocumentResolution,
   DocumentSortDirection,
   DocumentSortField,
+  type DocumentVersion,
+  DocumentVisibility,
   MemberSortDirection,
   MemberSortField,
   type MeetingAgendaItem,
@@ -420,6 +570,8 @@ export {
   OrganizationType,
   type OrganizationDetail,
   type OrganizationMember,
+  OrgSortDirection,
+  OrgSortField,
   PaymentMethod,
   ReceiptFileType,
   TransactionItemSortDirection,
@@ -428,6 +580,7 @@ export {
   type TransactionProcedureStep,
   TransactionProcedureStepKey,
   type TransactionReceipt,
+  TransactionRequestType,
   TransactionSortDirection,
   TransactionSortField,
   TransactionStatus,

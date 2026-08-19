@@ -1,14 +1,22 @@
 // 実データを取得する API が無いため, 概要タブなどで使うダミーデータをまとめて置く場所
 
+import { OrganizationType } from "@src/features/organization/types";
+
 import { DocumentVisibility, type DocumentSummary, type Organization } from "./types";
 
 // test-org (文化祭実行委員会) は features/organization/mockData.ts の
 // MOCK_ORGANIZATION と同じ組織を指す — 組織プロフィールページからユーザーの
-// プロフィールページへの繋がりを確認できるように, 同じ id で参照している
+// プロフィールページへの繋がりを確認できるように, 同じ id/type で参照している
 const MOCK_ORGANIZATIONS: Organization[] = [
-  { id: "student-council", name: "生徒会", role: "書記" },
-  { id: "newspaper-club", name: "新聞部", role: "部長" },
-  { id: "test-org", name: "文化祭実行委員会", role: "委員" },
+  { id: "student-council", name: "生徒会", role: "書記", type: OrganizationType.ExecutiveBody },
+  { id: "newspaper-club", name: "新聞部", role: "部長", type: OrganizationType.Club },
+  {
+    id: "test-org",
+    name: "文化祭実行委員会",
+    role: "委員",
+    type: OrganizationType.IndependentCommittee,
+    hasBankAccount: true,
+  },
 ];
 
 const MOCK_DOCUMENTS: DocumentSummary[] = [

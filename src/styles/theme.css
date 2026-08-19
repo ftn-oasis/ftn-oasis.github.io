@@ -93,6 +93,7 @@
   --color-status-peach: var(--ctp-latte-peach);
   --color-status-mauve: var(--ctp-latte-mauve);
   --color-status-red: var(--ctp-latte-red);
+  --color-status-teal: var(--ctp-latte-teal);
   --color-status-text: var(--ctp-latte-base);
 
   /* header */
@@ -165,6 +166,7 @@
   --color-status-peach: var(--ctp-mocha-peach);
   --color-status-mauve: var(--ctp-mocha-mauve);
   --color-status-red: var(--ctp-mocha-red);
+  --color-status-teal: var(--ctp-mocha-teal);
   --color-status-text: var(--ctp-mocha-base);
 
   /* header */
