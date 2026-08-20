@@ -38,10 +38,31 @@
   font-size: 1.125rem;
 }
 
+/* 「セクションのタイトルがクリックされた場合その文書 (規則について/資料に
+   ついて) が開くようにしてほしい」という依頼のため, 見出しの色/サイズは
+   そのままに文字だけリンク化する (UserNameLink と同じ「表示は変化させず,
+   ホバーで下線」という方針) */
+.sectionHeadingLink {
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+}
+
+.sectionHeadingLink:hover {
+  text-decoration: underline;
+}
+
 .linkList {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+/* 「リンクの横のアイコンをなくし, リンクだと判るように文字色を青色にして
+   ほしい」という依頼のため, MenuLink (アイコン必須) ではなく menuItemBase.root
+   を直接 <Link> に適用し, 文字色だけ --color-link に上書きしている */
+.documentLink {
+  color: var(--color-link);
 }
 
 .changesHeading {
