@@ -24,7 +24,7 @@ type TransactionFilter = {
 // (選択中判定/見出し表示で同じ一覧が必要), コンポーネントファイルではなく
 // このファイルに切り出している (react-refresh の「1ファイル1コンポーネント」
 // 制約を避ける意図もある). 「所属する組織のみ」フィルターは組織横断の一覧
-// (~/books) と組織プロフィールページ配下 (~/orgs/:orgId/book) とで意味が
+// (~/book) と組織プロフィールページ配下 (~/orgs/:orgId/book) とで意味が
 // 異なる — documentFilters.ts の getDocumentFilters と同じ理由で, 後者だけ
 // 「子組織を含む」に切り替える
 function getTransactionFilters(scopedToOrganization: boolean): TransactionFilter[] {

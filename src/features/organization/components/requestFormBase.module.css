@@ -46,7 +46,6 @@
 }
 
 .input,
-.select,
 .textarea {
   box-sizing: border-box;
   width: 100%;
@@ -63,7 +62,6 @@
 }
 
 .input:focus-visible,
-.select:focus-visible,
 .textarea:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: -1px;
@@ -90,11 +88,54 @@
 .fieldRow {
   display: flex;
   gap: 12px;
+  margin-bottom: 12px;
 }
 
 .fieldRow > * {
   flex: 1 1 0;
   min-width: 0;
+}
+
+/* .fieldRow の中の入力欄1つ分 — 銀行名/銀行コードなど, 個々に小さな見出しを
+   添えて何の欄か判るようにする (BudgetExecutionRequestForm の銀行口座情報) */
+.subField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subLabel {
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ゆうちょ銀行の口座記号番号 (5桁-1桁-8桁) — 桁数の区切りが判るよう入力欄を
+   分割し, 間に "-" の分割線を挟む (BudgetExecutionRequestForm の払込票) */
+.postalAccountRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.postalSegmentSymbol {
+  width: calc(5ch + 24px);
+}
+
+.postalSegmentCheckDigit {
+  width: calc(1ch + 24px);
+}
+
+/* 番号欄は左詰めで入力し, 1桁以上埋まっていればよい (=全桁埋める必要は無い)
+   ため, 他の桁数固定の欄と区別できるよう text-align は明示的に left のまま */
+.postalSegmentNumber {
+  width: calc(8ch + 24px);
+  text-align: left;
+}
+
+.postalSeparator {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
 }
 
 .requestTypeOptions {
@@ -188,9 +229,12 @@
   gap: 8px;
 }
 
+/* 「寄付の申請」の金額欄が横に長すぎて判りにくいという指摘のため, 伸縮せず
+   常に240px幅にしている (このクラスの唯一の呼び出し元 DonationRequestForm
+   専用の値) */
 .amountField {
-  width: auto;
-  flex: 1 1 auto;
+  width: 240px;
+  flex: 0 0 auto;
   min-width: 0;
 }
 

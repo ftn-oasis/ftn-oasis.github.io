@@ -1,6 +1,7 @@
 import { UserNameLink } from "@src/components/ui/UserNameLink";
 import { Link } from "react-router";
 
+import { canCurrentUserEditDocument } from "../documentViewerAccess";
 import { AgendaItemVoteResult, type OrganizationDocument } from "../types";
 import { DocumentContentViewer } from "./DocumentContentViewer";
 
@@ -20,13 +21,25 @@ type DocumentOverviewSectionProps = {
 // 「GitHubのリポジトリのページを参考に」という依頼のため, 左をメインの資料,
 // 右を資料の情報 (OrganizationOverviewSection と同じ 3fr/1fr の列比率) に
 // 分割している. メインは DocumentContentViewer (概要/版タブで共通) —
-// Markdown のときだけ, 依頼どおりトグルスイッチの左横に「編集する」ボタン
-// (動作はのちほど実装) を表示する
+// 「閲覧権限のみ・議決されている場合 (管理・編集権限があっても議決された
+// ものはこれを表示): 問題点を指摘・修正提案のボタン, 管理・編集権限があり
+// 議決されたものでない場合: 編集ボタン」という依頼のため,
+// canCurrentUserEditDocument (documentViewerAccess.ts) の判定結果に応じて
+// onEdit か onReportIssue/onProposeEdit のどちらかだけを渡す
 function DocumentOverviewSection({ document }: DocumentOverviewSectionProps) {
   const latestVersion = document.versions[document.versions.length - 1];
+  const canEdit = canCurrentUserEditDocument(document);
 
   const handleEdit = () => {
     // 編集ボタンの動作はのちほど実装する
+  };
+
+  const handleReportIssue = () => {
+    // 問題点を指摘ボタンの動作はのちほど実装する
+  };
+
+  const handleProposeEdit = () => {
+    // 修正提案ボタンの動作はのちほど実装する
   };
 
   return (
@@ -36,7 +49,9 @@ function DocumentOverviewSection({ document }: DocumentOverviewSectionProps) {
           fileType={document.fileType}
           title={document.title}
           content={latestVersion.content}
-          onEdit={handleEdit}
+          onEdit={canEdit ? handleEdit : undefined}
+          onReportIssue={canEdit ? undefined : handleReportIssue}
+          onProposeEdit={canEdit ? undefined : handleProposeEdit}
         />
       </main>
 

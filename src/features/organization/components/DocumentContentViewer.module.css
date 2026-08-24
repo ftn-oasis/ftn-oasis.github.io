@@ -1,11 +1,28 @@
+/* Text/PDF/MP4 の見出し (fileName) + 操作ボタン (DocumentViewerActions) を
+   左右に振り分ける行. Markdown は MarkdownFileViewer 自身の .toolbar が
+   同じ役割を持つため, ここは Text/PDF/MP4 のときだけ使う */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 16px;
+}
+
 .fileName {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 16px;
   color: var(--color-body-headline);
   font-size: 1.125rem;
   font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
 }
 
 /* PDF/MP4 は実ファイルの保存先が無いため, それとわかるプレースホルダーに

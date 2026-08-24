@@ -85,7 +85,7 @@ function NavDrawer({ open, onClose }: NavDrawerProps) {
           onClick={onClose}
         />
         <MenuLink
-          to="/books"
+          to="/book"
           icon={IconReceiptYen}
           label="会計処理一覧"
           onClick={onClose}

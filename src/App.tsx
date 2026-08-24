@@ -1,5 +1,5 @@
 import { AppLayout } from "@src/components/layout/AppLayout";
-import { BooksPage } from "@src/pages/BooksPage";
+import { BookPage } from "@src/pages/BookPage";
 import { DocumentsPage } from "@src/pages/DocumentsPage";
 import { HomePage } from "@src/pages/HomePage";
 import { IssuesPage } from "@src/pages/IssuesPage";
@@ -45,7 +45,7 @@ function App() {
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/documents" element={<DocumentsPage />} />
         <Route path="/documents/new" element={<NewDocumentPage />} />
-        <Route path="/books" element={<BooksPage />} />
+        <Route path="/book" element={<BookPage />} />
         <Route path="/book/new" element={<NewTransactionPage />} />
         <Route path="/meetings" element={<MeetingsPage />} />
         <Route path="/issues" element={<IssuesPage />} />

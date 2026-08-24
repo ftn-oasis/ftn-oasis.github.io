@@ -26,11 +26,18 @@
   color: var(--color-overlay1);
 }
 
+/* overflow-x は明示的に hidden — MarkdownFileViewer のプレビュー/ソース
+   切り替えボタンが持つホバー時ツールチップ (::after, position: absolute)
+   は非表示時 (opacity: 0) でもレイアウト上の領域を占めるため, 横方向に
+   数px だけ scrollWidth を押し広げてしまい, overflow: auto のままだと
+   見た目には何もはみ出していないのに横スクロールバーが常に表示されてしまう
+   不具合になっていた (MaterialsExplorer で実際に踏んだのと同じ不具合).
+   縦方向のスクロールは維持しつつ, 横方向だけ明示的に隠す */
 .main {
   flex: 1 1 auto;
   min-width: 0;
   padding: 24px;
-  overflow: auto;
+  overflow: hidden auto;
 }
 
 .empty {

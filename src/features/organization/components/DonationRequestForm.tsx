@@ -136,7 +136,7 @@ function DonationRequestForm() {
 
         <div className={styles.formActions}>
           <Button type="button" variant="ghost" onClick={handleRequestCancel}>
-            キャンセル
+            入力内容を破棄
           </Button>
           <Button type="submit" color="green">
             寄付申請を送信する
@@ -152,7 +152,6 @@ function DonationRequestForm() {
             { label: "金額", value: `${amount || 0}円` },
           ]}
           onEdit={closeConfirm}
-          onCancel={handleRequestCancel}
           onConfirm={handleConfirmedSubmit}
         />
       )}

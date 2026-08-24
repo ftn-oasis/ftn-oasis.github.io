@@ -9,9 +9,11 @@ type DiscardConfirmDialogProps = {
 };
 
 // 会計申請作成フォーム (ExpenseRequestForm/BudgetExecutionRequestForm/
-// DonationRequestForm の3種類共通) の「キャンセル」ボタン (入力画面/確認画面
-// RequestConfirmDialog のどちらから押されても) 押下時に表示する, 破棄確認の
-// モーダルです. 誤操作防止のため, 安全な側の操作 (入力画面に戻る) を右側+青の
+// DonationRequestForm の3種類共通) の入力画面の「入力内容を破棄」ボタン
+// (元は「キャンセル」— 依頼により改称. RequestConfirmDialog 側にも同名の
+// ボタンがありましたが, 依頼により削除済みのため現在の入口はここだけです)
+// 押下時に表示する, 破棄確認のモーダルです. 誤操作防止のため, 安全な側の
+// 操作 (入力画面に戻る) を右側+青の
 // 強調色に, 破壊的な操作 (入力内容を破棄する) を左側+背景透過にしています —
 // オーバーレイのクリック/Escape も同じ理由で安全な側 (onKeepEditing) に
 // 割り当てています

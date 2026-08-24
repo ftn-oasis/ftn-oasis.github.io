@@ -8,7 +8,6 @@ const SPECIAL_ROOT_LABELS: Record<string, string> = {
   materials: "規則・資料",
   orgs: "組織",
   meetings: "会議",
-  books: "帳簿",
   book: "帳簿",
   issues: "指摘事項",
   pulls: "修正提案",

@@ -1,9 +1,9 @@
-import { IconButton } from "@src/components/ui/IconButton";
 import { Icon } from "@src/components/ui/Icon";
-import { IconCode, IconEye, IconPencil } from "@tabler/icons-react";
+import { IconCode, IconEye } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useState } from "react";
 
+import { DocumentViewerActions } from "./DocumentViewerActions";
 import { MarkdownDocument } from "./MarkdownDocument";
 
 import styles from "./MarkdownFileViewer.module.css";
@@ -28,6 +28,12 @@ type MarkdownFileViewerProps = {
   // 表示する (文書詳細ページの概要タブで使用. 動作自体はのちほど実装する
   // 想定のため, 現時点ではこのコールバックを呼ぶだけ)
   onEdit?: () => void;
+  // 指定するとトグルスイッチの左横に「問題点を指摘」「修正提案」のボタンを
+  // 表示する (DocumentViewerActions を参照. onEdit とは呼び出し側が
+  // 排他的に渡す想定 — 動作自体はのちほど実装する想定のため, 現時点では
+  // これらのコールバックを呼ぶだけ)
+  onReportIssue?: () => void;
+  onProposeEdit?: () => void;
 };
 
 // Markdown ファイルの表示 (資料タブ/議事録タブで共通利用). 上部に文書名
@@ -46,6 +52,8 @@ function MarkdownFileViewer({
   title,
   bordered = true,
   onEdit,
+  onReportIssue,
+  onProposeEdit,
 }: MarkdownFileViewerProps) {
   const [mode, setMode] = useState<MarkdownViewMode>(MarkdownViewMode.Preview);
 
@@ -56,9 +64,11 @@ function MarkdownFileViewer({
           {title}
         </span>
         <div className={styles.controls}>
-          {onEdit && (
-            <IconButton icon={IconPencil} label="編集する" onClick={onEdit} />
-          )}
+          <DocumentViewerActions
+            onEdit={onEdit}
+            onReportIssue={onReportIssue}
+            onProposeEdit={onProposeEdit}
+          />
           <div className={styles.toggleRoot}>
             <div
               className={clsx(

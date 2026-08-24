@@ -185,7 +185,7 @@ function ExpenseRequestForm() {
 
         <div className={styles.formActions}>
           <Button type="button" variant="ghost" onClick={handleRequestCancel}>
-            キャンセル
+            入力内容を破棄
           </Button>
           <Button type="submit" color="green">
             会計申請を送信する
@@ -208,7 +208,6 @@ function ExpenseRequestForm() {
               : []),
           ]}
           onEdit={closeConfirm}
-          onCancel={handleRequestCancel}
           onConfirm={handleConfirmedSubmit}
         />
       )}

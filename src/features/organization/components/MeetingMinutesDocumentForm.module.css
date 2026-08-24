@@ -1,0 +1,73 @@
+/* requestFormBase.module.css の .field 直下, MeetingSelectField の下に
+   「新しい会議」選択時だけ現れる会議名の入力欄 */
+.newMeetingNameField {
+  margin-top: 12px;
+}
+
+.attendeeList,
+.agendaList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.attendeeChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.attendeeName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-body-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agendaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agendaRow > input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 参加者/議題どちらの行の "×" ボタンにも使う, 正方形の控えめなボタン */
+.removeButton {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-body-subtext);
+  cursor: pointer;
+}
+
+.removeButton:hover {
+  background: var(--color-body-button-hover);
+  color: var(--color-body-body);
+}
+
+.emptyHint {
+  margin: 0 0 8px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.addAgendaButton {
+  align-self: flex-start;
+}

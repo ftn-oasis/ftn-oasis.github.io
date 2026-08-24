@@ -1170,6 +1170,30 @@ const MOCK_ORGANIZATION_MEETINGS: OrganizationMeeting[] = Array.from(
   },
 );
 
+// ~/documents/new の「議事録を作成」モード用 — 「今日自身が参加することに
+// なっている会議」をドロップダウンに表示するため, 今日開催の会議 (dayOffset
+// === 0, つまり index 20/21. MEETING_ANCHOR が実行時の実際の日付を基準にして
+// いるため, これらの index は常に「今日」を指す) の出席者に currentUser を
+// 追加する — CURRENT_USER_AS_MEMBER (文書の編集者への追加) と同じ, 生成後に
+// 一部だけ書き換える手法
+const TODAY_DATE_KEY = toDashedDate(MEETING_ANCHOR);
+MOCK_ORGANIZATION_MEETINGS.forEach((meeting) => {
+  if (!meeting.startsAt.startsWith(TODAY_DATE_KEY)) return;
+  if (meeting.status !== MeetingStatus.Normal) return;
+  meeting.attendees = [...meeting.attendees, CURRENT_USER_AS_MEMBER];
+});
+
+// currentUser が出席者に含まれる, 今日開催の会議を開催時刻の早い順に返す —
+// 文書作成フォーム (NewDocumentSection) の「議事録を作成」モードの会議選択
+// ドロップダウンで使う
+function getMeetingsAttendedByCurrentUserToday(): OrganizationMeeting[] {
+  return MOCK_ORGANIZATION_MEETINGS.filter(
+    (meeting) =>
+      meeting.startsAt.startsWith(TODAY_DATE_KEY) &&
+      meeting.attendees.some((attendee) => attendee.id === currentUser.id),
+  ).sort((a, b) => (a.startsAt < b.startsAt ? -1 : 1));
+}
+
 // 文書詳細ページ概要タブの「議決されていればその会議と可決･否決の情報」用 —
 // 実在する会議のうち可決/否決された議題を探し, 一部の文書に後付けで割り当てる.
 // MOCK_ORGANIZATION_MEETINGS の定義後でないと参照できないため (文書一覧は
@@ -1200,8 +1224,11 @@ MOCK_ORGANIZATION_DOCUMENTS.forEach((document, index) => {
 });
 
 export {
+  CURRENT_USER_AS_MEMBER,
   getDocumentsEditedByCurrentUser,
   getInProgressTransactionsProposedByCurrentUser,
+  getMeetingsAttendedByCurrentUserToday,
+  MEETING_LOCATIONS,
   MOCK_ACTIVITIES,
   MOCK_DOCUMENT_ISSUES,
   MOCK_DOCUMENT_PULL_REQUESTS,

@@ -15,7 +15,7 @@ function PrimaryNavLinks() {
       <IconLink to="/issues" icon={IconFileAlert} label="指摘事項" />
       <IconLink to="/pulls" icon={IconFileTextSpark} label="修正提案" />
       <IconLink to="/documents" icon={IconFileText} label="全ての文書" />
-      <IconLink to="/books" icon={IconReceiptYen} label="全ての会計申請" />
+      <IconLink to="/book" icon={IconReceiptYen} label="全ての会計申請" />
       <IconLink
         to="/meetings"
         icon={IconCalendarTime}

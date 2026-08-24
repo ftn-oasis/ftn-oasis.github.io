@@ -43,7 +43,7 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   (詳細は「会計処理詳細ページ」を参照)/`/orgs/:orgId/meetings/:meetingId`
   (詳細は「会議詳細ページ」を参照) の3つの個別詳細ページと, 組織/文書に紐付かない
   グローバルな `/notifications` (詳細は「通知ページ (`NotificationsPage`)」を参照)
-  も実装済みです. さらに `/documents`/`/books`/`/meetings`/`/issues`/`/pulls`
+  も実装済みです. さらに `/documents`/`/book`/`/meetings`/`/issues`/`/pulls`
   (それぞれ対応する `/orgs/:orgId/...` ページと同じ構造で, 内容だけ組織を
   横断した全件にしたもの. 詳細は「組織を横断した一覧ページ」を参照)/`/orgs`
   (組織一覧, 詳細は「組織一覧ページ (`OrgsPage`)」を参照)/`/materials`・
@@ -64,7 +64,7 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   貼っていますが, 実ページが無いため `NotFoundPage` (404) になります.
 - **`/`/`/users/:userId`/`/orgs/:orgId`/`/orgs/:orgId/documents`/`/orgs/:orgId/book`/
   `/orgs/:orgId/members`/`/orgs/:orgId/meetings` (と上記の各詳細ページ)/
-  `/notifications`/`/documents`/`/documents/new`/`/books`/`/book/new`/`/meetings`/
+  `/notifications`/`/documents`/`/documents/new`/`/book`/`/book/new`/`/meetings`/
   `/issues`/`/pulls`/`/orgs`/`/materials`・`/materials/:documentKey` 以外の実ページ**は依然として
   存在しません — Header/Drawer 内のリンク先の一部, および組織プロフィールページの
   「設定」タブは実際には `NotFoundPage` (404) が表示されるだけの状態です.
@@ -183,7 +183,7 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   - `ui/` — `Button`/`Avatar`/`IconLink`/`IconButton`/`MenuLink`/`Divider`/`CurrentContentBar`/
     `Label` などの原子的な部品と, それらが共有するフック (`useTooltipAlign`,
     `useDismissablePopover`, `useEscapeKey`) や CSS Module (`controlBase`/`menuItemBase`/
-    `tabBase`, 「UI コンポーネントの共通パターン」を参照).
+    `tabBase`/`selectFieldBase`, 「UI コンポーネントの共通パターン」を参照).
   - `layout/` — `Header` とその内部部品 (`Breadcrumb`, `PrimaryNavLinks`,
     `useHeaderResponsiveLayout`, `getBreadcrumb`, 下部ヘッダーのスロットを提供する
     `HeaderBottomSlotContext`/`HeaderBottomPortal`), 全ページ共通の `AppLayout`
@@ -216,8 +216,8 @@ FTH OASIS (**F**uzoku **T**enoji **H**igh school OASIS) — React + TypeScript +
   (`/book/new`, 詳細は「会計申請作成ページ (`NewTransactionSection`)」を参照),
   `UserProfilePage`
   (`/users/:userId`), `NotificationsPage` (`/notifications`, 詳細は「通知ページ
-  (`NotificationsPage`)」を参照), `DocumentsPage`/`BooksPage`/`MeetingsPage`/
-  `IssuesPage`/`PullsPage` (`/documents`/`/books`/`/meetings`/`/issues`/`/pulls`,
+  (`NotificationsPage`)」を参照), `DocumentsPage`/`BookPage`/`MeetingsPage`/
+  `IssuesPage`/`PullsPage` (`/documents`/`/book`/`/meetings`/`/issues`/`/pulls`,
   組織を横断した一覧. 詳細は「組織を横断した一覧ページ」を参照), `OrgsPage`
   (`/orgs`, 組織一覧. 詳細は「組織一覧ページ (`OrgsPage`)」を参照),
   `MaterialsPage`/`MaterialDetailPage` (`/materials`/`/materials/:documentKey`,
@@ -513,6 +513,23 @@ ellipsis; min-width: 0;` (「折り返しを無効化してはみ出した部分
   アドレスなどが `min-width` の範囲内で複数行に割れてしまうため, 折り返さずパネルの
   幅で吸収する方針にしています.
 
+**フォーム内のドロップダウン選択欄** (`OrganizationSelectField`/
+`BudgetLineItemSelectField`, いずれも `features/organization/components/`.
+詳細は「会計申請作成ページ (`NewTransactionSection`)」を参照) も同じ
+`useDismissablePopover` + `menuItemBase` の構成の亜種です — トリガーが
+`IconButton`/`MenuLink` ではなく, `requestFormBase.module.css` の `.input`
+と同じ見た目 (枠線+角丸+背景) のボタンである点が異なります. この見た目は
+`src/components/ui/selectFieldBase.module.css` (`.wrapper`/`.trigger`/
+`.triggerContent`/`.triggerLabel`/`.menu`/`.group`/`.groupLabel`) に
+共有の土台として切り出してあります. 「予算項目のドロップダウンを組織の
+ドロップダウンと同じ形式にしてほしい, 今後ドロップダウンを実装する場合も
+そうしてほしい」という依頼による標準方針です — **フォームにドロップダウンを
+追加する際は, ネイティブ `<select>` ではなく今後もまずこのパターンを
+検討してください.** グループ分け (所管→組織など, ネイティブ `<optgroup>`
+相当) が要る場合は `.group`/`.groupLabel` を使い, グループ見出し自体は
+クリックできない non-interactive な行にしてください (`BudgetLineItemSelectField`
+が実例).
+
 `NavDrawer` (`open`/`onClose` を外部から制御される, 左からスライドインする全画面ドロワー) は
 上記と構造が違うため同じフックは使いませんが, Escape 処理だけ `useEscapeKey(open, onClose)`
 で共通化しています. 外側クリックの代わりに全画面のオーバーレイ `<button>`
@@ -559,7 +576,7 @@ props で直接渡すことができません — `AppLayout` を `HeaderBottomS
 - **パンくず** (`Breadcrumb.tsx`) — `getBreadcrumb(pathname)` (`getBreadcrumb.ts`) が現在パスを
   `string[]` (各要素が1階層分の表示名) に変換し, `Breadcrumb` が `" / "` で結合して**配列の
   最後の要素だけ** `.current` (`font-weight: 700`) でボールド表示します. 既定では2階層まで
-  表示しますが, `settings`/`documents`/`materials`/`orgs`/`meetings`/`books` は階層に関わらず
+  表示しますが, `settings`/`documents`/`materials`/`orgs`/`meetings`/`book` は階層に関わらず
   1階層目だけを日本語の表示名で表示します (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS` に列挙—
   同様の性質を持つルートを新設したらここに追加). `/users/${userId}` (ユーザーのプロフィール
   ページ) も同様に1階層だけの特別扱いですが, `SPECIAL_ROOT_LABELS` とは別ロジックです —
@@ -2269,14 +2286,14 @@ GitHubのようにレンダリングして表示してほしい, レンダリン
   (固定の過去日付ではない — 「最近の通知」として常に新しく見えるようにする
   ため), 3件に1件を未読にしています.
 
-## 組織を横断した一覧ページ (`/documents`/`/books`/`/meetings`/`/issues`/`/pulls`)
+## 組織を横断した一覧ページ (`/documents`/`/book`/`/meetings`/`/issues`/`/pulls`)
 
-「`~/orgs/組織ID/{issues, pulls, documents, books, meetings}` のページと
+「`~/orgs/組織ID/{issues, pulls, documents, book, meetings}` のページと
 同じ構造とし, 内容は組織を横断したものとしてほしい」という依頼による,
 5つのグローバル (`/orgs/:orgId` に属さないトップレベル) な一覧ページです.
 Header/`NavDrawer` の「全ての文書」/「全ての会計申請」/「予定されている会議」/
 「指摘事項」/「修正提案」ボタン (`getBreadcrumb.ts` の `SPECIAL_ROOT_LABELS`
-にも `documents: "文書"`/`books: "帳簿"`/`meetings: "会議"`/`issues: "指摘事項"`/
+にも `documents: "文書"`/`book: "帳簿"`/`meetings: "会議"`/`issues: "指摘事項"`/
 `pulls: "修正提案"` として以前から用意されていた) が指す, 従来は 404 だった
 5つのルートです.
 
@@ -2298,7 +2315,7 @@ Header/`NavDrawer` の「全ての文書」/「全ての会計申請」/「予�
   リファクタリングしています (詳細は「文書詳細ページ」の「指摘事項/
   修正提案タブ」を参照) — `documentId` prop 自体も `issue.documentId`
   と重複していたため, この整理で不要になり削除しています.
-- **`DocumentsPage`/`BooksPage`/`MeetingsPage`**: それぞれ
+- **`DocumentsPage`/`BookPage`/`MeetingsPage`**: それぞれ
   `OrganizationDocumentsSection`/`OrganizationBookSection`/
   `OrganizationMeetingsSection` (すでに自身で `max-width: 1280px;
   margin: 0 auto;` を持つ, トップレベルページとして単独で使える設計) に
@@ -2715,23 +2732,26 @@ margin: 0 auto;` を持つ独立ページ) で実装しています — 「組�
   コンポーネントにしています (元は支出専用の `TransactionConfirmDialog`
   でしたが, 予算執行/寄付それぞれの要約内容 (対象組織/対象予算項目/支払方法/
   支払先/購入品目, など) が異なるため, 固定 props ではなく `items`
-  配列に一般化しました). 送信する (緑)/修正する (背景透過)/キャンセル
-  (背景透過) を**縦に**並べます (「送信ボタン, 修正ボタン, キャンセル
-  ボタンを縦に配置してほしい」という依頼のため — キャンセル確認画面
-  `DiscardConfirmDialog` の2ボタンは逆に横並びのままなので混同しないよう
-  注意してください). 見た目の土台 (オーバーレイ+画面中央のパネル) は
-  `src/components/ui/Dialog.tsx` (`onClose`+`labelledBy`+`children` を
-  受け取るだけの汎用シェル. `RequestConfirmDialog`/`DiscardConfirmDialog`
-  の両方がここから切り出されています) を使っています.
+  配列に一般化しました). 送信する (緑)/修正する (背景透過) を**縦に**並べます
+  (元は「送信する/修正する/キャンセル」の3ボタンでしたが,
+  「送信の確認モーダルからキャンセルボタンをなくしてほしい」という依頼により
+  キャンセルボタン (`onCancel` prop ごと) を削除しています — 入力内容を
+  破棄したい場合は「修正する」(またはオーバーレイ/Escape, どちらも同じ
+  `onEdit` に割り当て) でいったん入力画面に戻ってから, 入力画面側の
+  「入力内容を破棄」ボタンを使う想定です). 見た目の土台 (オーバーレイ+
+  画面中央のパネル) は `src/components/ui/Dialog.tsx` (`onClose`+
+  `labelledBy`+`children` を受け取るだけの汎用シェル. `RequestConfirmDialog`/
+  `DiscardConfirmDialog` の両方がここから切り出されています) を使っています.
 - **`DiscardConfirmDialog`** (`features/organization/components/`) —
   「キャンセルボタンが押下された場合は, 確認モーダルでも入力画面でも
   『入力内容が破棄されるが本当にキャンセルするか』を訊くモーダルを作成して
-  ほしい」という依頼で追加した, 破棄確認の第2段モーダルです. 「本当に
-  キャンセルしますか?」の下に, 右側に青で「入力画面に戻る」, 左側に背景透過で
-  「入力内容を破棄する」を配置しています (安全な側の操作を右+強調色, 破壊的な
-  操作を左+控えめな見た目にする, という判断. オーバーレイのクリック/Escape も
-  安全な側 = 「入力画面に戻る」に割り当てています). 3フォームいずれの
-  キャンセルボタンからも, いったんこのモーダルを必ず経由します.
+  ほしい」という依頼で追加した, 破棄確認の第2段モーダルです (当時は確認画面
+  側にも「キャンセル」ボタンがありましたが, 上記のとおり削除済みのため,
+  現在この確認は入力画面の「入力内容を破棄」ボタンからのみ経由します).
+  「本当にキャンセルしますか?」の下に, 右側に青で「入力画面に戻る」, 左側に
+  背景透過で「入力内容を破棄する」を配置しています (安全な側の操作を右+
+  強調色, 破壊的な操作を左+控えめな見た目にする, という判断. オーバーレイの
+  クリック/Escape も安全な側 = 「入力画面に戻る」に割り当てています).
 - **`useRequestSubmitFlow`** (`features/organization/`) — 送信/確認/
   キャンセル/破棄の一連の状態遷移 (`confirmOpen`/`discardConfirmOpen`/
   `submitAttempted` の3つの state と, それぞれの操作に対応するハンドラ) を
@@ -2789,31 +2809,75 @@ margin: 0 auto;` を持つ独立ページ) で実装しています — 「組�
     ではなく `useDismissablePopover` + `menuItemBase` の構成 (`CreateButton`
     と同じパターン) のカスタムドロップダウンです. トリガー/パネル内の各項目
     どちらもアバター (`Avater shape="square" size={20}`) を組織名の左に
-    表示します.
+    表示します. 見た目の土台は `src/components/ui/selectFieldBase.module.css`
+    (`.wrapper`/`.trigger`/`.triggerContent`/`.triggerLabel`/`.menu`/
+    `.group`/`.groupLabel`) — 元は `OrganizationSelectField` 専用の
+    CSS Module でしたが, 「予算項目のドロップダウンを組織のドロップダウンと
+    同じ形式にしてほしい, 今後ドロップダウンを実装する場合もそうしてほしい」
+    という依頼を機に, `BudgetLineItemSelectField` (後述の「予算執行の申請」
+    を参照) とも共有する汎用の土台として `components/ui/` へ切り出しました
+    — **フォームにドロップダウンを追加する際は, 今後もまずこのパターン
+    (ネイティブ `<select>` ではなく, ボタントリガー+`menuItemBase` のパネル)
+    を検討してください.** `.group`/`.groupLabel` はグループ分けが要る
+    ドロップダウン (`BudgetLineItemSelectField` など) だけが使う, オプトイン
+    のクラスです.
 - **予算執行の申請 (`BudgetExecutionRequestForm`)** — 対象組織/対象予算項目/
   支払方法/支払先/購入品目の5項目です.
-  - **対象予算項目**: `features/organization/budgetMockData.ts` の
-    `MOCK_BUDGET_LINE_ITEMS` (所管/組織/項の3階層を持つダミーデータ) を,
-    「所管 - 組織」を `<optgroup label>` に, 「項」を `<option>`
-    にした素のネイティブ `<select>` (`styles.select`, `requestFormBase`
-    の `.input` と同じ見た目) で表示しています. 3階層の分類をそのまま
-    表現しつつ, 実際の選択操作は (依頼の「どの項を使用するか選択する」の
-    とおり) 単一の select 1つに単純化しています — 所管→組織→項と3段の
-    ネイティブ select をカスケードさせる案もありましたが, 依頼文の
-    「分類されており, 選択する」という表現がこの (1つの select+階層的な
-    グループラベル) 実装で十分満たせると判断しました.
-  - **支払方法**: 「銀行口座･振り込み用紙･現金」の3択ラジオです. `振り込み
-    用紙」は実際の決済手段を表す `PaymentMethod` (現金/銀行振込/引き落し.
-    完了済み会計処理の一覧/詳細ページ側で使う型) の「引き落し」とは別概念
-    (用紙に記入して提出する方式) のため, 混同を避けてこのフォーム限定の
-    `BudgetPaymentMethod` (`bank-account`/`transfer-slip`/`cash`) を
-    `BudgetExecutionRequestForm.tsx` 内に独立して定義しています.
-  - **支払先**: 支払方法に応じて表示する入力欄を出し分けます — 銀行口座
-    なら口座番号+名義の2つの `<input>` (`.fieldRow` で横並び), 振り込み
-    用紙なら自由記述の `<textarea>`, 現金なら支払先を書く `<input>`
-    1つです. 共通で末尾に「参考となる画像 (任意)」として
-    `ReceiptUploadField` (証憑画像アップロード欄と同じコンポーネントを
-    再利用. 必須マーカーは付けません) を配置しています.
+  - **対象予算項目 (`BudgetLineItemSelectField`)**: `features/organization/
+    budgetMockData.ts` の `MOCK_BUDGET_LINE_ITEMS` (所管/組織/項の3階層を
+    持つダミーデータ) を「所管 - 組織」でグループ化して表示します. 当初は
+    ネイティブ `<select>` + `<optgroup>` でしたが, 「予算項目のドロップダウンを
+    組織のドロップダウン (`OrganizationSelectField`) と同じ形式にしてほしい,
+    今後ドロップダウンを実装する場合もそうしてほしい」という依頼により,
+    `OrganizationSelectField` と同じ `useDismissablePopover` +
+    `menuItemBase` のカスタムドロップダウンに置き換えています (詳細・
+    共通土台の切り出しは後述の `selectFieldBase.module.css` を参照). 3階層の
+    分類は, パネル内でグループ見出し (`selectFieldBase.module.css` の
+    `.group`/`.groupLabel`) の下に該当する項を並べる形で表現しています —
+    グループ見出し自体はクリックできず, 「項」の行だけが選択可能です
+    (ネイティブ `<optgroup>` と同じ役割分担). グループ化のロジック
+    (所管→組織のキーで `Map` に集約) は, 呼び出し元ではなくこの選択欄の
+    コンポーネント自身が引数の `items` から算出する形にしています —
+    以前はネイティブ select 版の実装当時, `BudgetExecutionRequestForm`
+    側で `useMemo` していましたが, この関心事は選択欄の内部実装なので
+    コンポーネントに閉じ込めました.
+  - **支払方法**: 「口座振込･払込票 (ゆうちょ銀行)･現金」の3択ラジオです
+    (元は「銀行口座･振り込み用紙･現金」という表示名でしたが依頼により
+    改称 — コード上の識別子 `BudgetPaymentMethod.BankAccount`/
+    `TransferSlip`/`Cash` (`bank-account`/`transfer-slip`/`cash`) 自体は
+    当時のまま変えていません). 実際に完了した会計処理の決済手段を表す
+    `PaymentMethod` (現金/銀行振込/引き落し. 一覧/詳細ページ側で使う型) の
+    「引き落し」とは別概念 (「払込票」は用紙に記入して提出する方式) のため,
+    混同を避けてこのフォーム限定の型として独立させています.
+  - **支払先**: 支払方法に応じて表示する入力欄を出し分けます.
+    - **口座振込**: 銀行名/銀行コード (4桁)/支店名/支店番号 (3桁)/口座番号
+      (自然数, 桁数上限無し)/口座名義 (全角カタカナのみ) の6項目です
+      (`.fieldRow`+`.subField`/`.subLabel` で2つずつ横並びに, 個々に
+      小さな見出しを添えています). 銀行コード/支店番号/口座番号は数字のみ
+      (先頭の "0" も許容 — `purchaseItemDraft.ts` の
+      `isValidNaturalNumberInput` とは異なる検証のため, 専用の
+      `isValidDigitsInput` を `BudgetExecutionRequestForm.tsx` 内に
+      定義), 口座名義は全角カタカナ (+空白) のみを `onChange`
+      で弾く形で入力を制限しています (`isValidKatakanaInput`).
+    - **払込票 (ゆうちょ銀行)**: 口座記号番号 (記号5桁-検査数字1桁-番号
+      最大8桁, 例: `12345-6-78901234`) + 加入者名の2項目です. 「それぞれの
+      入力欄が5桁, 1桁, 8桁であることが判るよう, 入力欄を分割し, 桁の間に
+      分割線を入れてほしい」という依頼のため, 1つの `<input>` ではなく
+      3分割した `<input>` を `-` の区切り文字 (`.postalSeparator`) で
+      繋いだ `.postalAccountRow` にしています (各欄の幅は `ch` 単位
+      (`calc(Nch + 24px)`, `.input` の左右 padding 分を加算) で桁数どおりに
+      見た目でも判るようにしています). 番号欄 (最大8桁) だけは「左詰めで
+      入力し, 1桁でも埋まっていればよい」という依頼のため, 他2つ (記号/
+      検査数字, 桁数ちょうどでないと無効) と異なり1桁以上あれば有効です.
+      元は自由記述の `<textarea>` (「振り込み用紙」名義当時) でしたが,
+      この依頼で置き換えています.
+    - **現金**: 支払先を書く `<input>` 1つです (ラベル「支払先」を明示的に
+      表示 — 依頼を機に他の支払方法と同じ `.subField`/`.subLabel` の見た目に
+      揃えています).
+    - 支払方法に関わらず, 末尾に「備考 (任意)」の `<textarea>` +
+      「参考となる画像 (任意)」の `ReceiptUploadField` (証憑画像
+      アップロード欄と同じコンポーネントを再利用) を配置しています —
+      「参考画像の上に任意の備考欄を設けてほしい」という依頼で追加しました.
   - **購入品目**: 「支出の申請のものと同じリスト」という依頼のとおり,
     `ExpenseRequestForm` と全く同じ `PurchaseItemsInput` をそのまま
     再利用しています (`isEstimate` は渡していないため常に「金額」「合計」
@@ -2854,8 +2918,10 @@ margin: 0 auto;` を持つ独立ページ) で実装しています — 「組�
    `src/contexts/ToastContext.tsx` を参照).
 3. 確認画面の「修正する」→ 確認画面を閉じて入力画面に戻るだけ (入力内容は
    そのまま). オーバーレイのクリック/Escape もこちらと同じ扱いです.
-4. 確認画面 or 入力画面いずれかの「キャンセル」→ `DiscardConfirmDialog`
-   (破棄確認) を表示. 確認画面は (もし開いていれば) 閉じておきます.
+4. 入力画面の「入力内容を破棄」(元は「キャンセル」— 依頼により改称. 確認画面
+   側の同名ボタンは削除済みのため, 現在この操作の入口はここだけです)
+   → `DiscardConfirmDialog` (破棄確認) を表示. 確認画面は (もし開いていれば)
+   閉じておきます.
 5. 破棄確認の「入力画面に戻る」→ 破棄確認を閉じるだけ (常に入力画面へ
    戻る — 確認画面を経由していた場合でも確認画面へは戻さず, 素の入力画面
    まで戻します).

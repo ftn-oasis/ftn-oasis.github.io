@@ -39,7 +39,8 @@
   white-space: nowrap;
 }
 
-/* 「編集する」ボタン (任意) + トグルスイッチをまとめる右詰めのグループ */
+/* DocumentViewerActions (「編集する」, または「問題点を指摘」「修正提案」,
+   いずれも任意) + トグルスイッチをまとめる右詰めのグループ */
 .controls {
   display: flex;
   flex-shrink: 0;

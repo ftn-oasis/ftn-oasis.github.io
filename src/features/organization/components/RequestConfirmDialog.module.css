@@ -32,9 +32,11 @@
   white-space: nowrap;
 }
 
-/* 「送信ボタン, 修正ボタン, キャンセルボタンを縦に配置してほしい」という
-   依頼のため column にしている (キャンセル確認画面 DiscardConfirmDialog の
-   .actions は逆に横並びのまま — 依頼の対象がこちらのモーダルだけだったため) */
+/* 元々「送信ボタン, 修正ボタン, キャンセルボタンを縦に配置してほしい」という
+   依頼で column にしていた (キャンセル確認画面 DiscardConfirmDialog の
+   .actions は逆に横並びのまま — 依頼の対象がこちらのモーダルだけだったため).
+   キャンセルボタン自体は後の依頼で削除したが, 残る2ボタンも同じ column の
+   まま維持している */
 .actions {
   display: flex;
   flex-direction: column;

@@ -29,11 +29,17 @@
 
 /* MarkdownFileViewer (bordered={false}) を直接内包するため, 外枠は .root
    だけに任せて padding は持たない — ツールバーが .root の内側の縁に
-   フラットに接するようにしている (DocumentListBox の .toolbar と同じ考え方) */
+   フラットに接するようにしている (DocumentListBox の .toolbar と同じ考え方).
+   overflow-x は明示的に hidden — MarkdownFileViewer のプレビュー/ソース
+   切り替えボタンが持つホバー時ツールチップ (::after, position: absolute)
+   は非表示時 (opacity: 0) でもレイアウト上の領域を占めるため, 横方向に
+   数px だけ scrollWidth を押し広げてしまい, overflow: auto のままだと
+   見た目には何もはみ出していないのに横スクロールバーが常に表示されてしまう
+   不具合になっていた (MaterialsExplorer で実際に踏んだのと同じ不具合) */
 .main {
   flex: 1 1 auto;
   min-width: 0;
-  overflow: auto;
+  overflow: hidden auto;
 }
 
 .empty {
