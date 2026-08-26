@@ -1,0 +1,37 @@
+/* selectFieldBase.module.css の .trigger と同じ見た目 (requestFormBase.module.css
+   の .input と揃えた枠線/角丸/背景) を <input> 向けに書き直したもの — <button>
+   と違い <input> は子要素 (末尾の caret アイコン) を持てないため, 右側に
+   padding を確保した上で .triggerIcon を wrapper 基準の絶対配置で重ねている
+   (wrapper は selectFieldBase.module.css の .wrapper が既に position: relative
+   を持つため, 追加の指定は不要) */
+.triggerInput {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-background);
+  color: var(--color-body-body);
+  font: inherit;
+}
+
+.triggerInput:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -1px;
+}
+
+.triggerIcon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: var(--color-body-subtext);
+  pointer-events: none;
+}
+
+.emptyHint {
+  margin: 0;
+  padding: 4px 8px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}

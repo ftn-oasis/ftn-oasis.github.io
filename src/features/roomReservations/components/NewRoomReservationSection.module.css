@@ -1,0 +1,17 @@
+/* NewMeetingSection.module.css の .timeRangeRow/.timeInput/.timeSeparator と
+   同一 (見た目を揃えるため) — こちらは参加者/自由入力の場所を持たないため,
+   対応するクラスは無い */
+.timeRangeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeInput {
+  width: auto;
+}
+
+.timeSeparator {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+}

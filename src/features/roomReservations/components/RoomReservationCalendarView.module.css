@@ -1,0 +1,142 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.yearMonth {
+  color: var(--color-body-headline);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.navButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.todayButton {
+  height: 32px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+  font: inherit;
+}
+
+.todayButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.todayButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.weekdayRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 4px 0;
+}
+
+.weekday {
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 2fr 1fr;
+  gap: var(--borderWidth-thin);
+  box-sizing: border-box;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-border);
+}
+
+.dayCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 6px;
+  background: var(--color-background);
+}
+
+.dayCellTopRow {
+  min-height: 200px;
+}
+
+.dayCellBottomRow {
+  min-height: 100px;
+}
+
+.dayCellWeekend {
+  background: var(--color-secondary1);
+}
+
+.dayCell:nth-child(1) {
+  border-top-left-radius: var(--borderRadius-medium);
+}
+
+.dayCell:nth-child(7) {
+  border-top-right-radius: var(--borderRadius-medium);
+}
+
+.dayCell:nth-child(8) {
+  border-bottom-left-radius: var(--borderRadius-medium);
+}
+
+.dayCell:nth-child(14) {
+  border-bottom-right-radius: var(--borderRadius-medium);
+}
+
+.dayNumber {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  color: var(--color-body-body);
+  font-size: 0.875rem;
+}
+
+.dayNumberToday {
+  background: var(--color-link);
+  color: var(--color-background);
+  font-weight: 700;
+}
+
+.dayReservations {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
