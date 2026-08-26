@@ -23,6 +23,7 @@ import { Icon } from "@src/components/ui/Icon";
 import { useEscapeKey } from "@src/components/ui/useEscapeKey";
 import menuItemBase from "@src/components/ui/menuItemBase.module.css";
 import { MenuLink } from "@src/components/ui/MenuLink";
+import { useReportIssueModal } from "@src/contexts/ReportIssueModalContext";
 import {
   getDocumentsEditedByCurrentUser,
   MOCK_ORGANIZATION,
@@ -38,6 +39,7 @@ type NavDrawerProps = {
 function NavDrawer({ open, onClose }: NavDrawerProps) {
   useEscapeKey(open, onClose);
   const recentDocuments = getDocumentsEditedByCurrentUser();
+  const { openReportIssueModal } = useReportIssueModal();
 
   return (
     <>
@@ -162,6 +164,10 @@ function NavDrawer({ open, onClose }: NavDrawerProps) {
         <button
           type="button"
           className={clsx(menuItemBase.root, styles.reportButton)}
+          onClick={() => {
+            onClose();
+            openReportIssueModal();
+          }}
         >
           <Icon icon={IconMessageReport} aria-hidden="true" />
           <span>問題を報告</span>
