@@ -1,6 +1,7 @@
 import { Avater } from "@src/components/ui/Avatar";
 import { Divider } from "@src/components/ui/Divider";
 import { UserNameLink } from "@src/components/ui/UserNameLink";
+import { useUserProfile } from "@src/contexts/UserProfileContext";
 import { currentUser } from "@src/lib/currentUser";
 
 import { MOCK_ORGANIZATIONS } from "../mockData";
@@ -9,10 +10,15 @@ import { OrganizationListItem } from "./OrganizationListItem";
 import styles from "./ProfileSidebar.module.css";
 
 function ProfileSidebar() {
+  // ここは常に currentUser 自身のプロフィールなので (/users/:userId は
+  // currentUser.id と一致する場合しか実データを表示しない — 「プロジェクトに
+  // ついて」を参照), ~/settings で変更したアバターをそのまま反映する
+  const { avatarDataUrl } = useUserProfile();
+
   return (
     <aside className={styles.root}>
       <div className={styles.identity}>
-        <Avater size="large" />
+        <Avater src={avatarDataUrl ?? undefined} size="large" />
         <div className={styles.identityText}>
           <UserNameLink
             userId={currentUser.id}

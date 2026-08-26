@@ -1,4 +1,4 @@
-import { IconLogout, IconSettings, IconSunMoon } from "@tabler/icons-react";
+import { IconLogout, IconSettings } from "@tabler/icons-react";
 import clsx from "clsx";
 import { Link } from "react-router";
 
@@ -7,13 +7,21 @@ import { Divider } from "@src/components/ui/Divider";
 import { useDismissablePopover } from "@src/components/ui/useDismissablePopover";
 import menuItemBase from "@src/components/ui/menuItemBase.module.css";
 import { MenuLink } from "@src/components/ui/MenuLink";
+import { useRolePreview } from "@src/contexts/RolePreviewContext";
+import { useUserProfile } from "@src/contexts/UserProfileContext";
+import { isAdminRole } from "@src/features/organization/memberRole";
 import { currentUser } from "@src/lib/currentUser";
+
+import { RolePreviewToggle } from "./RolePreviewToggle";
+import { ThemePreferenceToggle } from "./ThemePreferenceToggle";
 
 import styles from "./UserMenuButton.module.css";
 
 function UserMenuButton() {
   const { open, wrapperRef, toggle, close } =
     useDismissablePopover<HTMLDivElement>();
+  const { previewRole } = useRolePreview();
+  const { avatarDataUrl } = useUserProfile();
 
   return (
     <div ref={wrapperRef} className={styles.wrapper}>
@@ -27,7 +35,7 @@ function UserMenuButton() {
       >
         {/* ヘッダーの他のアイコンボタン (controlBase の --control-size) と
             大きさを揃える依頼のため, プリセットではなく直接 35px を指定 */}
-        <Avater size={35} />
+        <Avater src={avatarDataUrl ?? undefined} size={35} />
       </button>
 
       {open && (
@@ -37,10 +45,14 @@ function UserMenuButton() {
             onClick={close}
             className={clsx(menuItemBase.root, styles.profileRow)}
           >
-            <Avater size="medium" />
+            <Avater src={avatarDataUrl ?? undefined} size="medium" />
             <span className={styles.profileText}>
               <span className={styles.userName}>{currentUser.name}</span>
               <span className={styles.userEmail}>{currentUser.email}</span>
+              <span className={styles.userRole}>
+                役職: {previewRole}
+                {isAdminRole(previewRole) && " (管理者)"}
+              </span>
             </span>
           </Link>
 
@@ -52,12 +64,19 @@ function UserMenuButton() {
             label="設定"
             onClick={close}
           />
-          <MenuLink
-            to="/settings/theme"
-            icon={IconSunMoon}
-            label="外観"
-            onClick={close}
-          />
+          <div className={styles.themeRow}>
+            <ThemePreferenceToggle />
+          </div>
+
+          <Divider />
+
+          {/* 役職によって表示する UI を出し分ける機能を確認するための,
+              開発/確認用のプレビュー切り替え (実際のユーザー設定ではないため
+              永続化はしない — RolePreviewContext.tsx を参照) */}
+          <div className={styles.roleRow}>
+            <span className={styles.roleLabel}>表示する役職 (プレビュー用)</span>
+            <RolePreviewToggle />
+          </div>
 
           <Divider />
 

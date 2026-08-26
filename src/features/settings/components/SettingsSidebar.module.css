@@ -1,0 +1,9 @@
+/* NavDrawer/DocumentFilterSidebar と同じ「サイドバーの文字サイズをパンくずと
+   揃える」慣習 (menuItemBase.root 自体は font-size を持たないため, 呼び出し側の
+   コンテナでカスケードさせる) */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.9rem;
+}
