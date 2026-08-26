@@ -1,0 +1,46 @@
+/* TransactionListRow.module.css と同じ土台だが, 対応する詳細ページが無く
+   行全体はリンクではない (<div>) ため, hover/focus-visible の見た目や
+   color/text-decoration のリセットは不要 */
+.root {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+}
+
+.root:last-child {
+  border-bottom: none;
+}
+
+.badge {
+  flex-shrink: 0;
+}
+
+.title {
+  overflow: hidden;
+  flex-shrink: 0;
+  max-width: 40%;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--color-body-subtext);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.requester {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}

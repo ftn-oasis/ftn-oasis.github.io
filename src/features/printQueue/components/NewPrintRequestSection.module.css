@@ -1,0 +1,109 @@
+/* NewDocumentUploadSection.module.css と同じ土台
+   (「~/documents/new/upload を参考にする」という依頼のため) */
+.root {
+  max-width: 900px;
+  padding: 24px 16px;
+  margin: 0 auto;
+}
+
+.heading {
+  margin: 0 0 4px;
+  color: var(--color-body-headline);
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.field {
+  margin-bottom: 24px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-body-headline);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.required {
+  margin-left: 2px;
+  color: var(--color-status-red);
+}
+
+.input,
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-background);
+  color: var(--color-body-body);
+  font: inherit;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -1px;
+}
+
+.inputError {
+  border-color: var(--color-status-red);
+}
+
+.error {
+  margin: 4px 0 0;
+  color: var(--color-status-red);
+  font-size: 0.75rem;
+}
+
+/* 部数の入力欄+右側の "部" 表記 — ExpenseRequestForm 等の
+   amountFieldWrapper/currencySuffix と同じ考え方 */
+.copiesFieldWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copiesField {
+  width: 120px;
+  flex: 0 0 auto;
+}
+
+.copiesSuffix {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+}
+
+/* ファイルごとの情報入力画面の先頭に出す "n / m 件目 — ファイル名" */
+.progress {
+  margin: 0 0 24px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 「入力内容を破棄」+「この印刷依頼を取り消す」の2つを左側にまとめる —
+   .formActions は2ボタン (RequestConfirmDialog 等) 用の space-between だが,
+   ファイルごとの情報入力画面だけ3ボタンになるため */
+.secondaryActions {
+  display: flex;
+  gap: 8px;
+}
