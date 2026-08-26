@@ -2,16 +2,11 @@ import { UserNameLink } from "@src/components/ui/UserNameLink";
 import { Link } from "react-router";
 
 import { canCurrentUserEditDocument } from "../documentViewerAccess";
+import { isAdminRole } from "../memberRole";
 import { AgendaItemVoteResult, type OrganizationDocument } from "../types";
 import { DocumentContentViewer } from "./DocumentContentViewer";
 
 import styles from "./DocumentOverviewSection.module.css";
-
-// 「編集者(管理者は)」— 委員長/副委員長のような特別な役職を持つ編集者だけ
-// 「(管理者)」を付記する (「委員」は付記しない)
-function isAdminRole(role: string): boolean {
-  return role !== "委員";
-}
 
 type DocumentOverviewSectionProps = {
   document: OrganizationDocument;
