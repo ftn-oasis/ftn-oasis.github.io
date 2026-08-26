@@ -1,0 +1,75 @@
+/* 参加者チップ — NewOrganizationSection.module.css の .memberList/.memberChip/
+   .memberName/.removeButton/.emptyHint (構成員版) と全く同じ見た目 */
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.memberChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.memberName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-body-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeButton {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-body-subtext);
+  cursor: pointer;
+}
+
+.removeButton:hover {
+  background: var(--color-body-button-hover);
+  color: var(--color-body-body);
+}
+
+.emptyHint {
+  margin: 0 0 8px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+/* 会議場所の「自由入力」選択時に, ドロップダウンの下へ続けて表示するテキスト欄 */
+.customLocationInput {
+  margin-top: 8px;
+}
+
+/* 時間 (開始〜終了) の入力欄. type="time" のブラウザ標準の時刻ピッカーを,
+   他のフィールドと同じ requestFormBase.module.css の .input の見た目で
+   包んだ上で, 2つを "〜" で横に並べる */
+.timeRangeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeInput {
+  width: auto;
+}
+
+.timeSeparator {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+}
