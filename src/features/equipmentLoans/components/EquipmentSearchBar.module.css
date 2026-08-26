@@ -1,0 +1,68 @@
+.root {
+  display: flex;
+  align-items: stretch;
+  height: 40px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-background);
+}
+
+.inputWrapper {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-body-body);
+  font: inherit;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-body-subtext);
+}
+
+.clear {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-body-subtext);
+  cursor: pointer;
+}
+
+.searchButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  padding: 0;
+  border: none;
+  border-left: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: 0 var(--borderRadius-medium) var(--borderRadius-medium) 0;
+  background: var(--color-surface0);
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.searchButton:hover {
+  background: var(--color-surface1);
+}
+
+.searchButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

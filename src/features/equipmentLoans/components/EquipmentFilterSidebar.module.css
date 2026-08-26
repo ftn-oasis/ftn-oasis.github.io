@@ -1,0 +1,14 @@
+/* MemberFilterSidebar.module.css と同じ (グリッドのセル位置だけを保持する
+   プレースホルダー+position: fixed の本体, 詳細は useFixedSidebarPosition.ts
+   を参照) */
+.placeholder {
+  min-width: 0;
+}
+
+.root {
+  display: flex;
+  position: fixed;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.9rem;
+}

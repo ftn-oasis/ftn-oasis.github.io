@@ -1,0 +1,218 @@
+/* MeetingDatePicker.module.css の見た目 (macOS のカレンダーアプリ風,
+   独立した項目として置かれるための外枠) を踏襲しつつ, こちらは単一の日では
+   なく期間 (枠) を表示・ドラッグ操作する必要があるため, セル (.day) を
+   position: relative の入れ物にして枠 (.rangeBackground) と取っ手
+   (.handleStart/.handleEnd) を重ねて配置しています */
+.root {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  font-size: 0.75rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 4px;
+}
+
+.headerLabel {
+  color: var(--color-body-headline);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.navButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.todayButton {
+  height: 20px;
+  padding: 0 6px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+}
+
+.todayButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.todayButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.weekdayRow {
+  display: flex;
+  align-self: center;
+}
+
+.weeks {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+}
+
+/* ドラッグ中は, セル間を素早く行き来してもブラウザ標準のテキスト選択が
+   走らないようにする (mousedown 側の preventDefault だけでは, 既に選択済みの
+   テキストが残っていた場合など取りこぼすことがあるため, ドラッグ中は
+   コンテナ全体で明示的に禁止する) */
+.weeksDragging {
+  user-select: none;
+}
+
+.weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  color: var(--color-body-subtext);
+}
+
+.week {
+  display: flex;
+}
+
+.day {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  height: 33px;
+}
+
+/* pointer-events: none — 日付の数字はセル中央 (.rangeBackground/.handleStart/
+   .handleEnd と重なる位置) にあり, これが無いと数字の上でのクリック/ドラッグが
+   下の各ボタンに届かず「セルの中央 (最も自然にクリックされる場所) だけ範囲の
+   移動を開始できない」という不具合になる (実装時に Playwright での動作確認で
+   実際に踏んだ不具合です) */
+.dayInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--color-body-body);
+  pointer-events: none;
+}
+
+.dayWeekend {
+  color: var(--color-body-subtext);
+}
+
+.dayOutside {
+  color: var(--color-overlay1);
+}
+
+/* 今日 (選択中の期間に含まれていない場合) — 選択中の期間と混同しないよう
+   塗り潰しではなく枠線のみ */
+.dayToday {
+  border: var(--borderWidth-thin) solid var(--color-link);
+}
+
+/* 選択中の期間に含まれる日の文字色 — .rangeBackground (下記) の塗り潰しの上に
+   乗るため, .daySelected (MeetingDatePicker) と同じく背景色で反転させる */
+.dayInRange {
+  color: var(--color-background);
+  font-weight: 700;
+}
+
+/* 選択中の期間を表す枠. 各セルの全面を塗り潰した上で, 開始日セルの左半分/
+   終了日セルの右半分だけを丸めることで, セル同士が隙間なく繋がった1本の
+   ピル型の帯に見えるようにしている (期間が1日だけの場合は開始日=終了日の
+   同じセルに両方のクラスが乗り, 4隅すべてが丸まって完全な円になる —
+   border-radius のショートハンドではなく角ごとのプロパティを使っているのは,
+   2つのクラスが同時に乗ったときに一方がもう一方を上書きしてしまわないため) */
+.rangeBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border: none;
+  background: var(--color-link);
+  cursor: grab;
+}
+
+.rangeBackground:active {
+  cursor: grabbing;
+}
+
+.rangeStartCap {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.rangeEndCap {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+/* 開始日/終了日の取っ手 — セルの端の細い帯をドラッグすると, その日だけを
+   (反対側の日を超えない範囲で) 動かせる. 中央につまみを模した短い縦線を
+   表示し, ドラッグ可能であることを示す */
+.handleStart,
+.handleEnd {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  width: 8px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: ew-resize;
+}
+
+.handleStart {
+  left: 0;
+}
+
+.handleEnd {
+  right: 0;
+}
+
+.handleStart::after,
+.handleEnd::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--color-background);
+  opacity: 0.7;
+}
+
+.summary {
+  margin: 4px 2px 0;
+  color: var(--color-body-subtext);
+  text-align: center;
+}

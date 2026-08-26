@@ -1,0 +1,30 @@
+/* MemberListRow.module.css と同じ土台だが, 対応する詳細ページが無く行全体は
+   リンクではない (<div>) ため, hover/focus-visible の見た目や color/
+   text-decoration のリセットは不要 (PrintRequestListRow と同じ理由) */
+.root {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+}
+
+.root:last-child {
+  border-bottom: none;
+}
+
+.title {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quantity {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}

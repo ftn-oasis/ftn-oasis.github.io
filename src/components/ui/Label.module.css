@@ -26,3 +26,8 @@
   border-color: var(--color-label-peach);
   color: var(--color-label-peach);
 }
+
+.red {
+  border-color: var(--color-label-red);
+  color: var(--color-label-red);
+}

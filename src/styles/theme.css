@@ -82,6 +82,7 @@
   --color-label-mauve: var(--ctp-latte-mauve);
   --color-label-green: var(--ctp-latte-green);
   --color-label-peach: var(--ctp-latte-peach);
+  --color-label-red: var(--ctp-latte-red);
 
   /* 会計処理詳細ページの状態ラベル (TransactionStatusBadge) の塗りつぶし色.
      テキスト側は --color-status-text (Catppuccin base) を使う — latte/mocha
@@ -161,6 +162,7 @@
   --color-label-mauve: var(--ctp-mocha-mauve);
   --color-label-green: var(--ctp-mocha-green);
   --color-label-peach: var(--ctp-mocha-peach);
+  --color-label-red: var(--ctp-mocha-red);
   --color-status-blue: var(--ctp-mocha-blue);
   --color-status-green: var(--ctp-mocha-green);
   --color-status-peach: var(--ctp-mocha-peach);
