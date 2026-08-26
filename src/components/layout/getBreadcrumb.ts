@@ -31,8 +31,10 @@ function getBreadcrumb(pathname: string): string[] {
     return [second === currentUser.id ? currentUser.name : second];
   }
 
-  if (first === "orgs" && second) {
-    // 組織プロフィールページ (/orgs/:orgId): 同様に ID ではなく組織名を1階層だけ表示する
+  if (first === "orgs" && second && second !== "new") {
+    // 組織プロフィールページ (/orgs/:orgId): 同様に ID ではなく組織名を1階層だけ表示する.
+    // /orgs/new (組織作成ページ) は組織 ID ではないため対象外とし,
+    // 下の SPECIAL_ROOT_LABELS.orgs ("組織") にそのまま流す
     return [second === MOCK_ORGANIZATION.id ? MOCK_ORGANIZATION.name : second];
   }
 
