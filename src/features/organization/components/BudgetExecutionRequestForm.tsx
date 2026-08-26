@@ -146,6 +146,32 @@ function BudgetExecutionRequestForm() {
 
   const isValid = organizationId !== "" && budgetLineItemId !== "" && !payeeError && !itemsError;
 
+  // 「どの作成画面でも入力欄にユーザーが入力している場合は, 別のページに
+  // 移動しようとした際に破棄確認を挟んでほしい」という依頼のための離脱ガード
+  // 判定 (useRequestSubmitFlow.ts を参照) — 初期値 (組織/予算項目の先頭選択/
+  // 口座振込) から変わっていない状態を「未入力」とみなす
+  const hasPayeeTextInput = [
+    bankName,
+    bankCode,
+    branchName,
+    branchCode,
+    accountNumber,
+    accountHolder,
+    postalSymbol,
+    postalCheckDigit,
+    postalNumber,
+    postalAccountHolder,
+    cashPayee,
+    remarks,
+  ].some((value) => value !== "");
+  const isDirty =
+    organizationId !== (SELECTABLE_ORGANIZATIONS[0]?.id ?? "") ||
+    budgetLineItemId !== (MOCK_BUDGET_LINE_ITEMS[0]?.id ?? "") ||
+    paymentMethod !== BudgetPaymentMethod.BankAccount ||
+    hasPayeeTextInput ||
+    referenceImages.length > 0 ||
+    nonBlankItems.length > 0;
+
   const {
     submitAttempted,
     confirmOpen,
@@ -158,6 +184,7 @@ function BudgetExecutionRequestForm() {
     closeDiscardConfirm,
   } = useRequestSubmitFlow({
     isValid,
+    isDirty,
     pendingMessage: "予算執行申請を送信しています…",
     successMessage: "予算執行申請の送信が完了しました.",
   });

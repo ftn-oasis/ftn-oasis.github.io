@@ -71,3 +71,24 @@
 .addAgendaButton {
   align-self: flex-start;
 }
+
+/* 「詳細設定を開く/隠す」— 枠線の無いテキストボタン (Button の "ghost"
+   variant は枠線を持つため使わず, 独自の control-base 相当を用意している) */
+.detailsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border-radius: var(--borderRadius-medium);
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.detailsToggle:hover {
+  color: var(--color-link);
+}
+
+.detailsToggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

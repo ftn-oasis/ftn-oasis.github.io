@@ -41,6 +41,15 @@ function DonationRequestForm() {
   const amountError = amount === "" ? "金額を入力してください." : undefined;
   const isValid = organizationId !== "" && !amountError;
 
+  // 「どの作成画面でも入力欄にユーザーが入力している場合は, 別のページに
+  // 移動しようとした際に破棄確認を挟んでほしい」という依頼のための離脱ガード
+  // 判定 (useRequestSubmitFlow.ts を参照) — 初期値 (組織の先頭選択/現金)
+  // から変わっていない状態を「未入力」とみなす
+  const isDirty =
+    organizationId !== (SELECTABLE_ORGANIZATIONS[0]?.id ?? "") ||
+    paymentMethod !== PaymentMethod.Cash ||
+    amount !== "";
+
   const {
     submitAttempted,
     confirmOpen,
@@ -53,6 +62,7 @@ function DonationRequestForm() {
     closeDiscardConfirm,
   } = useRequestSubmitFlow({
     isValid,
+    isDirty,
     pendingMessage: "寄付申請を送信しています…",
     successMessage: "寄付申請の送信が完了しました.",
   });

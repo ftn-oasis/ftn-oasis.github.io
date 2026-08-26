@@ -80,6 +80,16 @@ function StandardDocumentForm() {
 
   const isValid = !titleError && !descriptionError && organizationId !== "";
 
+  // 「どの作成画面でも入力欄にユーザーが入力している場合は, 別のページに
+  // 移動しようとした際に破棄確認を挟んでほしい」という依頼のための離脱ガード
+  // 判定 (useRequestSubmitFlow.ts を参照) — 初期値 (最近編集した組織/公開)
+  // から変わっていない状態を「未入力」とみなす
+  const isDirty =
+    trimmedTitle !== "" ||
+    description !== "" ||
+    visibility !== DocumentVisibility.Public ||
+    organizationId !== getDefaultOrganizationId();
+
   const {
     submitAttempted,
     confirmOpen,
@@ -92,6 +102,7 @@ function StandardDocumentForm() {
     closeDiscardConfirm,
   } = useRequestSubmitFlow({
     isValid,
+    isDirty,
     pendingMessage: "文書を作成しています…",
     successMessage: "文書の作成が完了しました.",
   });
@@ -111,7 +122,7 @@ function StandardDocumentForm() {
       <form onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
           <label htmlFor="new-document-organization" className={styles.label}>
-            組織<span className={styles.required}>*</span>
+            1. 組織<span className={styles.required}>*</span>
           </label>
           <OrganizationSelectField
             id="new-document-organization"
@@ -123,7 +134,7 @@ function StandardDocumentForm() {
 
         <div className={styles.field}>
           <label htmlFor="new-document-title" className={styles.label}>
-            文書名<span className={styles.required}>*</span>
+            2. 文書名<span className={styles.required}>*</span>
           </label>
           <input
             id="new-document-title"
@@ -146,7 +157,7 @@ function StandardDocumentForm() {
 
         <div className={styles.field}>
           <label htmlFor="new-document-description" className={styles.label}>
-            文書概要<span className={styles.required}>*</span>
+            3. 文書概要<span className={styles.required}>*</span>
           </label>
           <textarea
             id="new-document-description"
@@ -171,7 +182,7 @@ function StandardDocumentForm() {
         </div>
 
         <div className={styles.field}>
-          <span className={styles.label}>公開範囲</span>
+          <span className={styles.label}>4. 公開範囲</span>
           <div className={requestFormStyles.requestTypeOptions}>
             {VISIBILITY_OPTIONS.map((option) => (
               <label
@@ -207,7 +218,9 @@ function StandardDocumentForm() {
           <Button type="button" variant="ghost" onClick={handleRequestCancel}>
             入力内容を破棄
           </Button>
-          <Button type="submit">文書を作成する</Button>
+          <Button type="submit" color="green">
+            文書を作成する
+          </Button>
         </div>
       </form>
 
@@ -219,6 +232,8 @@ function StandardDocumentForm() {
             { label: "文書概要", value: description },
             { label: "公開範囲", value: selectedVisibilityLabel ?? "" },
           ]}
+          heading="この内容で作成しますか?"
+          confirmLabel="作成する"
           onEdit={closeConfirm}
           onConfirm={handleConfirmedSubmit}
         />

@@ -1,6 +1,6 @@
 import { Button } from "@src/components/ui/Button";
 import { Icon } from "@src/components/ui/Icon";
-import { IconX } from "@tabler/icons-react";
+import { IconCaretDownFilled, IconCaretUpFilled, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 
 import {
@@ -49,9 +49,9 @@ function getInitialMeetingSelection(): string {
 function MeetingMinutesDocumentForm() {
   const [meetingSelection, setMeetingSelection] = useState(getInitialMeetingSelection);
   const [newMeetingTitle, setNewMeetingTitle] = useState("");
-  // 今日参加予定の会議が無ければ初期選択は「新しい会議」になり, その場合だけ
-  // 折りたたんだ状態で始める (既存の会議が選ばれている間は詳細設定は
-  // 常に表示するため, この state は「新しい会議」選択時にしか参照しない)
+  // 「新しい会議」以外 (既存の会議を選択中) は標準で展開済み,
+  // 「新しい会議」は標準で未展開. 会議の選択が変わるたびに
+  // handleMeetingChange 側でも同じ既定値へ作り直している
   const [detailsExpanded, setDetailsExpanded] = useState(() => TODAYS_MEETINGS.length > 0);
   const [attendees, setAttendees] = useState<OrganizationMember[]>(
     () => TODAYS_MEETINGS[0]?.attendees ?? [],
@@ -96,6 +96,28 @@ function MeetingMinutesDocumentForm() {
   // 会議名は「任意」の入力のため, このモードには送信を弾く必須項目が無い
   const isValid = true;
 
+  // 「どの作成画面でも入力欄にユーザーが入力している場合は, 別のページに
+  // 移動しようとした際に破棄確認を挟んでほしい」という依頼のための離脱ガード
+  // 判定 (useRequestSubmitFlow.ts を参照). 参加者/議題/場所は選択中の会議に
+  // 応じて自動入力されるため, マウント時点の初期値 (今日最初の会議, または
+  // 「新しい会議」) からの変化 — 会議の選択自体を変えたか, 自動入力された
+  // 内容をさらに編集したか — を「未入力」判定の基準にしている
+  const initialAttendees = TODAYS_MEETINGS[0]?.attendees ?? [];
+  const initialAgendaLabels = (TODAYS_MEETINGS[0]?.agenda ?? []).map((item) => item.label);
+  const initialLocation = TODAYS_MEETINGS[0]?.location ?? MEETING_LOCATIONS[0] ?? "";
+  const attendeesChanged =
+    attendees.length !== initialAttendees.length ||
+    attendees.some((member, index) => member.id !== initialAttendees[index]?.id);
+  const agendaChanged =
+    agenda.length !== initialAgendaLabels.length ||
+    agenda.some((item, index) => item.label !== initialAgendaLabels[index]);
+  const isDirty =
+    meetingSelection !== getInitialMeetingSelection() ||
+    newMeetingTitle.trim() !== "" ||
+    attendeesChanged ||
+    agendaChanged ||
+    location !== initialLocation;
+
   const {
     confirmOpen,
     discardConfirmOpen,
@@ -107,6 +129,7 @@ function MeetingMinutesDocumentForm() {
     closeDiscardConfirm,
   } = useRequestSubmitFlow({
     isValid,
+    isDirty,
     pendingMessage: "議事録を作成しています…",
     successMessage: "議事録の作成が完了しました.",
   });
@@ -116,7 +139,7 @@ function MeetingMinutesDocumentForm() {
     : (selectedMeeting?.title ?? "");
   const nonBlankAgenda = agenda.filter((item) => item.label.trim() !== "");
 
-  const showConfigurationFields = !isNewMeetingSelected || detailsExpanded;
+  const showConfigurationFields = detailsExpanded;
 
   return (
     <>
@@ -236,12 +259,28 @@ function MeetingMinutesDocumentForm() {
                 onChange={setLocation}
               />
             </div>
+
+            <div className={requestFormStyles.field}>
+              <button
+                type="button"
+                className={styles.detailsToggle}
+                onClick={() => setDetailsExpanded(false)}
+              >
+                詳細設定を隠す
+                <Icon icon={IconCaretUpFilled} size={13} aria-hidden="true" />
+              </button>
+            </div>
           </>
         ) : (
           <div className={requestFormStyles.field}>
-            <Button type="button" variant="ghost" onClick={() => setDetailsExpanded(true)}>
-              詳細設定
-            </Button>
+            <button
+              type="button"
+              className={styles.detailsToggle}
+              onClick={() => setDetailsExpanded(true)}
+            >
+              詳細設定を開く
+              <Icon icon={IconCaretDownFilled} size={13} aria-hidden="true" />
+            </button>
           </div>
         )}
 
@@ -249,7 +288,9 @@ function MeetingMinutesDocumentForm() {
           <Button type="button" variant="ghost" onClick={handleRequestCancel}>
             入力内容を破棄
           </Button>
-          <Button type="submit">議事録を作成する</Button>
+          <Button type="submit" color="green">
+            議事録を作成する
+          </Button>
         </div>
       </form>
 
@@ -261,6 +302,8 @@ function MeetingMinutesDocumentForm() {
             { label: "議題", value: `${nonBlankAgenda.length}件` },
             { label: "場所", value: location },
           ]}
+          heading="この内容で議事録を作成しますか?"
+          confirmLabel="作成する"
           onEdit={closeConfirm}
           onConfirm={handleConfirmedSubmit}
         />

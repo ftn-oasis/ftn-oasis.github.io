@@ -15,6 +15,12 @@ type RequestConfirmDialogProps = {
   // 破壊的ではない閉じ方のため)
   onEdit: () => void;
   onConfirm: () => void;
+  // 見出し/送信ボタンの文言 (既定は会計申請作成フォーム (~/book/new) 向けの
+  // 文言). 「通常の文書を作成」(StandardDocumentForm) だけ「この内容で
+  // 作成しますか?」/「作成する」に差し替えるための override — 呼び出し元を
+  // 増やさずこのコンポーネントを共有し続けるための最小限の拡張です
+  heading?: string;
+  confirmLabel?: string;
 };
 
 // 会計申請作成フォーム (支出/予算執行/寄付の3種類共通) の送信ボタン押下時に
@@ -25,11 +31,17 @@ type RequestConfirmDialogProps = {
 // 汎用コンポーネントに切り出しています. 「キャンセル」ボタンは依頼により削除
 // 済み — 破棄したい場合は「修正する」(またはオーバーレイ/Escape) で入力画面に
 // 戻ってから, 入力画面側の「入力内容を破棄」ボタンを使う想定です
-function RequestConfirmDialog({ items, onEdit, onConfirm }: RequestConfirmDialogProps) {
+function RequestConfirmDialog({
+  items,
+  onEdit,
+  onConfirm,
+  heading = "この内容で送信しますか?",
+  confirmLabel = "送信する",
+}: RequestConfirmDialogProps) {
   return (
     <Dialog onClose={onEdit} labelledBy="request-confirm-heading">
       <h2 id="request-confirm-heading" className={styles.heading}>
-        この内容で送信しますか?
+        {heading}
       </h2>
       <dl className={styles.summaryList}>
         {items.map((item) => (
@@ -43,7 +55,7 @@ function RequestConfirmDialog({ items, onEdit, onConfirm }: RequestConfirmDialog
       </dl>
       <div className={styles.actions}>
         <Button color="green" className={styles.actionButton} onClick={onConfirm}>
-          送信する
+          {confirmLabel}
         </Button>
         <Button variant="ghost" className={styles.actionButton} onClick={onEdit}>
           修正する

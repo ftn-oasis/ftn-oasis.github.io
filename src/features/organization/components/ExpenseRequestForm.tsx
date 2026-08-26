@@ -77,6 +77,17 @@ function ExpenseRequestForm() {
 
   const isValid = !purposeError && organizationId !== "" && !itemsError;
 
+  // 「どの作成画面でも入力欄にユーザーが入力している場合は, 別のページに
+  // 移動しようとした際に破棄確認を挟んでほしい」という依頼のための離脱ガード
+  // 判定 (useRequestSubmitFlow.ts を参照) — 初期値 (組織の先頭選択/仮払)
+  // から変わっていない状態を「未入力」とみなす
+  const isDirty =
+    organizationId !== (SELECTABLE_ORGANIZATIONS[0]?.id ?? "") ||
+    purpose !== "" ||
+    requestType !== TransactionRequestType.AdvancePayment ||
+    nonBlankItems.length > 0 ||
+    receiptFiles.length > 0;
+
   const {
     submitAttempted,
     confirmOpen,
@@ -89,6 +100,7 @@ function ExpenseRequestForm() {
     closeDiscardConfirm,
   } = useRequestSubmitFlow({
     isValid,
+    isDirty,
     pendingMessage: "会計申請を送信しています…",
     successMessage: "会計申請の送信が完了しました.",
   });
