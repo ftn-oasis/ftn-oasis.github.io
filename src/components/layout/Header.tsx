@@ -10,11 +10,16 @@ import { Link, useLocation } from "react-router";
 
 import { Breadcrumb } from "./Breadcrumb";
 import { getBreadcrumb } from "./getBreadcrumb";
+import { useHeaderBottomSlot } from "./HeaderBottomSlotContext";
 import styles from "./Header.module.css";
 import { PrimaryNavLinks } from "./PrimaryNavLinks";
 import { useHeaderResponsiveLayout } from "./useHeaderResponsiveLayout";
 
 function Header() {
+  // 「下部ヘッダー」(ProfileTabs など) を HeaderBottomPortal 経由で描画するための
+  // スロット. Header 自身はここに何が入るか関知しない
+  const { setSlot } = useHeaderBottomSlot();
+
   const {
     ref: homeRef,
     align: homeAlign,
@@ -34,34 +39,38 @@ function Header() {
 
   return (
     <header className={styles.header}>
-      <div className={styles.left}>
-        <MenuButton />
-        <Link
-          ref={homeRef}
-          to="/"
-          aria-label="ホーム"
-          onMouseEnter={onHomeMouseEnter}
-          onFocus={onHomeFocus}
-          data-tooltip-align={homeAlign}
-          className={styles.homeLink}
-        >
-          <Emblem name="fth-oasis-icon" height={40} />
-        </Link>
-        <Breadcrumb ref={breadcrumbRef} segments={breadcrumb} />
+      <div className={styles.top}>
+        <div className={styles.left}>
+          <MenuButton />
+          <Link
+            ref={homeRef}
+            to="/"
+            aria-label="ホーム"
+            onMouseEnter={onHomeMouseEnter}
+            onFocus={onHomeFocus}
+            data-tooltip-align={homeAlign}
+            className={styles.homeLink}
+          >
+            <Emblem name="fth-oasis-icon" height={35} />
+          </Link>
+          <Breadcrumb ref={breadcrumbRef} segments={breadcrumb} />
+        </div>
+
+        <div ref={searchWrapperRef} className={styles.center}>
+          {searchCollapsed
+            ? <IconButton icon={IconSearch} label="検索" />
+            : <IconButton icon={IconSearch} label="検索" text="検索…" stretch />}
+        </div>
+
+        <div ref={rightRef} className={styles.right}>
+          <CreateButton />
+          {!navCollapsed && <PrimaryNavLinks />}
+          <IconLink to="/notifications" icon={IconBell} label="全ての通知" />
+          <UserMenuButton />
+        </div>
       </div>
 
-      <div ref={searchWrapperRef} className={styles.center}>
-        {searchCollapsed
-          ? <IconButton icon={IconSearch} label="検索" />
-          : <IconButton icon={IconSearch} label="検索" text="検索…" stretch />}
-      </div>
-
-      <div ref={rightRef} className={styles.right}>
-        <CreateButton />
-        {!navCollapsed && <PrimaryNavLinks />}
-        <IconLink to="/notifications" icon={IconBell} label="全ての通知" />
-        <UserMenuButton />
-      </div>
+      <div ref={setSlot} />
     </header>
   );
 }

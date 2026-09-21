@@ -1,0 +1,6 @@
+/* RequestConfirmDialog.module.css の .heading と同じ見た目 */
+.heading {
+  margin: 0 0 16px;
+  color: var(--color-body-headline);
+  font-size: 1.25rem;
+}

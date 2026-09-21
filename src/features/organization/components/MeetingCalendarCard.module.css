@@ -1,0 +1,156 @@
+/* overflow は付けない (テキストの省略記号は .cardLabel 側で完結させている) —
+   ここに付けるとホバー時に表示する .popover (このカードからはみ出て表示される)
+   まで一緒に切り取られてしまう */
+.card {
+  position: relative;
+  display: block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: var(--color-body-button-hover);
+  color: var(--color-body-body);
+  font-size: 0.7rem;
+  text-decoration: none;
+}
+
+.cardLabel {
+  overflow: hidden;
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card:hover,
+.card:focus-visible {
+  background: var(--color-link);
+  color: var(--color-background);
+  outline: none;
+}
+
+/* ホバー/フォーカス時だけ表示するポップオーバー. JS を使わず :hover/:focus-visible
+   だけで開閉する (クリックでの開閉ではなく, 依頼通り「ホバーすると」の挙動のため) */
+.popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 220px;
+  margin-top: 4px;
+  padding: 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-header-background);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+  color: var(--color-body-body);
+  font-size: 0.8125rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+  white-space: normal;
+}
+
+.card:hover .popover,
+.card:focus-visible .popover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* グリッド右寄りの列 (木/金/土) 用. 右端に揃えることで画面右にはみ出さないようにする */
+.popoverAlignRight {
+  right: 0;
+  left: auto;
+}
+
+.popoverTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popoverTitle {
+  overflow: hidden;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popoverAgenda {
+  margin: 0;
+  color: var(--color-body-subtext);
+}
+
+.popoverMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.popoverMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* expanded (上段の週) 用 — ポップオーバーを使わず, 同じ情報をカード自身に
+   常時表示する. .popoverTitleRow/.popoverAgenda/.popoverMeta/.popoverMetaItem
+   と見た目は揃えつつ, 独立したクラスにしている (ポップオーバーは
+   position: absolute の別レイヤーだが, こちらはカードの通常のドキュメント
+   フローに乗る要素のため) */
+.cardExpanded {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  font-size: 0.8125rem;
+  white-space: normal;
+}
+
+.expandedTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* タイトルの左横に表示する時刻. アイコンは付けない (依頼通り) — 固定色では
+   なく opacity で目立たせすぎないようにしている. .card:hover で文字色が
+   background 色に反転しても (color: inherit を経由するため), opacity
+   はその反転後の色に対しても同じ濃淡比率で効くので, ホバー時も違和感が無い */
+.expandedTime {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.expandedTitle {
+  overflow: hidden;
+  color: inherit;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expandedAgenda {
+  overflow: hidden;
+  display: -webkit-box;
+  margin: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.expandedMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem;
+}
+
+.expandedMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

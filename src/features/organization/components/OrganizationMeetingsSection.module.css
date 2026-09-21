@@ -1,0 +1,38 @@
+.root {
+  display: grid;
+  grid-template-columns: 1fr auto 3fr;
+  gap: 16px;
+  max-width: 1280px;
+  padding: 24px 16px;
+  margin: 0 auto;
+}
+
+/* カレンダーモードのときだけ下側の padding を無くす — MeetingCalendarView の
+   .grid は window の高さちょうどに実測して伸びるため, ここで下側に 24px の
+   余白を残すと, ページ全体がその分だけ window より高くなって縦スクロール
+   バーが出てしまう (「カレンダーの下限が window の下限と揃い, スクロール
+   バーが出ないようにしてほしい」という依頼のため). リストモードでは
+   このような JS 実測の仕組みが無いため, 通常どおり四辺均等の padding
+   のままにしている */
+.rootCalendarMode {
+  padding-bottom: 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-body-headline);
+  font-size: 1.5rem;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

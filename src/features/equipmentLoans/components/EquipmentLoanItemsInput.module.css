@@ -1,0 +1,91 @@
+/* PurchaseItemsInput.module.css と同じ考え方 (border-collapse: collapse だと
+   border-radius が効かないため separate + border-spacing: 0 + overflow: hidden) */
+.table {
+  width: 100%;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 8px 12px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  text-align: left;
+}
+
+.table th {
+  background: var(--color-secondary1);
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table .numeric {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.quantityColumn {
+  width: 96px;
+}
+
+/* selectFieldBase の .trigger は自身で border/padding を持つため, PurchaseItemsInput
+   の .cellInput (4px 6px) と同じだけ td 側の padding を削り, 見た目の余白を揃える */
+.nameCell {
+  padding: 4px 6px;
+}
+
+.cellInputNumeric {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 6px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-body-body);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.cellInputNumeric:hover {
+  border-color: var(--color-border);
+}
+
+.cellInputNumeric:focus-visible {
+  border-color: var(--color-focus);
+  outline: none;
+}
+
+.deleteCell {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: none;
+  color: var(--color-body-subtext);
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background: var(--color-body-button-hover);
+  color: var(--color-status-red);
+}
+
+.deleteButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

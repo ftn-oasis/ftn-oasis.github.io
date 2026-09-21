@@ -1,0 +1,47 @@
+.root {
+  display: flex;
+  min-height: 320px;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 220px;
+  overflow-y: auto;
+  padding: 8px;
+  border-right: var(--borderWidth-thin) solid var(--color-border);
+  background: var(--color-secondary1);
+}
+
+.sessionLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.sessionDate {
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+/* MarkdownFileViewer (bordered={false}) を直接内包するため, 外枠は .root
+   だけに任せて padding は持たない — ツールバーが .root の内側の縁に
+   フラットに接するようにしている (DocumentListBox の .toolbar と同じ考え方).
+   overflow-x は明示的に hidden — MarkdownFileViewer のプレビュー/ソース
+   切り替えボタンが持つホバー時ツールチップ (::after, position: absolute)
+   は非表示時 (opacity: 0) でもレイアウト上の領域を占めるため, 横方向に
+   数px だけ scrollWidth を押し広げてしまい, overflow: auto のままだと
+   見た目には何もはみ出していないのに横スクロールバーが常に表示されてしまう
+   不具合になっていた (MaterialsExplorer で実際に踏んだのと同じ不具合) */
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden auto;
+}
+
+.empty {
+  color: var(--color-body-subtext);
+}

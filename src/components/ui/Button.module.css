@@ -1,0 +1,45 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  color: var(--color-background);
+  font-weight: 700;
+}
+
+.blue {
+  background: var(--color-link);
+}
+
+.green {
+  background: var(--color-status-green);
+}
+
+/* 背景透過+枠線のみ (会計申請の確認画面のキャンセルボタンなど, 主要アクション
+   ではないボタン用) */
+.ghost {
+  border: var(--borderWidth-thin) solid var(--color-border);
+  background: transparent;
+  color: var(--color-body-body);
+}
+
+.root:hover {
+  opacity: 0.9;
+}
+
+.ghost:hover {
+  background: var(--color-body-button-hover);
+  opacity: 1;
+}
+
+.root:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

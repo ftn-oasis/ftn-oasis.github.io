@@ -1,0 +1,96 @@
+/* ReceiptUploadField.module.css と同一 (見た目を揃えるため). 幅480pxの
+   モーダル内に収まるよう padding のみ少し詰めている */
+.dropZone {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-secondary1);
+  text-align: center;
+}
+
+.dropZone:hover,
+.dropZoneActive {
+  border-color: var(--color-link);
+  background: var(--color-body-button-hover);
+}
+
+.dropZone:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.uploadIcon {
+  color: var(--color-body-subtext);
+}
+
+.dropZoneText {
+  color: var(--color-body-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.dropZoneHint {
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  color: var(--color-body-subtext);
+}
+
+.fileName {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--color-body-body);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: none;
+  color: var(--color-body-subtext);
+  cursor: pointer;
+}
+
+.removeButton:hover {
+  background: var(--color-body-button-hover);
+  color: var(--color-status-red);
+}
+
+.removeButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

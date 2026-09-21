@@ -1,0 +1,131 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* TransactionProcedureTimeline の .step は <div> だが, ここは版をクリックで
+   選択できるようにするため <button> にしている — 見た目はテキストの左揃え
+   以外, 素の button の既定スタイルを打ち消して合わせている */
+.step {
+  display: flex;
+  gap: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.step:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 30px;
+}
+
+.circle {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+/* 選択中の版 — 中空の円 (30px四方) の中に塗り潰しの小さな円を置く,
+   二重丸 (radio ボタンの選択中のような見た目). box-sizing: border-box
+   が無いと border 分 (2px×2) だけ実際のサイズが 30px を超え, 横並びの
+   flexbox 内で幅だけ縮小され縦長に潰れてしまう (実際に踏んだ不具合) ため,
+   border を含めて 30px 四方に収まるようにしている */
+.circleRing {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-link);
+  border-radius: 50%;
+}
+
+.circleRingDot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-link);
+}
+
+.circleMuted {
+  color: var(--color-body-subtext0);
+}
+
+.stepBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+}
+
+.label {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.labelMuted {
+  color: var(--color-body-subtext0);
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.metaMuted {
+  color: var(--color-body-subtext0);
+}
+
+/* 「矢印の色が上下で異なるので, subtext1色に統一してほしい」という依頼のため,
+   選択中/非選択中による色分け (以前の .connectorMuted) は廃止し, 常に
+   subtext1 の単色にしている */
+.connector {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-body-subtext);
+}
+
+.connectorSpacer {
+  flex: 1 1 0;
+}
+
+.connectorLine {
+  flex: 1 1 auto;
+  width: var(--borderWidth-thin);
+  background: currentcolor;
+}
+
+/* 「矢印は下から上に伸びるようにしてほしい」という依頼のため, 上向きの三角形
+   (bottom border だけに幅を持たせる CSS 三角形トリック) にしている */
+.connectorArrowhead {
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border-width: 0 4px 5px;
+  border-style: solid;
+  border-color: transparent transparent currentcolor;
+}

@@ -1,0 +1,53 @@
+/* MeetingMinutesDocumentForm.module.css の .attendeeList/.attendeeChip/
+   .attendeeName/.removeButton/.emptyHint と同じ (構成員版) — 「議事録作成
+   画面の参加者入力欄を参考にする」という依頼のため, 見た目もそのまま揃えている */
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.memberChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.memberName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-body-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeButton {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-body-subtext);
+  cursor: pointer;
+}
+
+.removeButton:hover {
+  background: var(--color-body-button-hover);
+  color: var(--color-body-body);
+}
+
+.emptyHint {
+  margin: 0 0 8px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}

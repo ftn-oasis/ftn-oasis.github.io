@@ -1,0 +1,19 @@
+/* <a> は既定でブラウザ固有の色/下線を持つため, 呼び出し側の見た目を一切
+   変えないようにするには, それらを打ち消した上で親から色/フォントを継承する
+   必要がある. :where() で包み詳細度を 0 にすることで, 呼び出し側が className
+   経由で渡す独自の色指定 (ActivityCard の .actorName, MarkdownDocument の
+   .mention など) と詳細度が衝突せず, 常に呼び出し側の指定が優先されるように
+   している — 同じ詳細度 (単純クラス1つ) 同士だと, バンドル後の CSS の
+   読み込み順に結果が左右されてしまうため */
+:where(.root) {
+  color: inherit;
+  font: inherit;
+
+  /* nested (role="link" の <span>) は既定でポインターカーソルを持たないため */
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.root:hover {
+  text-decoration: underline;
+}

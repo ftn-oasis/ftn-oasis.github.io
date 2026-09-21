@@ -1,0 +1,48 @@
+.heading {
+  margin: 0 0 16px;
+  color: var(--color-body-headline);
+  font-size: 1.25rem;
+}
+
+.summaryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 24px;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.summaryLabel {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+}
+
+.summaryValue {
+  overflow: hidden;
+  color: var(--color-body-body);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 元々「送信ボタン, 修正ボタン, キャンセルボタンを縦に配置してほしい」という
+   依頼で column にしていた (キャンセル確認画面 DiscardConfirmDialog の
+   .actions は逆に横並びのまま — 依頼の対象がこちらのモーダルだけだったため).
+   キャンセルボタン自体は後の依頼で削除したが, 残る2ボタンも同じ column の
+   まま維持している */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actionButton {
+  width: 100%;
+}

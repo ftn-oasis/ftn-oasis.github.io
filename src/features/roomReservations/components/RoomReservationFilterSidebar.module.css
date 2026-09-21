@@ -1,0 +1,27 @@
+/* MeetingFilterSidebar.module.css と同じ (グリッドのセル位置だけを保持する
+   プレースホルダー+position: fixed の本体, 詳細は useFixedSidebarPosition.ts
+   を参照) */
+.placeholder {
+  min-width: 0;
+}
+
+.root {
+  display: flex;
+  position: fixed;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.filterList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendarSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}

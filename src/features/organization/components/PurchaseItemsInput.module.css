@@ -1,0 +1,141 @@
+/* TransactionItemsList.module.css と同じ考え方 (border-collapse: collapse だと
+   border-radius が効かないため separate + border-spacing: 0 + overflow: hidden) */
+.table {
+  width: 100%;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 8px 12px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  text-align: left;
+}
+
+.table th {
+  background: var(--color-secondary1);
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+/* 最下部の合計行 — 通常の項目より暗くする (TransactionItemsList と同じ) */
+.totalRow td {
+  background: var(--color-secondary1);
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 「計」/「合計」列の "0円" が幅不足で2行になっていた不具合の修正 —
+   nowrap にすると, table の auto layout がこの列の幅をこの内容 (折り返さない
+   前提) を基準に確保するようになる. セレクタを `.table .numeric` (詳細度
+   0,2,0) にしているのは, 単なる `.numeric` (0,1,0) だと `.table th, .table
+   td` (0,1,1) の text-align: left の方が詳細度で勝ってしまい, 右揃えが
+   全く反映されない (「計を右揃えにしてほしい」という指摘で発覚した) 不具合を
+   踏んだため */
+.table .numeric {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* 「金額」「個数」列を「計」列と同程度まで狭め, 名称/概要をより広く見せる —
+   <colgroup> の <col> に幅の目安を与える (table-layout: auto のままでも
+   ブラウザはこれをヒントとして尊重する). 「金額」列は5桁 (最大99999円) +
+   円マークが見切れないよう, 「個数」より広めに確保している */
+.amountColumn {
+  width: 130px;
+}
+
+.quantityColumn {
+  width: 64px;
+}
+
+.cellInput,
+.cellInputNumeric {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 6px;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid transparent;
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-body-body);
+  font: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 名称/概要は「入力可能なことが判るように」常時ボーダーラインを表示する
+   (金額/個数は数値入力欄のため, 右揃え+tabular-nums の見た目自体が既に
+   入力欄であることを示しており対象外). 見切れた場合は3点リーダを表示する
+   (cellInput/cellInputNumeric 共通の overflow/text-overflow/white-space) */
+.cellInput {
+  border-color: var(--color-border);
+}
+
+.cellInputNumeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cellInput:hover,
+.cellInputNumeric:hover {
+  border-color: var(--color-border);
+}
+
+.cellInput:focus-visible,
+.cellInputNumeric:focus-visible {
+  border-color: var(--color-focus);
+  outline: none;
+}
+
+/* 金額入力欄+右側の "円" 表記を横並びにするラッパー */
+.amountInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.amountInputWrapper .cellInputNumeric {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.currencySuffix {
+  flex-shrink: 0;
+  color: var(--color-body-subtext);
+}
+
+.deleteCell {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: none;
+  color: var(--color-body-subtext);
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background: var(--color-body-button-hover);
+  color: var(--color-status-red);
+}
+
+.deleteButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

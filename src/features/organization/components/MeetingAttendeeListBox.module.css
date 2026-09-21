@@ -1,0 +1,16 @@
+.root {
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.toolbar {
+  padding: 8px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  background: var(--color-secondary1);
+}
+
+.count {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}

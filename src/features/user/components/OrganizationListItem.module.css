@@ -1,0 +1,31 @@
+/* menuItemBase.root の padding: 8px 12px はアイコン1つ分の高さ (35px 前後)
+   を想定した値で, 40px のアバターを乗せるこの行には上下が余分だったため
+   打ち消す. menuItemBase 側とのカスケード順に依存しないよう, タグ込みの
+   セレクタ (specificity で確実に勝つ) にしている */
+a.root {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.name {
+  overflow: hidden;
+  color: var(--color-body-headline);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  overflow: hidden;
+  color: var(--color-body-body);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,64 @@
+/* サイドバー (MiniCalendar) ・メイン (MeetingCalendarView) 双方の「今日」
+   ナビゲーション ([前][今日][次]) が使う共通の外枠. 3つのボタンを1つの
+   罫線付きボックスにまとめ, ボタンには個別の border を持たせず, 隣り合う
+   ボタンの間にだけ区切り線を入れることで, バラバラのボタンが並んでいる
+   ようには見えないようにしている.
+   overflow: hidden は使わない — .tooltip (下記) が下にはみ出す形で表示する
+   ツールチップまで一緒に切り取ってしまうため (MeetingCalendarCard などで
+   何度も踏んだのと同じ種類の不具合). 代わりに最初/最後の子要素にだけ
+   角丸を個別に指定して, 見た目の角丸を再現している */
+.root {
+  display: inline-flex;
+  align-items: stretch;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.root > *:first-child {
+  border-top-left-radius: var(--borderRadius-medium);
+  border-bottom-left-radius: var(--borderRadius-medium);
+}
+
+.root > *:last-child {
+  border-top-right-radius: var(--borderRadius-medium);
+  border-bottom-right-radius: var(--borderRadius-medium);
+}
+
+.item {
+  border-left: var(--borderWidth-thin) solid var(--color-border);
+}
+
+.item:first-child {
+  border-left: none;
+}
+
+/* aria-label をツールチップとして表示する (controlBase.module.css の
+   ホバー時ツールチップと同じ仕組み — content: attr(aria-label) をそのまま
+   流用する). この外枠のうち, 依頼された特定のボタンにだけ個別に付ける
+   opt-in クラスとして分けている (.item のように全ボタン共通にはしていない) */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--color-hover-body);
+  background: var(--color-hover-background);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.05s ease;
+}
+
+.tooltip[aria-label]:not([aria-label=""]):hover::after,
+.tooltip[aria-label]:not([aria-label=""]):focus-visible::after {
+  opacity: 1;
+}

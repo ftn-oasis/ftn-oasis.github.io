@@ -1,0 +1,24 @@
+/* グリッドのセル位置 (幅) だけを保持する, 見た目を持たないプレースホルダー.
+   中身の .root は position: fixed で画面に固定表示するため, 元のグリッド
+   セルにはこの空の要素だけを残している (useFixedSidebarPosition.ts を参照) */
+.placeholder {
+  min-width: 0;
+}
+
+/* position: fixed — スクロールしてもサイドバーが画面上部を基準として
+   留まるようにする. top/left/width は useFixedSidebarPosition が実測して
+   inline style で設定する.
+   当初は position: sticky で実装していましたが, 一覧の末尾に近づくと
+   サイドバーの上端が画面外へ押し出されて見えなくなる不具合があったため
+   (詳細は useFixedSidebarPosition.ts のコメントを参照), scroll の影響を
+   一切受けない fixed に切り替えました */
+.root {
+  display: flex;
+  position: fixed;
+  flex-direction: column;
+  gap: 2px;
+
+  /* ヘッダーのパンくず (Breadcrumb.module.css) と同じ文字サイズに揃える.
+     menuItemBase.root は font: inherit のため, ここでカスケードするだけで反映される */
+  font-size: 0.9rem;
+}

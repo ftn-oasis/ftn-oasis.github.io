@@ -1,0 +1,144 @@
+/* MiniCalendar.module.css の見た目 (macOS のカレンダーアプリ風) を踏襲しつつ,
+   フォームの1項目として独立して置かれるため, サイドバーへの埋め込み前提だった
+   MiniCalendar には無かった外枠 (border/border-radius) を持たせている
+   (「リストの角は既定で丸めてほしい」という標準方針) */
+.root {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  font-size: 0.75rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 4px;
+}
+
+.headerLabel {
+  color: var(--color-body-headline);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.navButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.todayButton {
+  height: 20px;
+  padding: 0 6px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+}
+
+.todayButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.todayButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.weekdayRow {
+  display: flex;
+  align-self: center;
+}
+
+.weeks {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+}
+
+.weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  color: var(--color-body-subtext);
+}
+
+.week {
+  display: flex;
+}
+
+/* MiniCalendar の週ボタン (.week) と違い, ここでは日1つ1つがクリック可能な
+   ボタン (会議の開催「日」を選ぶため) */
+.day {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  height: 33px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.day:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+  border-radius: 50%;
+}
+
+.dayInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--color-body-body);
+}
+
+.dayWeekend {
+  color: var(--color-body-subtext);
+}
+
+.dayOutside {
+  color: var(--color-overlay1);
+}
+
+/* 今日 (選択中でない場合) — 選択中の日と混同しないよう塗り潰しではなく枠線のみ */
+.dayToday {
+  border: var(--borderWidth-thin) solid var(--color-link);
+}
+
+.daySelected {
+  color: var(--color-background);
+  background: var(--color-link);
+  font-weight: 700;
+}
+
+.day:hover .dayInner {
+  background: var(--color-body-button-hover);
+}
+
+.day:hover .daySelected {
+  background: var(--color-link);
+}

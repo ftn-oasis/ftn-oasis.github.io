@@ -1,0 +1,72 @@
+/* border-collapse: collapse だと border-radius が効かない (角が丸まらない)
+   ブラウザの既知の挙動のため, separate + border-spacing: 0 + overflow: hidden
+   に変更している — DocumentListBox 等, 他の一覧 Box と同じ角丸にするため */
+.table {
+  width: 100%;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 10px 16px;
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+  text-align: left;
+}
+
+/* 最下部の合計行 — 通常の項目より暗くする */
+.totalRow td {
+  background: var(--color-secondary1);
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table th {
+  background: var(--color-secondary1);
+}
+
+.headerButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--borderRadius-medium);
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+.headerButton:hover {
+  color: var(--color-link);
+}
+
+.headerButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.headerButtonActive {
+  color: var(--color-link);
+}
+
+.sortIcon {
+  color: var(--color-overlay1);
+}
+
+.headerButtonActive .sortIcon {
+  color: var(--color-link);
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.description {
+  color: var(--color-body-subtext);
+}

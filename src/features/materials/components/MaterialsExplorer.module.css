@@ -1,0 +1,124 @@
+.root {
+  display: flex;
+  min-height: 320px;
+  overflow: hidden;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 280px;
+  overflow-y: auto;
+  padding: 8px;
+  border-right: var(--borderWidth-thin) solid var(--color-border);
+  background: var(--color-secondary1);
+}
+
+/* ツリーの1行 — 「開閉トグル (子を持つ場合のみ)」+「文書自体を開くリンク」を
+   横並びにする. --depth (呼び出し側が inline style で設定) の階層ぶんだけ
+   インデントする (Pagination.module.css の --page-digits と同じ, CSS カスタム
+   プロパティを inline style で渡すパターン).
+   「入れ子の矢印アイコンを親のファイル・フォルダアイコンの位置に揃えて
+   ほしい」という依頼のため, 1階層あたりのインデント幅は単純な値ではなく,
+   「ある行の矢印アイコンの左端から, その1つ下の階層の行のファイル・
+   フォルダアイコンの左端までの距離」と一致させている —
+   .chevronButton の width (24px) + a.fileLink の margin-left (3px) +
+   padding-left (6px) = 33px (行頭からファイル・フォルダアイコン左端までの
+   距離) から, .chevronButton 内で矢印アイコン (14px) が中央寄せされる
+   ことによる余白 ((24px-14px)/2 = 5px, 矢印アイコン自体の行頭からの
+   オフセット) を差し引いた 28px. */
+.treeRow {
+  display: flex;
+  align-items: center;
+  padding-left: calc(var(--depth, 0) * 28px);
+}
+
+.chevronButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 24px;
+  height: 35px;
+  padding: 0;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: none;
+  cursor: pointer;
+}
+
+.chevronButton:hover {
+  background: var(--color-header-button-hover);
+}
+
+.chevronButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+/* 子を持たない文書 (トグルボタンが無い) も, 子を持つ文書と横位置が揃うように
+   同じ幅のスペーサーを置く */
+.chevronSpacer {
+  flex-shrink: 0;
+  width: 24px;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-overlay1);
+}
+
+.fileLink {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ファイル・フォルダアイコン. flex-shrink を明示していないと, 2行に
+   折り返すほど長い文書名 (「部活動・委員会への参加について」など) の行では
+   .fileLink (flex コンテナ) 内の空きが少なく, デフォルトの flex-shrink: 1
+   によりアイコンまで一緒に縮んでしまっていた (実際に発生した不具合) */
+.nodeIcon {
+  flex-shrink: 0;
+}
+
+/* 「矢印アイコン, ファイル･フォルダアイコン, 文書名のそれぞれの間を現状の
+   半分に縮小してほしい」という依頼のため, menuItemBase.root の margin-left
+   (6px→3px)/padding-left (12px→6px, 矢印⇔ファイル・フォルダアイコンの間)
+   /gap (10px→5px, ファイル・フォルダアイコン⇔文書名の間) を上書きしている.
+   タグ込みセレクタ (a.fileLink) にしているのは, menuItemBase.root と
+   同じ詳細度のクラスセレクタのままだと, バンドル後の CSS の読み込み順に
+   よって menuItemBase.root 側の指定が勝ってしまう可能性があるため
+   (OrganizationListItem の a.root 上書きと同じ理由) */
+a.fileLink {
+  gap: 5px;
+  margin-left: 3px;
+  padding-left: 6px;
+}
+
+/* overflow-x は明示的に hidden — MarkdownFileViewer のプレビュー/ソース
+   切り替えボタンが持つホバー時ツールチップ (::after, position: absolute)
+   は非表示時 (opacity: 0) でもレイアウト上の領域を占めるため, 横方向に
+   数px だけ scrollWidth を押し広げてしまい, overflow: auto のままだと
+   見た目には何もはみ出していないのに横スクロールバーが常に表示されてしまう
+   不具合になっていた. 縦方向のスクロールは維持しつつ, 横方向だけ明示的に
+   隠す (2軸のうち1つだけ visible 以外にすると, もう片方も暗黙的に auto
+   扱いになり得るため両方明示する — NavDrawer の .drawer と同じ考え方) */
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 24px;
+  overflow: hidden auto;
+}
+
+.empty {
+  color: var(--color-body-subtext);
+}
+
+/* MarkdownFileViewer (bordered={false}) 用 — .main の padding: 24px を
+   負の margin で打ち消し, ツールバーが .root の外枠に直接接するようにする
+   (2重に囲われるのを避けるため. MeetingMaterialsExplorer と同じ考え方) */
+.markdownContent {
+  margin: -24px;
+}

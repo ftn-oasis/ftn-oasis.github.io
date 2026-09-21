@@ -1,0 +1,7 @@
+/* DocumentIssuesSection は組織/文書詳細ページにネストされる前提で
+   max-width を持たないため, 単独ページとして使うここでだけ中央寄せする */
+.root {
+  max-width: 1280px;
+  padding: 24px 16px;
+  margin: 0 auto;
+}

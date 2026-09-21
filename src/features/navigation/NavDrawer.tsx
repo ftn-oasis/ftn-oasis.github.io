@@ -1,23 +1,33 @@
 import {
   IconBook2,
   IconBuilding,
+  IconBuildingEstate,
   IconCalendarTime,
   IconFileAlert,
-  IconFileDescription,
+  IconFileText,
   IconFileTextSpark,
   IconHome,
   IconMessageReport,
+  IconPackage,
+  IconPrinter,
   IconReceiptYen,
   IconX,
 } from "@tabler/icons-react";
 import clsx from "clsx";
+import { Link } from "react-router";
 
+import { Avater } from "@src/components/ui/Avatar";
 import { Divider } from "@src/components/ui/Divider";
 import { Emblem } from "@src/components/ui/Emblem";
 import { Icon } from "@src/components/ui/Icon";
 import { useEscapeKey } from "@src/components/ui/useEscapeKey";
 import menuItemBase from "@src/components/ui/menuItemBase.module.css";
 import { MenuLink } from "@src/components/ui/MenuLink";
+import { useReportIssueModal } from "@src/contexts/ReportIssueModalContext";
+import {
+  getDocumentsEditedByCurrentUser,
+  MOCK_ORGANIZATION,
+} from "@src/features/organization/mockData";
 
 import styles from "./NavDrawer.module.css";
 
@@ -28,6 +38,8 @@ type NavDrawerProps = {
 
 function NavDrawer({ open, onClose }: NavDrawerProps) {
   useEscapeKey(open, onClose);
+  const recentDocuments = getDocumentsEditedByCurrentUser();
+  const { openReportIssueModal } = useReportIssueModal();
 
   return (
     <>
@@ -55,39 +67,107 @@ function NavDrawer({ open, onClose }: NavDrawerProps) {
           </button>
         </div>
 
-        <MenuLink to="/" icon={IconHome} label="ホーム" />
-        <MenuLink to="/issues" icon={IconFileAlert} label="改善点の指摘" />
-        <MenuLink to="/pulls" icon={IconFileTextSpark} label="修正の提案" />
+        <MenuLink to="/" icon={IconHome} label="ホーム" onClick={onClose} />
+        <MenuLink
+          to="/issues"
+          icon={IconFileAlert}
+          label="指摘事項一覧"
+          onClick={onClose}
+        />
+        <MenuLink
+          to="/pulls"
+          icon={IconFileTextSpark}
+          label="修正提案一覧"
+          onClick={onClose}
+        />
         <MenuLink
           to="/documents"
-          icon={IconFileDescription}
-          label="全ての文書"
+          icon={IconFileText}
+          label="文書一覧"
+          onClick={onClose}
         />
-        <MenuLink to="/books" icon={IconReceiptYen} label="全ての会計申請" />
+        <MenuLink
+          to="/book"
+          icon={IconReceiptYen}
+          label="会計処理一覧"
+          onClick={onClose}
+        />
         <MenuLink
           to="/meetings"
           icon={IconCalendarTime}
-          label="予定されている会議"
+          label="会議一覧"
+          onClick={onClose}
         />
 
         <Divider />
 
         <MenuLink
-          to="https://<subdomain>.io/documents"
-          icon={IconBook2}
-          label="規則･資料"
+          to="/print-queue"
+          icon={IconPrinter}
+          label="印刷状況"
+          onClick={onClose}
         />
         <MenuLink
-          to="https://<subdomain>.io/organizations"
-          icon={IconBuilding}
-          label="組織"
+          to="/room-reservations"
+          icon={IconBuildingEstate}
+          label="新館予約状況"
+          onClick={onClose}
+        />
+        <MenuLink
+          to="/equipment-loans"
+          icon={IconPackage}
+          label="備品貸出状況"
+          onClick={onClose}
         />
 
-        <div className={styles.spacer} />
+        <Divider />
+
+        <MenuLink
+          to="/materials"
+          icon={IconBook2}
+          label="規則･資料"
+          onClick={onClose}
+        />
+        <MenuLink
+          to="/orgs"
+          icon={IconBuilding}
+          label="組織一覧"
+          onClick={onClose}
+        />
+
+        <Divider />
+
+        {/* 「直近で編集した文書を画面に収まる限り入れてほしい」という依頼のため,
+            .drawer 自体のスクロールとは別に, この一覧だけ overflow: hidden で
+            クリップし, スクロールではなく単純に入りきる分だけ表示する
+            (.spacer と同じ flex: 1 1 auto で残りの縦幅を埋めつつ, 「問題を
+            報告」ボタンを最下部に押し出す役割も兼ねる) */}
+        <div className={styles.recentDocuments}>
+          {recentDocuments.map((document) => (
+            <Link
+              key={document.id}
+              to={`/orgs/${document.organizationId}/documents/${document.id}`}
+              onClick={onClose}
+              className={menuItemBase.root}
+            >
+              <Avater shape="square" size={20} />
+              <span
+                className={styles.recentDocumentLabel}
+                title={`${MOCK_ORGANIZATION.name}/${document.title}`}
+              >
+                {MOCK_ORGANIZATION.name}/{document.title}
+              </span>
+            </Link>
+          ))}
+        </div>
 
         <button
           type="button"
           className={clsx(menuItemBase.root, styles.reportButton)}
+          onClick={() => {
+            onClose();
+            openReportIssueModal();
+          }}
         >
           <Icon icon={IconMessageReport} aria-hidden="true" />
           <span>問題を報告</span>

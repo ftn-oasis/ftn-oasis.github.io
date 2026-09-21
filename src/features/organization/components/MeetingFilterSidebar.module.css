@@ -1,0 +1,40 @@
+/* グリッドのセル位置 (幅) だけを保持する, 見た目を持たないプレースホルダー
+   (DocumentFilterSidebar と同じ理由 — 詳細は useFixedSidebarPosition.ts を参照) */
+.placeholder {
+  min-width: 0;
+}
+
+/* position: fixed — スクロールしてもサイドバーが画面上部を基準として
+   留まるようにする. top/left/width は useFixedSidebarPosition が, height は
+   div#root の下端とその top から MeetingFilterSidebar.tsx が算出した
+   ものを, それぞれ inline style で設定する (詳細はそちらを参照) —
+   「ミニカレンダーの最下部は, windowの最下部ではなくdiv#rootの最下部に
+   合わせてほしい」という依頼のため (以前は window.innerHeight を使って
+   いました). position: fixed は祖先要素の高さに一切影響されない
+   (position: sticky だと一覧の末尾に近づいた際に上端が画面外へ押し出される
+   不具合がありました) */
+.root {
+  display: flex;
+  position: fixed;
+  flex-direction: column;
+  gap: 8px;
+
+  /* ヘッダーのパンくず (Breadcrumb.module.css) と同じ文字サイズに揃える.
+     menuItemBase.root は font: inherit のため, ここでカスケードするだけで反映される */
+  font-size: 0.9rem;
+}
+
+.filterList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* .root (JS が window の下端に合わせて実測した高さを持つ) の縦幅に対して,
+   分割線+ミニカレンダーだけを最下部に貼り付ける */
+.calendarSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}

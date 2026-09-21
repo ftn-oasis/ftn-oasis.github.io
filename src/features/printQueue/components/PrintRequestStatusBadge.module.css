@@ -1,0 +1,36 @@
+/* TransactionStatusBadge.module.css と同じ土台 (左右が半円のピル型ラベル) */
+.root {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 12px;
+  border-radius: 999px;
+  color: var(--color-status-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.requesting {
+  background: var(--color-status-blue);
+}
+
+.queued {
+  background: var(--color-status-teal);
+}
+
+.awaitingPickup {
+  background: var(--color-status-peach);
+}
+
+.completed {
+  background: var(--color-status-green);
+}
+
+.canceled {
+  background: var(--color-status-red);
+}
+
+.compact {
+  padding: 1px 8px;
+  font-size: 0.75rem;
+}

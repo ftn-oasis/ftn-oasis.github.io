@@ -1,0 +1,65 @@
+/* GitHub の User/Organization Profile ページを参考にした, ヘッダー下部に
+   隙間なく続けて表示するタブバー共通の見た目. 呼び出し側は <button>
+   (状態切り替え, 例: ProfileTabs) と <NavLink> (実際のルーティング, 例:
+   OrganizationTabs) のどちらでも使うため, タグ非依存のクラスにしている. */
+
+.root {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border: none;
+  border-radius: var(--borderRadius-medium);
+  background: transparent;
+  color: var(--color-header-body-em);
+  font: inherit;
+
+  /* ヘッダーのパンくず (Breadcrumb.module.css) と同じ文字サイズに揃える */
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ホバー時はメニュードロワーの行 (menuItemBase) と同じ背景色のみで示す */
+.tab:hover {
+  background: var(--color-header-button-hover);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+/* 選択中を示す下線. ボタン自身の border ではなく, ボタンの margin (6px) の外側
+   = .root の下端 (= 外側の .header の border-bottom の位置) まで伸ばした疑似要素
+   として独立させることで, ヘッダー下部の線に沿って表示されるようにしている */
+.selected::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  left: 0;
+  height: 2px;
+  background: var(--color-link);
+}
+
+.selected {
+  font-weight: 700;
+}
+
+.count {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-background);
+  color: var(--color-header-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+}

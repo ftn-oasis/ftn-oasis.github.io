@@ -1,0 +1,33 @@
+.root {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+}
+
+.sky {
+  border-color: var(--color-label-sky);
+  color: var(--color-label-sky);
+}
+
+.mauve {
+  border-color: var(--color-label-mauve);
+  color: var(--color-label-mauve);
+}
+
+.green {
+  border-color: var(--color-label-green);
+  color: var(--color-label-green);
+}
+
+.peach {
+  border-color: var(--color-label-peach);
+  color: var(--color-label-peach);
+}
+
+.red {
+  border-color: var(--color-label-red);
+  color: var(--color-label-red);
+}

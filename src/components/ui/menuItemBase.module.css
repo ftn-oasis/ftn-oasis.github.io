@@ -2,15 +2,20 @@
    IconButton/IconLink の controlBase と違い, 通常時はボーダーを表示せず,
    横幅は親要素いっぱい, 中身は左揃えにする. */
 
+/* 左右 6px は CurrentContentBar (現在選択中の左脇の太線) がボタンと重ならずに
+   収まる隙間. width: 100% のままだと margin の分だけ親からはみ出すため,
+   その分を差し引いている */
 .root {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  width: calc(100% - 12px);
+  margin: 0 6px;
   padding: 8px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--borderRadius-medium);
   background: transparent;
   color: var(--color-header-body);
   text-align: left;
@@ -30,4 +35,13 @@
 .root:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: -2px;
+}
+
+/* 現在表示中のページに対応する項目: hover と同じ背景, 文字は太字+text色で強調.
+   左脇の太い青線は CurrentContentBar (独立した要素, box-shadow だと border-radius
+   に沿って角が丸まってしまうため) を呼び出し側が併せて描画する */
+.active {
+  background: var(--color-header-button-hover);
+  color: var(--color-header-body-em);
+  font-weight: 700;
 }

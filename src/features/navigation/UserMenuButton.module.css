@@ -45,14 +45,51 @@
 .profileText {
   display: flex;
   flex-direction: column;
-  min-width: 0;
 }
 
 .userName {
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .userEmail {
-  font-size: 0.85em;
   color: var(--color-overlay1);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+/* 役職プレビュー (下記 .roleRow) の効果をこのプロフィール行でも確認できる
+   ようにするための表示. userEmail と同じトーンで, 実際の設定ではなく現在の
+   プレビュー結果であることが伝わるよう控えめな見た目にしている */
+.userRole {
+  color: var(--color-overlay1);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+/* 「外観」— menuItemBase.root の行 (padding: 8px 12px) と横位置を揃えつつ,
+   ThemePreferenceToggle をこの行いっぱいに配置する (「メニューの幅に合致する
+   ようにしてほしい」という依頼のため, 中身のトグル自体を width: 100% にして
+   引き延ばしている — 詳細は ThemePreferenceToggle.module.css を参照).
+   クリック可能な行ではないため menuItemBase は使わず個別に実装している */
+.themeRow {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+}
+
+/* 役職プレビュー — .themeRow と同じ考え方だが, こちらはテキストラベルが
+   毎回同じ文言 (「表示する役職 (プレビュー用)」) で読みやすさを優先し,
+   ラベル+トグルを縦に並べている (.themeRow は横並びだが, 「外観」より
+   ラベルが長く, 横並びだとトグル自体の幅を圧迫するため) */
+.roleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.roleLabel {
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
 }

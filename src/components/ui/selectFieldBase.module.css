@@ -1,0 +1,89 @@
+/* フォーム内のドロップダウン選択欄が共通で使う土台. requestFormBase.module.css
+   の .select (ネイティブ <select>) の代わりに, ヘッダーの「作成」ボタン
+   (CreateButton) と同じ useDismissablePopover + menuItemBase の構成で
+   実装するための見た目一式です. 元は OrganizationSelectField 専用の
+   CSS でしたが, 「予算項目のドロップダウンを組織のドロップダウンと同じ形式に
+   してほしい, 今後ドロップダウンを実装する場合もそうしてほしい」という依頼で
+   BudgetLineItemSelectField からも使う共通土台として切り出しました —
+   今後フォームにドロップダウンを追加する際は, ネイティブ <select> ではなく
+   まずこのパターンを検討してください */
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+}
+
+/* requestFormBase.module.css の .input と同じ見た目のトリガー */
+.trigger {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-background);
+  color: var(--color-body-body);
+  cursor: pointer;
+  font: inherit;
+}
+
+.trigger:hover {
+  background: var(--color-body-button-hover);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -1px;
+}
+
+.triggerContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.triggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* CreateButton.module.css の .menu と同じ, ボタン下に浮くパネル
+   (左右をトリガーの幅に揃えるため left/right: 0 にしている点のみ異なる) */
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 240px;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-header-background);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+}
+
+/* グループ分けが必要なドロップダウン (BudgetLineItemSelectField の
+   所管-組織単位のグループなど) 用 — グループが無い場合 (OrganizationSelectField
+   など) は使わない */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.groupLabel {
+  padding: 4px 8px 2px;
+  color: var(--color-body-subtext);
+  font-size: 0.75rem;
+  font-weight: 700;
+}

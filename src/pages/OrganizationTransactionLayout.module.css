@@ -1,0 +1,21 @@
+.root {
+  max-width: 1280px;
+  padding: 0 16px;
+  margin: 0 auto;
+}
+
+.notFound {
+  padding: 32px 24px;
+  color: var(--color-body-body);
+}
+
+/* タブ下部にヘッダーの border-bottom と同じ役割の区切り線を持たせる —
+   OrganizationTabs はヘッダー自身 (.header) の border-bottom を借りられるが,
+   このタブバーはページ本文側にあるため自前で持たせている */
+.tabsWrapper {
+  border-bottom: var(--borderWidth-thin) solid var(--color-border);
+}
+
+.content {
+  padding: 24px 0;
+}

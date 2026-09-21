@@ -1,0 +1,146 @@
+/* 「手続き状況のboxについて, 左右のpaddingを24pxとってほしい」という依頼で
+   一度ボーダー付きの Box にしていましたが, 「内容を囲う枠を消してほしい」
+   という依頼により border/border-radius は外し, padding だけ残しています.
+   さらに, 親 (OrganizationTransactionLayout.module.css の .content, 上下
+   padding: 24px) と縦方向の padding が二重にかかり内容が二重に囲われて
+   見えていたため, 上下は 0 にし左右の24pxだけ残しています */
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 24px;
+}
+
+/* align-items は既定の stretch のまま — .rail (円+矢印) を .stepBody
+   (テキスト) と同じ高さまで伸ばすことで, 円がテキストの縦方向中央に来て,
+   矢印も円の縁から次の円の縁まで隙間なく届くようにしている (詳細は
+   TransactionProcedureTimeline.tsx のコメントを参照) */
+.step {
+  display: flex;
+  gap: 12px;
+}
+
+/* 円+矢印を縦に並べる列. 常に固定幅 (CIRCLE_SIZE=30px, 最大の円に合わせる) —
+   幅を可変にすると行ごとに .rail の実効幅が変わり, 円の中心が横にずれる
+   不具合になっていました */
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 30px;
+}
+
+/* サイズは固定 (30px, 最大の円に合わせる) — 中のアイコンは16/24/30pxと
+   可変だが, ボックス自体を固定サイズにすることで .rail の中央寄せが
+   常に同じ横位置になる (縦方向は rail 内の flex: 1 1 auto なスペーサー/矢印
+   2つが円を挟んで均等に伸びることで中央に来る) */
+.circle {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+/* 未完了の手順は円のみ (色は overlay1, 塗りつぶし無し) */
+.circleIncomplete {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: var(--borderWidth-thin) solid var(--color-overlay1);
+  border-radius: 999px;
+}
+
+.circleCompleted {
+  color: var(--color-status-green);
+}
+
+.circleDenied {
+  color: var(--color-status-red);
+}
+
+/* 直近 (最後に完了した手順) より前の完了済の手順 — 「最後の完了のチェック
+   マーク以外は subtext0 色に, 大きさも24pxに」という依頼のため, 色 (このクラス)
+   もサイズ (TransactionProcedureTimeline.tsx 側で size={24} を指定) も控えめにする.
+   通常/否認いずれの完了済チェックマークもこの1色に統一している (過去の手順は
+   もう「結果の種類」を強調する必要が無いため) */
+.circleMuted {
+  color: var(--color-body-subtext0);
+}
+
+.stepBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+}
+
+.label {
+  color: var(--color-body-headline);
+  font-weight: 700;
+}
+
+/* circleMuted と同じ対象 (直近より前の完了済の手順) にだけ適用する */
+.labelMuted {
+  color: var(--color-body-subtext0);
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+}
+
+.metaMuted {
+  color: var(--color-body-subtext0);
+}
+
+/* チェックマーク同士を, 汎用の矢印アイコンではなく縦線+CSSで描いた矢頭
+   (.connectorArrowhead) で繋ぐ. 1本の矢印を隣り合う2行 (前の行の「次への
+   矢印」= 線のみ, 次の行の「前からの矢印」= 線+矢頭) に分けて描画しており,
+   行同士に隙間が無いため見た目には1本の連続した矢印になる. 既定 (直近の
+   手順に繋がる矢印ではない場合) は overlay1 — 直近の手順に繋がる矢印だけ
+   subtext0 (「最近のチェックマークに伸びる矢印もsubtext0色にしてほしい」
+   という依頼のため, 当初の緑/赤から変更) にしている.
+   flex-basis は auto ではなく 0 にしている — 矢頭が付く側 (前の円からの矢印)
+   は矢頭の高さ (5px) の分だけ auto だと初期サイズが大きくなり, 矢頭の無い側
+   (次の円への矢印) との間で最終的な高さが5px分ずれてしまう (結果として円の
+   中心が本来の位置から2.5pxずれる不具合になっていました). basis: 0 にして
+   純粋に flex-grow の比率 (どちらも1) だけで分配することで, 矢頭の有無に
+   関わらず前後が正確に半分ずつになる */
+.connector {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-overlay1);
+}
+
+/* 最初/最後の手順には矢印が無いが, それでも円を rail の縦方向中央に
+   来させるため, 同じ flex: 1 1 0 の透明なスペーサーを代わりに置く */
+.connectorSpacer {
+  flex: 1 1 0;
+}
+
+.connectorLine {
+  flex: 1 1 auto;
+  width: var(--borderWidth-thin);
+  background: currentcolor;
+}
+
+.connectorArrowhead {
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border-width: 5px 4px 0;
+  border-style: solid;
+  border-color: currentcolor transparent transparent;
+}
+
+.connectorMuted {
+  color: var(--color-body-subtext0);
+}

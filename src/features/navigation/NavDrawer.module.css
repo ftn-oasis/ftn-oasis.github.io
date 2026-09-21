@@ -28,6 +28,11 @@
   gap: 2px;
   padding: 8px;
   background: var(--color-header-background);
+
+  /* ヘッダーのパンくず (Breadcrumb.module.css) と同じ文字サイズに揃える.
+     menuItemBase.root/.closeButton/.reportButton はいずれも font: inherit
+     (または相対単位) のため, ここでカスケードするだけで反映される */
+  font-size: 0.9rem;
   border-right: 1px solid var(--color-border);
   border-radius: 0 8px 8px 0;
   transform: translateX(-100%);
@@ -58,7 +63,7 @@
   height: 35px;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--borderRadius-medium);
   background: transparent;
   color: var(--color-header-body);
   cursor: pointer;
@@ -78,8 +83,29 @@
   outline-offset: -2px;
 }
 
-.spacer {
-  flex: 1 0 auto;
+/* 直近で編集した文書一覧. 「問題を報告」を最下部に押し出す役割 (以前の
+   .spacer) を引き継ぎつつ, 残りの縦幅に応じて入りきる分だけ表示する —
+   .drawer 自体は overflow: hidden auto (縦スクロール可能) だが, ここは
+   min-height: 0 + overflow: hidden で自身の中身だけをクリップし, スクロール
+   ではなく単純に「画面に収まる限り」表示する挙動にしている */
+.recentDocuments {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 長い "組織名/文書名" が折り返さず, はみ出した部分は3点リーダで見切れて
+   いることが判るようにする (アイコンをアバターに変えた際に追加した挙動).
+   flex item がデフォルトで持つ min-width: auto (中身の幅ぶん縮まない) を
+   min-width: 0 で打ち消さないと, ellipsis が効かず親からはみ出してしまう */
+.recentDocumentLabel {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 「問題を報告」: 最下部固定・本文より2pxほど小さいフォント */

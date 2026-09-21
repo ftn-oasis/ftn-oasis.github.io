@@ -1,0 +1,8 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  /* ヘッダーのパンくずと同じ文字サイズに揃える (他のサイドバーと同じ) */
+  font-size: 0.9rem;
+}

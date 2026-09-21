@@ -1,0 +1,77 @@
+/* 選択中の側 (.indicator) は「押し込まれた track の上に浮かぶボタン」に見えるよう,
+   外枠 (.root) を surface0 の少し沈んだトーンにし, .indicator 自体は独立した
+   ボタンのように border/background/影を持たせている */
+.root {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 0;
+  padding: 3px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-surface0);
+}
+
+/* 選択中を示すボタン型のオーバーレイ. 左側 (カレンダー) を既定位置とし,
+   リスト選択時に translateX でスライドする */
+.indicator {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: calc(var(--borderRadius-medium) - 2px);
+  background: var(--color-background);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
+  transition: transform 0.15s ease;
+}
+
+.indicatorList {
+  transform: translateX(34px);
+}
+
+.button {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+/* aria-label をツールチップとして表示する (controlBase.module.css/
+   calendarNavGroup.module.css の .tooltip と同じ仕組み) */
+.button::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--color-hover-body);
+  background: var(--color-hover-background);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.05s ease;
+}
+
+.button:hover::after,
+.button:focus-visible::after {
+  opacity: 1;
+}

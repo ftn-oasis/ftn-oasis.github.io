@@ -1,0 +1,168 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.yearMonth {
+  color: var(--color-body-headline);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* border/border-radius は持たない — calendarNavGroup.module.css の .root
+   (外枠) + .item (区切り線) がそれを担う. border は指定しない (MiniCalendar の
+   同種のボタンと同じ理由 — `border: none;` を書くと import 順序の都合で
+   .item の border-left を上書きしてしまい, 区切り線が消える不具合になります) */
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+}
+
+.navButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.todayButton {
+  height: 32px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--color-body-body);
+  cursor: pointer;
+  font: inherit;
+}
+
+.todayButton:hover {
+  background: var(--color-body-button-hover);
+}
+
+.todayButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.weekdayRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 4px 0;
+}
+
+.weekday {
+  color: var(--color-body-subtext);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* gap 1px + 背景色 (--color-border) で, セル間に細い罫線があるように見せている.
+   overflow: hidden は使わない (日付セル内のカードがホバー時に表示するポップオーバー
+   が, セルからはみ出た途端に切り取られてしまうため) — 代わりに4隅のセルにだけ
+   border-radius を個別に指定して, 見た目の角丸を再現している.
+   grid-template-rows は 2fr 1fr — 「上の週はその次の週の2倍程度の幅を取る」
+   という依頼のため, 上段 (今週) を下段 (次週) の2倍の比率にしている */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 2fr 1fr;
+  gap: var(--borderWidth-thin);
+
+  /* JS で inline style として設定する height (MeetingCalendarView.tsx) を
+     border 込みの実際の見た目のサイズと一致させるため */
+  box-sizing: border-box;
+  border: var(--borderWidth-thin) solid var(--color-border);
+  border-radius: var(--borderRadius-medium);
+  background: var(--color-border);
+}
+
+/* min-width: 0 が無いと, CSS Grid の既定 (グリッドアイテムの自動最小サイズは
+   中身の min-content 幅) により, カード内の長い文字列がその日の列を押し広げて
+   しまう — 「大カードの内容によってカレンダーの日の幅を変更しないでほしい」
+   という依頼の原因がこれで, テキストの省略記号 (.dayMeetings/各カード側で
+   overflow: hidden 済み) を実際に効かせるためにもこの指定が要る */
+.dayCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 6px;
+  background: var(--color-background);
+}
+
+/* 上段 (今週)/下段 (次週) で min-height を 2:1 の比率にし, grid-template-rows
+   の 2fr 1fr と揃える — 上段のカードは expanded 表示 (MeetingCalendarCard) の
+   分だけ元々余計に高さを必要とするため, min-height でも下限を保証している */
+.dayCellTopRow {
+  min-height: 200px;
+}
+
+.dayCellBottomRow {
+  min-height: 100px;
+}
+
+/* 休日 (土日) の欄はトーンを落とす — MiniCalendar の土日文字色と同じ考え方だが,
+   こちらはセル自体の背景を沈める (メインの週表示では文字色だけだと目立ちにくいため) */
+.dayCellWeekend {
+  background: var(--color-secondary1);
+}
+
+.dayCell:nth-child(1) {
+  border-top-left-radius: var(--borderRadius-medium);
+}
+
+.dayCell:nth-child(7) {
+  border-top-right-radius: var(--borderRadius-medium);
+}
+
+.dayCell:nth-child(8) {
+  border-bottom-left-radius: var(--borderRadius-medium);
+}
+
+.dayCell:nth-child(14) {
+  border-bottom-right-radius: var(--borderRadius-medium);
+}
+
+/* 見出しと異なる月の日付は "MM/DD" (formatMonthDay@calendarUtils.ts) で
+   表示するため, 固定の正円ではなく min-width + 横 padding のピル形状にしている
+   — 通常の日数字 (1-2桁) は今まで通り実質的に円に見える */
+.dayNumber {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  color: var(--color-body-body);
+  font-size: 0.875rem;
+}
+
+.dayNumberToday {
+  background: var(--color-link);
+  color: var(--color-background);
+  font-weight: 700;
+}
+
+.dayMeetings {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}

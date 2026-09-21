@@ -2,8 +2,15 @@
   flex: none;
   object-fit: cover;
   aspect-ratio: 1;
+  border: var(--borderWidth-thin) solid var(--color-border);
+}
+
+.circle {
   border-radius: 50%;
-  border: 1px solid var(--color-border);
+}
+
+.square {
+  border-radius: var(--borderRadius-medium);
 }
 
 .small {
@@ -15,5 +22,5 @@
 }
 
 .large {
-  width: 300px;
+  width: 50px;
 }
